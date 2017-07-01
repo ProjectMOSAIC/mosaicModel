@@ -31,5 +31,5 @@
 #' 
 #' @examples
 #' mod_1 <- lm(Cost ~ Age + Coverage, data = AARP)
-#' effect_size(mod_1, ~ Coverage)
+#' mod_effect_size(mod_1, ~ Coverage)
 "AARP"

@@ -33,7 +33,7 @@ e.g. \code{post_transform = c(price = exp)} to undo a log transformation of pric
 Currently, this is the same as \code{mod_plot}. I think the
 name \code{gf_model} makes more sense, and I want to be able to add
 additional functionality (such as including data points on the plot) 
-without breaking fmodel.
+without breaking \code{\link{mod_plot}}.
 }
 \details{
 #' Plot out model values
@@ -45,22 +45,22 @@ to be a data frame with the cases you want to plot.
 \examples{
 \dontrun{
 mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
-fmodel(mod1)
-fmodel(mod1, ~ sector + sex + age) # not necessarily a good ordering
+mod_plot(mod1)
+mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 # show the data used for fitting along with the model
-fmodel(mod1, ~ age + sex + sector, nlevels = 8) + 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
   ggplot2::geom_point(data = mosaicData::CPS85, alpha = 0.1)
 require(ggplot2)
-fmodel(mod1, ~ age + sex + sector, nlevels = 8) + 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
   geom_point(data = mosaicData::CPS85, alpha = 0.1) +
   ylim(0, 20)
 mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
-fmodel(mod2, post_transform = c(wage = exp)) # undo the log in the display
+mod_plot(mod2, post_transform = c(wage = exp)) # undo the log in the display
 mod3 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
-fmodel(mod3, type = "response")
+mod_plot(mod3, type = "response")
 # Adding the raw data requires an as.numeric() trick when it's TRUE/FALSE
-fmodel(mod3, ~ age + sex + sector, nlevels = 10, type = "response") + 
+mod_plot(mod3, ~ age + sex + sector, nlevels = 10, type = "response") + 
   geom_point(data = mosaicData::CPS85, 
   aes(x = age, y = as.numeric(married == "Married")), alpha = .1)
 }

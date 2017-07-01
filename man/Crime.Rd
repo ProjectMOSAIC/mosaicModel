@@ -29,9 +29,9 @@ case corresponds to a state in the US.
 mod_1 <- lm(R ~ W, data = Crime)
 mod_2 <- lm(R ~ X, data = Crime)
 mod_3 <- lm(R ~ W + X, data = Crime)
-effect_size(mod_1, ~ W)
-effect_size(mod_3, ~ W)
-effect_size(mod_2, ~ X)
-effect_size(mod_3, ~ X)
+mod_effect_size(mod_1, ~ W)
+mod_effect_size(mod_3, ~ W)
+mod_effect_size(mod_2, ~ X)
+mod_effect_size(mod_3, ~ X)
 }
 \keyword{datasets}
