@@ -30,14 +30,14 @@
 #'
 #' @examples
 #' mod1 <- lm(wage ~ age * sex * educ + sector, data = mosaicData::CPS85)
-#' mod_effect_size(mod1, ~ sex)
-#' mod_effect_size(mod1, ~ sector)
-#' mod_effect_size(mod1, ~ age, sex = "M", educ = c(10, 12, 16), age = c(30, 40))
-#' mod_effect_size(mod1, ~ age, sex = "F", age = 34, step = 1)
-#' mod_effect_size(mod1, ~ sex, age = 35, sex = "M", to = "F" )
+#' mod_effect(mod1, ~ sex)
+#' mod_effect(mod1, ~ sector)
+#' mod_effect(mod1, ~ age, sex = "M", educ = c(10, 12, 16), age = c(30, 40))
+#' mod_effect(mod1, ~ age, sex = "F", age = 34, step = 1)
+#' mod_effect(mod1, ~ sex, age = 35, sex = "M", to = "F" )
 
 #' @export
-mod_effect_size <- function(model, formula, step = NULL, 
+mod_effect <- function(model, formula, step = NULL, 
                         bootstrap = FALSE, to = step, data = NULL, at = NULL, ... ) {
   dots <- handle_dots_as_variables(model, ...)
   inline_vals <- dots$at

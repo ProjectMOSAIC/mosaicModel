@@ -23,7 +23,7 @@
 #' for compatibility purposes with other software under development.)  
 #' 
 #' @export 
-cv_pred_error <- function(..., k = 10, ntrials = 5, 
+mod_cv <- function(..., k = 10, ntrials = 5, 
                      output = c("mse", "likelihood", "error_rate", "class")) {
   output <- match.arg(output)
   

@@ -1,12 +1,17 @@
 Package: mosaicModel
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Provide a consistent interface to a range of statistical model architectures.
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Kaplan Daniel [aut, cre],
+  Pruim Randall [aut, cre]
+Maintainer: Daniel Kaplan <kaplan@macalester.edu>
+Description: Provides functions for training, evaluating, and interpreting a range of statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
+LazyData: TRUE
+LazyLoad: TRUE
 RoxygenNote: 6.0.1
+Depends: R (>= 3.1), ggplot2
+Suggests: mosaic, dplyr, mosaicData, magrittr
+VignetteBuilder: knitr
+   

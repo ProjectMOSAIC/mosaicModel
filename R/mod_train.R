@@ -12,7 +12,7 @@
 #' @param formula the formula describing the structure of the relationship among variables 
 #' @param architecture the model architecture, given as a function name, quoted or not, e.g. lm or "lm"
 #' 
-train <- function(data, formula = formula(data), architecture = "lm") {
+mod_train <- function(data, formula = formula(data), architecture = "lm") {
  
 }
 
