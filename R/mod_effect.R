@@ -123,7 +123,7 @@ mod_effect <- function(model, formula, step = NULL,
 
   if ( ! ensemble_flag && bootstrap) {
     if (is.logical(bootstrap)) bootstrap = 100  # set the default
-    model <- ensemble(model, bootstrap)
+    model <- mod_ensemble(model, bootstrap)
     Bootstrap_reps <- mod_effect_size(model, formula, at = at, step = step, to = to, data = data, ...)
     # find the sd for each set of replications
     set_number <- rep(1:(nrow(Bootstrap_reps) / bootstrap), length_out = nrow(Bootstrap_reps))
