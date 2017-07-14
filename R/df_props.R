@@ -29,9 +29,10 @@ df_props <- function (formula, data, as.percent = FALSE, ...,
                       wide = FALSE, margins = FALSE, format = c("proportion", "percent", "count")) 
 {
   if (inherits(formula, "data.frame") && inherits(data, "formula")) {
-    Tmp <- data
+    # switched at birth. Likely because input is piped in
+    tmp <- data
     data <- formula
-    formula <- Tmp
+    formula <- tmp
   }
   if (margins & !wide) {
     wide <- TRUE

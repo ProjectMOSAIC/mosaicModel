@@ -32,3 +32,11 @@ Using \code{|} in the formula specifies a conditional proportion
 \item A ~ B: another way of specifying the conditional proportion
 }
 }
+\examples{
+mtcars \%>\% df_props( ~ cyl + gear) 
+mtcars \%>\% df_props( ~ cyl | gear)
+mtcars \%>\% df_props( ~ cyl + gear, wide = TRUE)
+mtcars \%>\% df_props( ~ cyl + gear, margins = TRUE)
+mtcars \%>\% df_props( ~ cyl | gear, margins = TRUE)
+
+}
