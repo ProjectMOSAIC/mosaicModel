@@ -12,7 +12,7 @@ mod_cv(..., k = 10, ntrials = 5, output = c("mse", "likelihood",
 
 \item{k}{the k in k-fold. cross-validation will use k-1/k of the data for training.}
 
-\item{ntrials}{how many random partitions to make. Each partition will be one case in the 
+\item{ntrials}{how many random partitions to make. Each partition will be one case in the
 output of the function}
 
 \item{output}{The kind of output to produce from each cross-validation. See details.}
@@ -21,19 +21,19 @@ output of the function}
 Compare models with k-fold cross-validation
 }
 \details{
-The purpose of cross-validation is to provide "new" data on which to test a model's 
-performance. In k-fold cross-validation, the data set used to train the model is broken into 
-new training and testing data. This is accomplished simply by using most of the data for training while 
+The purpose of cross-validation is to provide "new" data on which to test a model's
+performance. In k-fold cross-validation, the data set used to train the model is broken into
+new training and testing data. This is accomplished simply by using most of the data for training while
 reserving the remaining data for evaluating the model: testing. Rather than training a single model, k models
 are trained, each with its own particular testing set. The testing sets in the k models are arranged to cover the
-whole of the data set. On each of the k testing sets, a performance output is calculated. Which output is 
-most appropriate depends on the kind of model: regression model or classifier. The most basic measure is the mean square error: the 
-difference between the actual response variable in the testing data and the output of the model 
+whole of the data set. On each of the k testing sets, a performance output is calculated. Which output is
+most appropriate depends on the kind of model: regression model or classifier. The most basic measure is the mean square error: the
+difference between the actual response variable in the testing data and the output of the model
 when presented with inputs from the testing data. This is appropriate in many regression models.
 
 For classification models, two different outputs are appropriate. The first is the error rate: the frequency
-with which the classifier produces an incorrect output when presented with inputs from the testing data. This 
+with which the classifier produces an incorrect output when presented with inputs from the testing data. This
 is a rather course measure. A more graded measure is the likelihood: the probability of the response values
-from the test data given the model. (The "class" method is exactly the same as "error rate", but provided 
+from the test data given the model. (The "class" method is exactly the same as "error rate", but provided
 for compatibility purposes with other software under development.)
 }

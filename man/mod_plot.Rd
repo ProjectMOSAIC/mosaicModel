@@ -17,14 +17,14 @@ mod_plot(model = NULL, formula = NULL, data = NULL, nlevels = 3,
 
 \item{nlevels}{how many levels to display for those variables shown at discrete levels}
 
-\item{at}{named list giving specific values at which to hold the variables. You can accomplish 
+\item{at}{named list giving specific values at which to hold the variables. You can accomplish
 this without forming a list by using \code{...}. See examples.}
 
 \item{prob_of}{if to show probability of a given level of the output, name the class here as a character string.}
 
 \item{intervals}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
 
-\item{post_transform}{a scalar transformation and new name for the response variable, 
+\item{post_transform}{a scalar transformation and new name for the response variable,
 e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
 
 \item{...}{specific values for explantory variables and/or arguments to predict()}
@@ -33,8 +33,8 @@ e.g. \code{post_transform = c(price = exp)} to undo a log transformation of pric
 Plot out model values
 }
 \details{
-Often you will want to show some data along with the model functions. 
-You can do this with `ggplot2::geom_point()` making sure to set the \code{data} argument
+Often you will want to show some data along with the model functions.
+You can do this with \code{ggplot2::geom_point()} making sure to set the \code{data} argument
 to be a data frame with the cases you want to plot.
 }
 \examples{

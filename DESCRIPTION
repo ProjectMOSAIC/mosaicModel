@@ -14,4 +14,5 @@ RoxygenNote: 6.0.1
 Depends: R (>= 3.1), ggplot2
 Suggests: mosaic, dplyr, mosaicData, magrittr, splines
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
    

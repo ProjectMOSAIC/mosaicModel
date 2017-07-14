@@ -9,7 +9,7 @@
 \item LAND. landscape, floodplain vs. upland.
 \item SAMPPER. sampling period: early, mid, late
 \item SPECIES. host species, Alnus tenuifolia (AT) vs. A. crispa (AC)
-\item STAGE.  successional stage, early vs. late in 
+\item STAGE.  successional stage, early vs. late in
 floodplain and upland landscapes. This is not equivalent across landscapes.
 \item JULDAY. Julian day
 \item PERNODN. nodule percent nitrogen by mass
@@ -22,10 +22,10 @@ floodplain and upland landscapes. This is not equivalent across landscapes.
 \item DEL. del15N of leaf tissue
 \item DELNOD. del15N of nodule tissue
 \item NPERAREA. leaf nitrogen content per unit leaf area
-\item NDiff. nitrogen content difference between leaf and nodule 
+\item NDiff. nitrogen content difference between leaf and nodule
 of the same plant
 \item delDiff. del15N difference between leaf and nodule of the same plant
-\item SITE. Site designations: 1A,B,C for replicate early succession floodplain sites, 4A,B,C for late succession floodplain, UP1A,B,C 
+\item SITE. Site designations: 1A,B,C for replicate early succession floodplain sites, 4A,B,C for late succession floodplain, UP1A,B,C
 for early succession upland and UP3A,B,C for late succession upland
 \item HABSPEC. habitat+species, concatenated LAND, STAGE, SPECIES
 \item SITESPEC. concatenated SITE, SPECIES
@@ -45,12 +45,12 @@ bushes.
 }
 \details{
 Two questions that Anderson wanted to answer are:
-(1) Can any variation in nitrogen fixation (variable \code{SNF}) 
-be attributed to genotype (variable \code{RF})? (2) What are 
+(1) Can any variation in nitrogen fixation (variable \code{SNF})
+be attributed to genotype (variable \code{RF})? (2) What are
 the major sources of variation in \code{SNF} and
-\code{PERLEAFN}? Variables of biological interest are 
-seasonality (\code{SAMPPER} or \code{JULDAY}), 
-soil temperature and moisture, and habitat differences (\code{STAGE} for 
+\code{PERLEAFN}? Variables of biological interest are
+seasonality (\code{SAMPPER} or \code{JULDAY}),
+soil temperature and moisture, and habitat differences (\code{STAGE} for
 host species AT and\code{STAGE} and \code{LAND} for host species AC).
 
 Three replicate sites were sampled for each landscape/stage combination in three sampling periods across the growing season. Site sampling was arranged in a Latin Square design in order to systematize any effects of seasonality on N2-fixation rates.
@@ -59,8 +59,8 @@ Three replicate sites were sampled for each landscape/stage combination in three
 mod <- lm(logSNF ~ RF + SITESPEC, data = Alder)
 }
 \references{
-Anderson MD, Ruess RW, Myrold DD, Taylor DL. 
-``Host species and habitat affect modulation by specific 
+Anderson MD, Ruess RW, Myrold DD, Taylor DL.
+``Host species and habitat affect modulation by specific
 Frankia genotypes in interior Alaska''  Oecologia (2009) 160:619-630.
 }
 \keyword{datasets}

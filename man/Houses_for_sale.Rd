@@ -9,13 +9,13 @@
 data(Houses_for_sale)
 }
 \description{
-A random sample of 1,728 homes taken from public records 
-from the Saratoga County 
+A random sample of 1,728 homes taken from public records
+from the Saratoga County
 (http://www.saratogacountyny.gov/departments/real-property-tax-service-agency/).
 Collected by Candice Corvetti (Williams College '07) for her senior thesis.
 }
 \details{
-These data are part of a case study developed by Prof. Dick de Veaux at 
+These data are part of a case study developed by Prof. Dick de Veaux at
 Williams. They are available from the American Statistical Association's \href{http://community.amstat.org/stats101/home}{Stat 101} collection
 of case studies and included in this package for convenience.
 }

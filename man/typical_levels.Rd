@@ -14,23 +14,23 @@ typical_levels(model = NULL, data = NULL, nlevels = 3, at = list(), ...)
 \item{nlevels}{how many levels to construct for input variables.
 For quantitative variables, this is a suggestion. \code{pretty()} will determine}
 
-\item{at}{named list giving specific values at which to hold the variables. Use this to 
+\item{at}{named list giving specific values at which to hold the variables. Use this to
 override the automatic generation of levels for any or all explanatory variables.}
 
 \item{...}{a more concise mechanism to passing desired values for variables}
 }
 \value{
-A dataframe containing all combinations of the selected values for 
-the explanatory variables. If there are p explanatory variables, 
+A dataframe containing all combinations of the selected values for
+the explanatory variables. If there are p explanatory variables,
 there will be about \code{nlevels^p} cases.
 }
 \description{
-This function tries to choose sensible values of the explanatory variables 
-from the data used to build a model or any other specified data. 
+This function tries to choose sensible values of the explanatory variables
+from the data used to build a model or any other specified data.
 (or from data specified with the \code{data =} argument.)
 }
 \details{
-For categorical variables, the most populated levels are used. For quantitative 
+For categorical variables, the most populated levels are used. For quantitative
 variables, a sequence of \code{pretty()} values is generated.
 }
 \examples{

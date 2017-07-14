@@ -9,7 +9,7 @@
 data(NCI60_snippet)
 }
 \description{
-The data come from a National Cancer Institute study of gene expression in cell lines 
+The data come from a National Cancer Institute study of gene expression in cell lines
 drawn from various sorts of cancer. Each row corresponds to a different cell line. The type
 of cancer is identified by the first two or three letters of the row names, e.g. CO is colon, ME is melanoma, RE is kidney.
 }

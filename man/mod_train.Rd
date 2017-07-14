@@ -15,10 +15,12 @@ mod_train(data, formula = formula(data), architecture = "lm")
 }
 \description{
 This function coordinates four components in building statistical models:
-1) the data to use for training
-2) the response variable and
-3) the explanatory variables, specified as a model formula
-4) the architecture of the model.
+\enumerate{
+\item the data to use for training
+\item the response variable and
+\item the explanatory variables, specified as a model formula
+\item the architecture of the model.
+}
 }
 \details{
 This is a light wrapper on the architecture-specific function fitting programs

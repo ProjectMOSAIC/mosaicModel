@@ -27,28 +27,28 @@ the evaluation will occur at all combinations of the various levels.}
 }
 \value{
 A dataframe containing both the explanatory variable inputs and
-the resulting model output (in the `model_value` field). This differs from the output
+the resulting model output (in the \code{model_value} field). This differs from the output
 of \code{predict()}, which for many model classes/architectures may be a vector or matrix.
 
 A data frame containing both the inputs to the model and the corresponding outputs.
 }
 \description{
-Find the model outputs for specified inputs. This is equivalent to the 
+Find the model outputs for specified inputs. This is equivalent to the
 generic \code{predict()} function, except it will choose sensible values
 by default.  This simplifies getting a quick look at model values.
 }
 \details{
 There are four distinct ways to specify the values at which the model is to be evaluated.
-(1) Look for some "typical values" in the data to create a handful of inputs. This is useful for 
+(1) Look for some "typical values" in the data to create a handful of inputs. This is useful for
 getting a quick look at what the output of the model looks like. This is the default behavior. (2) Using \code{data =} to a dataframe containing the explanatory variables will evaluate the model
-at all of the cases contained in that dataframe. (3) Setting input variables explicitly by using 
-arguments of the form var_name = values, e.g. `sex = "F"`. If not all input variables are specified in 
+at all of the cases contained in that dataframe. (3) Setting input variables explicitly by using
+arguments of the form var_name = values, e.g. \code{sex = "F"}. If not all input variables are specified in
 this way, the ones that are not will have values set per (1). All combinations of the various variables
 will be created. See the \code{nlevels} argument. (4) Evaluating the model on the training data.
 There are two ways to do this. The first is
 to set the \code{data} argument to the same data frame used to train the model. The second
 is to use the \code{on_training = TRUE} argument. These are equivalent unless there is
-some random component among the explanatory terms, as with `mosaic::rand()`, `mosaic::shuffle()` and so on.
+some random component among the explanatory terms, as with \code{mosaic::rand()}, \code{mosaic::shuffle()} and so on.
 }
 \examples{
 \dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
