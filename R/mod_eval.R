@@ -79,18 +79,25 @@ mod_eval <- function(model = NULL, data = NULL, on_training = FALSE, append = TR
       }
     }
   
+  # need a more sophisticated model than this, but for now ...
+  predfun <- predict
+  if (inherits(model, "gam")) predfun <- predict.glm
+  # then add others for the sorts of model types where predict() has
+  # a nasty interface
+  
   model_vals <- 
     if (on_training) { 
-      do.call(predict, c(list(model), extras))
+      do.call(predfun, c(list(model), extras))
     } else {
-        do.call(predict,c(list(model, newdata = eval_levels), extras))
+        do.call(predfun,c(list(model, newdata = eval_levels), extras))
     }
   
-  if (append) output <- eval_levels
-  else output = NULL
+  if (append) {
+    output <- eval_levels
+    output$model_output <- model_vals
+  }
+  else output = data.frame(model_output = model_vals) 
     
-  output$model_output <- model_vals
-
   output
 }
 
