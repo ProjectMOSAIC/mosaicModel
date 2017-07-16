@@ -4,11 +4,13 @@
 \alias{mod_error}
 \title{Mean square prediction error}
 \usage{
-mod_error(model, testdata, LL = TRUE)
+mod_error(model, testdata, SS = FALSE, LL = TRUE)
 }
 \arguments{
 \item{testdata}{A data frame giving both model inputs and the actual value of the response
 variable. If no testing data is provided, the training data will be used and a warning issued.}
+
+\item{SS}{Flag to have output be the sum of square errors.}
 
 \item{LL}{Flag to calculate log likelihood when the response variable is categorical.}
 

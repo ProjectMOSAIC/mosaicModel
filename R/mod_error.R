@@ -10,6 +10,7 @@
 #' @param mod The model whose prediction error is to be estimated.
 #' @param testdata A data frame giving both model inputs and the actual value of the response
 #' variable. If no testing data is provided, the training data will be used and a warning issued.
+#' @param SS Flag to have output be the sum of square errors.
 #' @param LL Flag to calculate log likelihood when the response variable is categorical. 
 #' 
 #' @details When the response variable is categorical, the model 
@@ -41,7 +42,7 @@
 #' mod_error(classifier, testdata = Testing, LL = FALSE)
 #' }
 #' @export
-mod_error <- function(model, testdata, LL = TRUE) {
+mod_error <- function(model, testdata, SS = FALSE, LL = TRUE) {
   if (missing(testdata)) {
     testdata <- data_from_model(model)
     warning("Calculating error from training data.")
@@ -52,7 +53,8 @@ mod_error <- function(model, testdata, LL = TRUE) {
   actual <- eval(parse(text = mosaicModel:::response_var(model)), envir = testdata)
   model_vals <- mod_eval(model, data = testdata, append = FALSE)
   if (is.numeric(actual)) {
-    res <- base::mean((actual - model_vals)^2, na.rm = TRUE)
+    fun <- ifelse(SS, base::sum, base::mean)
+    res <- fun((actual - model_vals)^2, na.rm = TRUE)
   }
   else {
     probs <- p_of_actual(model_vals, actual)
