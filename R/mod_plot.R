@@ -1,6 +1,7 @@
 #' Plot out model values
 #'
-#' @param model the model to display graphically
+#' @param model the model to display graphically. 
+#' Can also be an ensemble produced with `mod_ensemble()`
 #' @param formula setting the y ~ x + color variables
 #' @param data optional data set from which to extract levels for explanatory variables
 #' @param nlevels how many levels to display for those variables shown at discrete levels
@@ -43,14 +44,17 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
                    nlevels = 3, at = list(), prob_of = NULL,
                    intervals = c("none", "confidence", "prediction"),
                    post_transform = NULL, ...) {
+  
+  # Deal with the arguments
   dots <- handle_dots_as_variables(model, ...)
   extras <- dots$extras
   inline_values <- dots$at
-  # Override the values in <at> with any set as inline arguments.
+      # Override the values in <at> with any set as inline arguments.
   at[names(inline_values)] <- NULL
   at <- c(at, inline_values)
   intervals <- match.arg(intervals)
   
+  # Can we plot this model
   if (is.null(model)) {
     stop("Must provide a model for graphing.")
   } else if (inherits(model, 
@@ -63,14 +67,18 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   if( inherits(model, "gbm")) stop("gbm models still not working.")
 
   # If data not explicitly provided, get from model
-  if (is.null(data)) data <- data_from_model(model)
+  levels_data <- 
+    if (is.null(data)) data_from_model(model) else data
   
   # try to figure out what are the possible levels of variables
   response_var_name <- response_var(model)
   # is the response categorical?  If so, plot the probability of the given level
   response_values <- 
-    if (response_var_name %in% names(data)) {data[[response_var_name]]}
-    else {eval(parse(text = response_var_name), envir = data)}
+    if (response_var_name %in% names(data)) {levels_data[[response_var_name]]}
+    else {eval(parse(text = response_var_name), envir = levels_data)}
+  
+  # if response is categorical, arrange to plot the probability of a
+  # specified level, or if none is specfied, the most common level
   if (! inherits(response_values, c("numeric", "logical"))) {
     # It's categorical
     if (is.null(prob_of)) 
@@ -79,7 +87,8 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
       stop("Level '", prob_of, "' doesn't exist in the response variable.")
     response_var <- prob_of
   }
-
+  
+  # Pick out the variables to be displayed, and their roles
   explan_vars <- explanatory_vars(model)
   if (is.null(formula)) show_vars <- explan_vars
   else show_vars <- all.vars(mosaic::rhs(formula))
@@ -95,7 +104,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   # then nlevels for the remaining ones.
   how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
   names(how_many) <- show_vars
-  eval_levels <- reference_values(data[explan_vars], n = how_many, at = at )
+  eval_levels <- reference_values(levels_data[explan_vars], n = how_many, at = at )
 
   # set up so that glms are plotted, by default, as the response rather than the link
   if (inherits(model, "glm") && ( ! "type" %in% names(extras))) {
@@ -105,34 +114,40 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
     warning("No intervals available for model type", class(model))
     intervals = "none"
   }
-  model_vals <- 
-    do.call(predict,c(list(model, newdata = eval_levels), 
-                      extras))
-  if (inherits(model, "rpart") && inherits(model_vals, c("data.frame", "matrix"))) {
-    # handle the matrix values from predict.rpart()
-    keepers <- colnames(model_vals) == prob_of
-    model_vals <- model_vals[,keepers] # just the first class
-  }
-  if ( ! is.null(post_transform)) model_vals <- post_transform[[1]](model_vals)
   
+  # Evaluate the model at the specified levels
+  eval_arguments <- c(list(model = model, data = eval_levels, append = FALSE), extras)
+  new_model_vals <- do.call(mod_eval, eval_arguments)
+  
+  # Need to replace this bit to correspond to use of mod_eval()
+  # model_vals <- 
+  #   do.call(predict,c(list(model, newdata = eval_levels), 
+  #                     extras))
+  # if (inherits(model, "rpart") && inherits(model_vals, c("data.frame", "matrix"))) {
+  #   # handle the matrix values from predict.rpart()
+  #   keepers <- colnames(model_vals) == prob_of
+  #   model_vals <- model_vals[,keepers] # just the first class
+  # }
+  # if ( ! is.null(post_transform)) model_vals <- post_transform[[1]](model_vals)
+  # 
   # get the confidence or prediction intervals
-  if (intervals == "none") {
-    # do nothing
-    Intervals <- NULL
-  } else {
-    if ( ! inherits(model, c("lm", "glm", "nls"))) {
-      warning("Intervals not yet available for models of class ", class(model))
-      Intervals <- NULL
-    } else {
-      Intervals <-
-        do.call(predict, c(list(model, newdata = eval_levels, interval = intervals)))
-      if ( ! is.null(post_transform)) {
-        the_transform <- post_transform[[1]]
-        for (k in 1:length(Intervals))
-          Intervals[[k]] <- the_transform(Intervals[[k]])
-      }
-    }
-  }
+  # if (intervals == "none") {
+  #   # do nothing
+  #   Intervals <- NULL
+  # } else {
+  #   if ( ! inherits(model, c("lm", "glm", "nls"))) {
+  #     warning("Intervals not yet available for models of class ", class(model))
+  #     Intervals <- NULL
+  #   } else {
+  #     Intervals <-
+  #       do.call(predict, c(list(model, newdata = eval_levels, interval = intervals)))
+  #     if ( ! is.null(post_transform)) {
+  #       the_transform <- post_transform[[1]]
+  #       for (k in 1:length(Intervals))
+  #         Intervals[[k]] <- the_transform(Intervals[[k]])
+  #     }
+  #   }
+  # }
 
   # convert any quantiles for numerical levels to discrete
   first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
@@ -181,8 +196,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
         alpha = 0.8)
     } else {
       P <- P + geom_point(
-        aes_string(color = show_vars[2], linetype = show_vars[2]), 
-        alpha = 0.8) +
+        aes_string(color = show_vars[2], linetype = show_vars[2]), alpha = 0.8) +
         geom_line(aes_string(group = show_vars[2], color = show_vars[2]), alpha = 0.8)
     }
   }

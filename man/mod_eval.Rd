@@ -4,16 +4,13 @@
 \alias{mod_eval}
 \title{Evaluate a model for specified inputs}
 \usage{
-mod_eval(model = NULL, data = NULL, on_training = FALSE, append = TRUE,
-  nlevels = 3, ...)
+mod_eval(model = NULL, data = NULL, append = TRUE, intervals = c("none",
+  "prediction", "confidence"), nlevels = 3, ..., on_training = FALSE)
 }
 \arguments{
 \item{model}{the model to display graphically}
 
 \item{data}{optional set of cases from which to extract levels for explanatory variables}
-
-\item{on_training}{flag whether to use the training data for evaluation. Only needed
-when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.}
 
 \item{append}{flag whether to include the inputs to the model along with the calculated
 model value in the output. Default: \code{TRUE}.}
@@ -24,6 +21,9 @@ For quantitative variables, this is a suggestion. \code{pretty()} will refine yo
 \item{...}{arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
 Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that
 the evaluation will occur at all combinations of the various levels.}
+
+\item{on_training}{flag whether to use the training data for evaluation. Only needed
+when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.}
 }
 \value{
 A dataframe containing both the explanatory variable inputs and

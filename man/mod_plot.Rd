@@ -9,7 +9,8 @@ mod_plot(model = NULL, formula = NULL, data = NULL, nlevels = 3,
   "prediction"), post_transform = NULL, ...)
 }
 \arguments{
-\item{model}{the model to display graphically}
+\item{model}{the model to display graphically.
+Can also be an ensemble produced with \code{mod_ensemble()}}
 
 \item{formula}{setting the y ~ x + color variables}
 

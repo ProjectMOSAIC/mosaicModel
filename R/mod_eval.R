@@ -48,11 +48,13 @@
 #' at = list(sex = "F"))
 #' }
 #' @export
-mod_eval <- function(model = NULL, data = NULL, on_training = FALSE, append = TRUE,
-                   nlevels = 3, ...) {
+mod_eval <- function(model = NULL, data = NULL, append = TRUE, intervals = c("none", "prediction", "confidence"),
+                   nlevels = 3, ..., on_training = FALSE) {
   dots <- handle_dots_as_variables(model, ...)
   extras <- dots$extras
   at <- dots$at
+  
+  intervals <- match.arg(intervals)
   # Override the values in <at> with any set as inline arguments.
   #at[names(inline_values)] <- NULL
   #at <- c(at, inline_values)
