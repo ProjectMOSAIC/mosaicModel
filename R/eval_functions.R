@@ -45,6 +45,23 @@ eval_linear <- function(model, data = NULL, interval = c("none", "confidence", "
 }
 
 #' @export
+eval_glm <- function(model, data = NULL, interval = c("none", "confidence")) {
+  if (!inherits(model, c("glm"))) 
+    stop("model not a recognized logistic type of model")
+  
+  link_type <- model[["family"]]
+  
+  fun <- switch(
+    link_type$link,
+    "identity", eval_lm,
+    "log", eval_poisson,
+    "logit", eval_logistic
+  )
+  
+  fun(model = model, data = data, interval = interval)
+}
+
+#' @export
 eval_logistic <- function(model, data = NULL, interval = c("none", "confidence")) {
   if (!inherits(model, c("glm"))) 
     stop("model not a recognized logistic type of model")
@@ -107,9 +124,48 @@ eval_poisson <- function(model, data = NULL, interval = c("none", "confidence"))
 
 #' @export
 eval_rpart <- function(model, data = NULL, interval = "none") {
+  if (!inherits(model, c("rpart"))) 
+    stop("model not a recognized rpart type of model")
+  
+  interval <- match.arg(interval)
+  
+  if (is.null(data)) data <- data_from_model(model) 
+  
+  if (model$method == "class") { # classifier
+    res <- as.data.frame(
+      predict(model, newdata = data, type = "prob" )
+    )
+  } else {
+    res <- as.data.frame(
+      predict(model, newdata = data)
+    )
+    names(res) <- "model_output"
+  }
+  
+  tibble::remove_rownames(res)
+}
 
-  # THIS IS WHERE YOU WERE WORKING. rpart doesn't have a facility for 
-  # computing intervals
+# the master list for the functions to evaluate models
+
+architectures <- tibble::tribble(
+  ~mod_class, ~eval_fun,
+  # the order matters
+  "glm",      eval_glm,
+  "lm",       eval_linear,
+  "rlm",      eval_linear,
+  "rpart",    eval_rpart,
+  "randomForest", eval_randomForest
+  
+)
+
+get_eval_function <- function(model) {
+  # find the ones that match
+  inds <- which(architectures$mod_class %in% class(model))
+  if (length(inds) == 0) 
+    stop("No mosaicModel evaluation function found for a model of class ", 
+         paste('"', class(model), '"', collapse = ", "))
+  # return the earliest one in the architecture list
+  architectures$eval_fun[min(inds)]
 }
 
 # YOU NEED TO TIE THIS BACK INTO mod_eval() 

@@ -46,5 +46,15 @@ test_that("poisson regression works", {
   outcome <- gl(3,1,9)
   treatment <- gl(3,3)
   d.AD <- data.frame(treatment, outcome, counts)
-  r5 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson())
+  m5 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson())
+  r1 <- eval_poisson(m5)
+  r2 <- eval_poisson(m5, interval = "confidence")
+  expect_true(sum(abs(r1$model_output[1:6] - c(21, 13.33333, 15.6667, 21, 13.3333, 15.666667))) < .01)
+})
+
+test_that("rpart regression works", {
+  mod1 <- rpart(mpg ~ ., data = mtcars)
+  mtcars$mileage <- cut(mtcars$mpg, c(5, 15, 25, 40))
+  mod2 <- rpart(mileage ~ . - mpg, data = mtcars)
+  
 })
