@@ -11,39 +11,34 @@
 #' the explanatory variables. If there are p explanatory variables, 
 #' there will be about \code{nlevels^p} cases.
 #'
-#' @param model the model to display graphically
 #' @param data optional data frame from which to extract levels for explanatory variables
 #' @param nlevels how many levels to construct for input variables.
-#' For quantitative variables, this is a suggestion. \code{pretty()} will determine 
+#' For quantitative variables, this is a suggestion. Set to `Inf` to get all levels 
+#' for categorical variables and 100 levels for quantitative variables.
 #' @param at named list giving specific values at which to hold the variables. Use this to 
 #' override the automatic generation of levels for any or all explanatory variables.
+#' @param model the model to display graphically
 #' @param ... a more concise mechanism to passing desired values for variables
 #'
+#' @details For categorical variables, will return the nlevels most popular levels, unless 
+#' the levels are specified explicitly in an argument.
+#'
 #' @examples
-#' \dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
-#' typical_levels(mod1)
-#' mod3 <- glm(married == "Married" ~ age + sex * sector,
-#'             data = mosaicData::CPS85, family = "binomial")
-#' typical_levels(mod3, nlevels = 2)
+#' \dontrun{
+#' df_typical(mosaicData::Galton, nlevels = 2, father = 70, mother = 68, nkids = 3)
+#' df_typical(mosaicData::Galton, nlevels = 2)
+#' mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
+#' df_typical(model = mod1, nlevels = 3)
 #' }
 #' @export
-typical_levels <- function(model=NULL, data = NULL, 
-                   nlevels = 3, at = list(), ...) {
+df_typical <- function(data = NULL,  
+                   nlevels = 3, at = list(), model=NULL, ...) {
   extras <- list(...)
-  if (is.null(model)) {
-    stop("Must provide a model to evaluate.")
-  } else if (inherits(model, 
-                      c("rpart", "glm", "lm", "groupwiseModel",
-                        "randomForest", "gbm"))) {
-    # nothing to do
-  } else {
-    stop("Model of type", class(model)[1], "not set up for evaluate_model().")
-  }
-  if( inherits(model, "gbm")) stop("gbm models still not working.")
-
-  explan_vars <- explanatory_vars(model)
+  at <- c(extras, at)
+  
   # try to figure out what are the possible levels of variables
-  if (is.null(data)) data <- data_from_model(model)
+  if ( (! is.null(model)) && is.null(data)) data <- data_from_model(model)
+  explan_vars <- if (! is.null(model)) explanatory_vars(model) else names(data)
 
   # Set a large number of levels for the first explanatory variable,
   # then nlevels for the remaining ones.

@@ -46,82 +46,105 @@ kfold_trial <- function(model,
 }
 
 # helper for reference levels
-get_range <- function(var_name, n, data) {
-  # get an appropriate set of levels
-  values <- eval(parse(text = var_name), envir = data)
-  conversion <- NA
-  value_set <-
-    if (n == Inf) {
-      if (is.numeric(values)) {
-        if (length(unique(values)) < 100) unique(values)
-        else seq(min(values, na.rm = TRUE), 
-                 max(values, na.rm = TRUE), length = 100)
-      } else {
-        as.character(unique(values))
-      }
+# get an appropriate set of levels
+n_levels <- function(values, n) {
+  n <- pmax(ceiling(abs(n)), 1)
+  unique_vals <- unique(values)
+  if (n == Inf) { # flag for "all levels". But don't go crazy if variable is quantitative
+    res <- if (is.numeric(values)) { # enough to make a nice plot
+      if (length(unique_vals) < 100) unique_vals
+      else seq(min(values, na.rm = TRUE), 
+               max(values, na.rm = TRUE), length = 100)
     } else {
-      if (is.numeric(values)) {
-        conversion <- "as.discrete"
-        if (n == 1) {
-          median(values, na.rm = TRUE)
-        } else {
-          bottom <- ifelse(n == 2, 0.3, 
-                           ifelse(n > 4, 
-                                  ifelse(n > 9, 0.0, 0.1), 
-                                  0.2))
-          most <- quantile(values, c(bottom, 1 - bottom), na.rm = TRUE)
-          pretty(most, n = pmax(1, n - 2))
-        }
-        #quant_levels <- seq(0,1, length = n + 2)[c(-1, -(n + 2))]
-        #quantile(values, quant_levels, na.rm = TRUE)
-      } else {
-        level_names <- names(sort(table(values), decreasing = TRUE))
-        level_names[1:pmin(n, length(level_names))]
-      }
+      as.character(unique_vals) # all categorical levels
     }
-  # will the variable ultimately be represented as discrete
-  attr(value_set, "convert") <- conversion
-  value_set
+    return(res)
+  } 
+
+  # finite number of categorical levels
+  if ( ! is.numeric(values)) {
+    level_names <- names(sort(table(values), decreasing = TRUE))
+    return( level_names[1:pmin(n, length(level_names))] )
+  }  
+  
+  # finite number of numerical levels
+  if (is.numeric(values)) {
+    med <- median(values, na.rm = TRUE)
+    if (n == 1) {
+      return(signif(med, 2))
+    }
+    outliers <- mosaicModel:::has_outlier(values)
+    order_of_magnitude <- 0
+    common_digits <- range(log10(abs(unique_vals[unique_vals != 0])))
+    if (1 > diff(common_digits) && sign(min(unique_vals)) == sign(max(unique_vals))) {
+      order_of_magnitude <- sign(max(unique_vals)) * signif(10^mean(common_digits), floor(-log10(diff(common_digits))))
+    }
+    to_two_digits <- signif(values - order_of_magnitude, 2L) 
+    
+    trim <- ifelse(n < 10, .1, ifelse(n > 100, .01, 0.05))
+    # if no outliers, do the whole range
+    if ( ! any(outliers)) where <- seq(0, 1, length = n)
+    else if (all(outliers)) where <- seq(trim, 1-trim, length = n)
+    else if (outliers[1]) where <- seq(trim, 1, length = n)
+    else where <- seq(0, 1-trim, length = n)
+    
+    candidate1 <- quantile(to_two_digits, where, type = 3, na.rm = TRUE)
+
+    return(unique(candidate1 + order_of_magnitude))
+  } 
+
+  stop("\"", var_name, "\" is neither numerical nor categorical. Can't figure out typical levels.")
+
 }
 
-# make reference levels for a model evaluation
-create_eval_levels <- function(model, formula, from = NULL, at = NULL, data = NULL){
-  # grab the explanatory variable to use for the difference
-  change_var <- all.vars(mosaic::rhs(formula))
+# look for pretty extreme outliers
+# return logicals: is the minimum an outlier? is the maximum an outlier?
+has_outlier <- function(values, whisker = 3) {
+  box <- as.numeric(quantile(values, probs = c(.25, .75)))
+  c(min(values) < box[1] - diff(box) * whisker,
+    max(values) > box[2] + diff(box) * whisker )
   
-  if (is.null(data)) data <- data_from_model(model, data = data)
-  response <- response_var(model)
-  explan_vars <- explanatory_vars(model)
-  
-  centers <- as.list(rep(NA, length(explan_vars)))
-  names(centers) <- explan_vars
-  for (var_name in explan_vars) {
-    values <- data[[var_name]]
-    centers[[var_name]] <-
-      if (is.numeric(values)) {
-        median(values, na.rm = TRUE)
-      } else {
-        # get the most popular level
-        popular <- names(sort(table(values), decreasing = TRUE))[1]
-        if (is.factor(values)) {
-          popular <- factor(popular, levels = levels(values))
-        }
-        popular
-      }
-  }
-  if ( ! is.null(from)) centers[[change_var]] <- from
-  
-  # loop over <at> and update any nominal values
-  for (k in seq_along(at)) {
-    nm <- names(at)[k]
-    if ( ! nm %in% explan_vars) stop(nm, "isn't an explanatory variable.")
-    centers[[nm]] <- at[[k]]
-    if (is.factor(data[[nm]]))
-      centers[[nm]] <- factor(centers[[nm]], levels = levels(data[[nm]]))
-  }
-  # input values for the explanatory variables
-  reference_values(data[,explan_vars, drop = FALSE], at = centers)
 }
+
+
+# make reference levels for a model evaluation
+# create_eval_levels <- function(model, formula, from = NULL, at = NULL, data = NULL){
+#   # grab the explanatory variable to use for the difference
+#   change_var <- all.vars(mosaic::rhs(formula))
+#   
+#   if (is.null(data)) data <- data_from_model(model, data = data)
+#   response <- response_var(model)
+#   explan_vars <- explanatory_vars(model)
+#   
+#   centers <- as.list(rep(NA, length(explan_vars)))
+#   names(centers) <- explan_vars
+#   for (var_name in explan_vars) {
+#     values <- data[[var_name]]
+#     centers[[var_name]] <-
+#       if (is.numeric(values)) {
+#         median(values, na.rm = TRUE)
+#       } else {
+#         # get the most popular level
+#         popular <- names(sort(table(values), decreasing = TRUE))[1]
+#         if (is.factor(values)) {
+#           popular <- factor(popular, levels = levels(values))
+#         }
+#         popular
+#       }
+#   }
+#   if ( ! is.null(from)) centers[[change_var]] <- from
+#   
+#   # loop over <at> and update any nominal values
+#   for (k in seq_along(at)) {
+#     nm <- names(at)[k]
+#     if ( ! nm %in% explan_vars) stop(nm, "isn't an explanatory variable.")
+#     centers[[nm]] <- at[[k]]
+#     if (is.factor(data[[nm]]))
+#       centers[[nm]] <- factor(centers[[nm]], levels = levels(data[[nm]]))
+#   }
+#   # input values for the explanatory variables
+#   reference_values(data[,explan_vars, drop = FALSE], at = centers)
+# }
 
 get_step = function(ref_vals, change_var, data, step = NULL, from = NULL) {
   if (is.null(step)) { # Need to set the step

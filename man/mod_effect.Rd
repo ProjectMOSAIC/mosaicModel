@@ -5,7 +5,7 @@
 \title{Calculate effect sizes in a model}
 \usage{
 mod_effect(model, formula, step = NULL, bootstrap = FALSE, to = step,
-  data = NULL, at = NULL, ...)
+  nlevels = 1, data = NULL, at = NULL, class_level = NULL, ...)
 }
 \arguments{
 \item{model}{the model from which the effect size is to be calculated}
@@ -23,15 +23,19 @@ specify the number of bootstrap replications (default:100).}
 \item{to}{a synonym for step. (In English, "to" is more appropriate for a
 categorical input, "step" for a quantitative. But you can use either.)}
 
-\item{data}{Specifies exactly the cases at which you want to calculate the effect size.
-Unlike \code{...} or \code{at}, no new combinations will be created.}
+\item{nlevels}{integer specifying the number of levels to use for "typical" inputs. (Default: up to 3)}
+
+\item{data}{Specifies exactly the cases at which you want to calculate the effect size.}
 
 \item{at}{similar to \code{...} but expects a list or dataframe of the values you want to set.
 Like \code{...}, all combinations of the values specified will be used as inputs.}
 
+\item{class_level}{Name of the categorical level for which the probability is to be used. Applies
+only to classifiers. (Default: Use the first level.)
+Unlike \code{...} or \code{at}, no new combinations will be created.}
+
 \item{...}{additional arguments for evaluation levels of explanatory
-variables or to be passed to  \code{predict()}. For instance, for a glm, perhaps you
-want \code{type = "response"}.}
+variables.}
 }
 \description{
 Like a derivative or finite-difference
@@ -50,4 +54,8 @@ mod_effect(mod1, ~ sector)
 mod_effect(mod1, ~ age, sex = "M", educ = c(10, 12, 16), age = c(30, 40))
 mod_effect(mod1, ~ age, sex = "F", age = 34, step = 1)
 mod_effect(mod1, ~ sex, age = 35, sex = "M", to = "F" )
+# For classifiers, the change in *probability* of a level is reported.
+mod2 <- rpart::rpart(sector ~ age + sex + educ + wage, data = mosaicData::CPS85)
+mod_effect(mod2, ~ educ)
+mod_effect(mod2, ~ educ, class_level = "manag")
 }

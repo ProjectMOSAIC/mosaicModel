@@ -41,12 +41,13 @@
 #'  
 #'
 #' @examples
-#' \dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
+#' \dontrun{
+#' mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 #' mod_eval(mod1)
 #' mod2 <- glm(married == "Married" ~ age + sex * sector,
 #'             data = mosaicData::CPS85, family = "binomial")
-#' mod_eval(mod2, nlevels = 2, type = "response")
-#' mod_eval(mod2, nlevels = 2, type = "response", sex = "F") 
+#' mod_eval(mod2, nlevels = 2)
+#' mod_eval(mod2, nlevels = 2, sex = "F") 
 #' }
 #' @export
 mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("none", "prediction", "confidence"),
@@ -76,7 +77,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("non
       data_from_model(model)
     } else { # If no data provided, get typical levels
       if (is.null(data)) {
-        typical_levels(model = model, data = data, nlevels = nlevels, at = at)
+        df_typical(model = model, data = data, nlevels = nlevels, at = at)
       } else {
         data
       }

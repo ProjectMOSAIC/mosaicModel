@@ -12,12 +12,14 @@
 #' specify the number of bootstrap replications (default:100).
 #' @param to a synonym for step. (In English, "to" is more appropriate for a 
 #' categorical input, "step" for a quantitative. But you can use either.)
+#' @param nlevels integer specifying the number of levels to use for "typical" inputs. (Default: up to 3)
 #' @param ... additional arguments for evaluation levels of explanatory 
-#' variables or to be passed to  \code{predict()}. For instance, for a glm, perhaps you
-#' want \code{type = "response"}.
+#' variables.
 #' @param at similar to \code{...} but expects a list or dataframe of the values you want to set.
 #' Like \code{...}, all combinations of the values specified will be used as inputs.
 #' @param data Specifies exactly the cases at which you want to calculate the effect size.
+#' @param class_level Name of the categorical level for which the probability is to be used. Applies 
+#' only to classifiers. (Default: Use the first level.)
 #' Unlike \code{...} or \code{at}, no new combinations will be created.
 #' 
 #'
@@ -35,10 +37,15 @@
 #' mod_effect(mod1, ~ age, sex = "M", educ = c(10, 12, 16), age = c(30, 40))
 #' mod_effect(mod1, ~ age, sex = "F", age = 34, step = 1)
 #' mod_effect(mod1, ~ sex, age = 35, sex = "M", to = "F" )
+#' # For classifiers, the change in *probability* of a level is reported.
+#' mod2 <- rpart::rpart(sector ~ age + sex + educ + wage, data = mosaicData::CPS85)
+#' mod_effect(mod2, ~ educ)
+#' mod_effect(mod2, ~ educ, class_level = "manag")
 
 #' @export
 mod_effect <- function(model, formula, step = NULL, 
-                        bootstrap = FALSE, to = step, data = NULL, at = NULL, ... ) {
+                        bootstrap = FALSE, to = step, nlevels = 1, 
+                       data = NULL, at = NULL, class_level = NULL, ... ) {
   dots <- handle_dots_as_variables(model, ...)
   inline_vals <- dots$at
   # combine values set inline with those set in <at>, overriding the ones in <at>
@@ -68,7 +75,7 @@ mod_effect <- function(model, formula, step = NULL,
   from_inputs <- to_inputs <- 
     if (is.null(data) || length(at) > 0) {
       data <- data_from_model(original_model)
-      create_eval_levels(original_model, formula, at=at, data = data)
+      df_typical(model = original_model, data = data, nlevels = nlevels, at = at)
     } else {
       # if data explicitly stated, use exactly those inputs
       data
@@ -106,15 +113,29 @@ mod_effect <- function(model, formula, step = NULL,
   # if the "model" input was a single model, rather than an ensemble,
   # that single model is being stored as an ensemble of 1, so that
   # the same loop covers both cases.
+  output_column <- 1
+  output_name_append <- ""
   for (k in 1:length(ensemble)) {
-    base_vals <-   do.call(predict, c(list(ensemble[[k]], newdata = from_inputs), extras))
+    base_vals <- mod_eval(ensemble[[k]], data = from_inputs, append = FALSE)
+    
     # model output after the step (or "offset")
-    offset_vals <- do.call(predict, c(list(ensemble[[k]], newdata = to_inputs),   extras))
-   
+    offset_vals <- mod_eval(ensemble[[k]], data = to_inputs, append = FALSE)
+    if (k == 1 &&  ! "model_output" %in% names(base_vals)) {
+      # it's a classifier
+      if (!is.null(class_level)) {
+        if ( ! class_level %in% names(base_vals)) {
+          warning("\"", class_level, "\" is not a valid level for the response variable. Will be using ", 
+                  names(base_vals)[output_column], " instead.")
+        } else {
+          output_column <- which(class_level == names(base_vals))
+        }
+      }
+      output_name_append <- paste0("_", names(base_vals)[output_column])
+    }
     res <- if (is.numeric(step)) {
-      data.frame(slope =  (offset_vals - base_vals) / step)
+      data.frame(slope =  (offset_vals[[output_column]] - base_vals[[output_column]]) / step)
     } else {
-      data.frame(change = offset_vals - base_vals)
+      data.frame(change = offset_vals[[output_column]] - base_vals[[output_column]])
     }
     if (ensemble_flag) output_form$bootstrap_rep <- k
     
@@ -130,6 +151,9 @@ mod_effect <- function(model, formula, step = NULL,
     std_errors <- mosaic::sd(Bootstrap_reps[[1]] ~ set_number)
     Result <- cbind(Result[1], stderr_effect = signif(std_errors,2), Result[2:length(Result)])
   }
+  # If a classifier, show the name of the level whose probability is being shown
+  names(Result)[1] <- paste0(names(Result)[1], output_name_append)
+
   Result
 }  
   

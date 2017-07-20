@@ -109,15 +109,14 @@ reference_values <- function(data, n = 1, at = list()) {
     # get the appropriate number of levels for each variable
     if (var_names[k] %in% names(at)) {
       ranges[[k]] <- at[[var_names[k]]]
-      conversions[[k]] <- ifelse(is.numeric(ranges[[k]]), "as.discrete", NA)
-
+      #conversions[[k]] <- ifelse(is.numeric(ranges[[k]]), "as.discrete", NA)
     } else {
-      ranges[[k]] <- get_range(var_names[k], n_values[[ var_names[k] ]], data)
-      conversions[[k]] <- attr(ranges[[k]], "convert")
+      ranges[[k]] <- n_levels(data[[var_names[k]]], n_values[[ var_names[k] ]])
+      #conversions[[k]] <- attr(ranges[[k]], "convert")
     }
   }
   res <- do.call(expand.grid, c(ranges, stringsAsFactors = FALSE))
-  attr(res, "convert") <- conversions
+  #attr(res, "convert") <- conversions
   
   vnames <- names(res)
   for (name in vnames) {
@@ -129,14 +128,14 @@ reference_values <- function(data, n = 1, at = list()) {
 }
 
 # arrange numerical variables that have just a few levels to be represented as discrete
-convert_to_discrete <- function(data) {
-  convert_to_what <- attr(data, "convert")
-  if (is.null(convert_to_what)) stop("Conversion to discrete not supported. See <reference_values> function.")
-  for (k in 1:ncol(data)) {
-    tmp <- convert_to_what[[k]]
-    if( (! is.na(tmp)) && tmp == "as.discrete")
-      data[[k]] <- factor(data[[k]], levels = as.character(sort(unique(data[[k]]))))
-  }
-
-  data
-}
+# convert_to_discrete <- function(data) {
+#   convert_to_what <- attr(data, "convert")
+#   if (is.null(convert_to_what)) stop("Conversion to discrete not supported. See <reference_values> function.")
+#   for (k in 1:ncol(data)) {
+#     tmp <- convert_to_what[[k]]
+#     if( (! is.na(tmp)) && tmp == "as.discrete")
+#       data[[k]] <- factor(data[[k]], levels = as.character(sort(unique(data[[k]]))))
+#   }
+# 
+#   data
+# }
