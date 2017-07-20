@@ -5,8 +5,8 @@
 \title{Plot out model values}
 \usage{
 mod_plot(model = NULL, formula = NULL, data = NULL, nlevels = 3,
-  at = list(), prob_of = NULL, intervals = c("none", "confidence",
-  "prediction"), post_transform = NULL, ...)
+  at = list(), class_level = NULL, interval = c("none", "confidence",
+  "prediction"), post_transform = NULL, size = 1, alpha = 0.8, ...)
 }
 \arguments{
 \item{model}{the model to display graphically.
@@ -21,22 +21,22 @@ Can also be an ensemble produced with \code{mod_ensemble()}}
 \item{at}{named list giving specific values at which to hold the variables. You can accomplish
 this without forming a list by using \code{...}. See examples.}
 
-\item{prob_of}{if to show probability of a given level of the output, name the class here as a character string.}
+\item{class_level}{character string. If a probability for a classifier is being shown,
+which levels of the response variable to use in the plot. (Default: the first one.)}
 
-\item{intervals}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
+\item{interval}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
 
 \item{post_transform}{a scalar transformation and new name for the response variable,
 e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
 
-\item{...}{specific values for explantory variables and/or arguments to predict()}
+\item{size}{numerical value for line width (default: 1)}
+
+\item{alpha}{numerical value in \link{0,1} for transparency (default: 0.8)}
+
+\item{...}{specific values for explantory variables}
 }
 \description{
 Plot out model values
-}
-\details{
-Often you will want to show some data along with the model functions.
-You can do this with \code{ggplot2::geom_point()} making sure to set the \code{data} argument
-to be a data frame with the cases you want to plot.
 }
 \examples{
 \dontrun{
@@ -44,20 +44,12 @@ mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_plot(mod1)
 mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 # show the data used for fitting along with the model
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
-  ggplot2::geom_point(data = mosaicData::CPS85, alpha = 0.1)
-require(ggplot2)
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
-  geom_point(data = mosaicData::CPS85, alpha = 0.1) +
-  ylim(0, 20)
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8, show_data = TRUE) 
 mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
-mod_plot(mod2, post_transform = c(wage = exp)) # undo the log in the display
+mod_plot(mod2, post_transform = c(wage = exp), interval = "confidence") # undo the log in the display
 mod3 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
-mod_plot(mod3, type = "response")
-# Adding the raw data requires an as.numeric() trick when it's TRUE/FALSE
-mod_plot(mod3, ~ age + sex + sector, nlevels = 10, type = "response") + 
-  geom_point(data = mosaicData::CPS85, 
-  aes(x = age, y = as.numeric(married == "Married")), alpha = .1)
+mod_plot(mod3)
+mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 }
 }

@@ -16,6 +16,8 @@
 #' @param data optional set of cases from which to extract levels for explanatory variables
 #' @param on_training flag whether to use the training data for evaluation. Only needed
 #' when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.
+#' @param interval the type of interval to use: "none", "confidence", "prediction". But not all
+#' types are available for all model architectures.
 #' @param nlevels how many levels to construct for input variables.
 #' For quantitative variables, this is a suggestion. \code{pretty()} will refine your choice. (default: 3) 
 #' @param ... arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
@@ -41,39 +43,38 @@
 #' @examples
 #' \dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 #' mod_eval(mod1)
-#' mod3 <- glm(married == "Married" ~ age + sex * sector,
+#' mod2 <- glm(married == "Married" ~ age + sex * sector,
 #'             data = mosaicData::CPS85, family = "binomial")
-#' mod_eval(mod3, nlevels = 2, type = "response")
-#' mod_eval(mod3, nlevels = 2, type = "response", sex = "F") 
-#' at = list(sex = "F"))
+#' mod_eval(mod2, nlevels = 2, type = "response")
+#' mod_eval(mod2, nlevels = 2, type = "response", sex = "F") 
 #' }
 #' @export
-mod_eval <- function(model = NULL, data = NULL, append = TRUE, intervals = c("none", "prediction", "confidence"),
+mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("none", "prediction", "confidence"),
                    nlevels = 3, ..., on_training = FALSE) {
   dots <- handle_dots_as_variables(model, ...)
   extras <- dots$extras
   at <- dots$at
   
-  intervals <- match.arg(intervals)
+  interval <- match.arg(interval)
   # Override the values in <at> with any set as inline arguments.
   #at[names(inline_values)] <- NULL
   #at <- c(at, inline_values)
   
   if (is.null(model)) {
     stop("Must provide a model to evaluate.")
-  } else if (inherits(model, 
-                      c("rpart", "glm", "lm", "groupwiseModel",
-                        "randomForest", "gbm"))) {
-    # nothing to do
-  } else {
-    stop("Model of type", class(model)[1], "not set up for mod_evaluate().")
-  }
-  if( inherits(model, "gbm")) stop("gbm models still not working.")
+  } 
+  
+  # Get the proper evaluation function
+  for_this_model <- get_eval_function(model)
+  this_eval_fun <- for_this_model$eval_fun
+  # Check that the intervals are actually available
+  if ( ! interval %in% for_this_model$intervals)
+    stop("Interval of type ", interval, " not available for models of class ", class(model)[1])
   
   eval_levels <- 
     if (on_training) {
       data_from_model(model)
-    } else {
+    } else { # If no data provided, get typical levels
       if (is.null(data)) {
         typical_levels(model = model, data = data, nlevels = nlevels, at = at)
       } else {
@@ -81,25 +82,11 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, intervals = c("no
       }
     }
   
-  # need a more sophisticated model than this, but for now ...
-  predfun <- predict
-  if (inherits(model, "gam")) predfun <- predict.glm
-  # then add others for the sorts of model types where predict() has
-  # a nasty interface
+  model_vals <- this_eval_fun(model, data = eval_levels, interval = interval)
   
-  model_vals <- 
-    if (on_training) { 
-      do.call(predfun, c(list(model), extras))
-    } else {
-        do.call(predfun,c(list(model, newdata = eval_levels), extras))
-    }
-  
-  if (append) {
-    output <- eval_levels
-    output$model_output <- model_vals
-  }
-  else output = data.frame(model_output = model_vals) 
-    
+  if (append) output <- cbind(eval_levels, model_vals)
+  else  output <- model_vals
+
   output
 }
 

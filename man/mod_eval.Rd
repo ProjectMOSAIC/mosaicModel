@@ -4,7 +4,7 @@
 \alias{mod_eval}
 \title{Evaluate a model for specified inputs}
 \usage{
-mod_eval(model = NULL, data = NULL, append = TRUE, intervals = c("none",
+mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
   "prediction", "confidence"), nlevels = 3, ..., on_training = FALSE)
 }
 \arguments{
@@ -14,6 +14,9 @@ mod_eval(model = NULL, data = NULL, append = TRUE, intervals = c("none",
 
 \item{append}{flag whether to include the inputs to the model along with the calculated
 model value in the output. Default: \code{TRUE}.}
+
+\item{interval}{the type of interval to use: "none", "confidence", "prediction". But not all
+types are available for all model architectures.}
 
 \item{nlevels}{how many levels to construct for input variables.
 For quantitative variables, this is a suggestion. \code{pretty()} will refine your choice. (default: 3)}
@@ -53,10 +56,9 @@ some random component among the explanatory terms, as with \code{mosaic::rand()}
 \examples{
 \dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_eval(mod1)
-mod3 <- glm(married == "Married" ~ age + sex * sector,
+mod2 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
-mod_eval(mod3, nlevels = 2, type = "response")
-mod_eval(mod3, nlevels = 2, type = "response", sex = "F") 
-at = list(sex = "F"))
+mod_eval(mod2, nlevels = 2, type = "response")
+mod_eval(mod2, nlevels = 2, type = "response", sex = "F") 
 }
 }

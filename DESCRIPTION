@@ -11,8 +11,8 @@ Encoding: UTF-8
 LazyData: TRUE
 LazyLoad: TRUE
 RoxygenNote: 6.0.1
-Depends: R (>= 3.1), ggplot2
+Depends: R (>= 3.1)
 Suggests: mosaic, dplyr, mosaicData, magrittr, splines,
-    testthat, rpart, randomForest
+    testthat, rpart, randomForest, ggplot2
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

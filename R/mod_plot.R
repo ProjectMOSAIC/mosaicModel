@@ -7,15 +7,15 @@
 #' @param nlevels how many levels to display for those variables shown at discrete levels
 #' @param at named list giving specific values at which to hold the variables. You can accomplish 
 #' this without forming a list by using \code{...}. See examples.
-#' @param prob_of if to show probability of a given level of the output, name the class here as a character string.
-#' @param intervals show confidence or prediction intervals: values "none", "confidence", "prediction"
+#' @param interval show confidence or prediction intervals: values "none", "confidence", "prediction"
 #' @param post_transform a scalar transformation and new name for the response variable, 
 #' e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.
-#' @param ... specific values for explantory variables and/or arguments to predict()
+#' @param size numerical value for line width (default: 1)
+#' @param alpha numerical value in [0,1] for transparency (default: 0.8)
+#' @param class_level character string. If a probability for a classifier is being shown,
+#' which levels of the response variable to use in the plot. (Default: the first one.)
+#' @param ... specific values for explantory variables 
 #'
-#' @details Often you will want to show some data along with the model functions. 
-#' You can do this with `ggplot2::geom_point()` making sure to set the \code{data} argument
-#' to be a data frame with the cases you want to plot.
 #'
 #' @examples
 #' \dontrun{
@@ -23,27 +23,25 @@
 #' mod_plot(mod1)
 #' mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 #' # show the data used for fitting along with the model
-#' mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
-#'   ggplot2::geom_point(data = mosaicData::CPS85, alpha = 0.1)
-#' require(ggplot2)
-#' mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
-#'   geom_point(data = mosaicData::CPS85, alpha = 0.1) +
-#'   ylim(0, 20)
+#' mod_plot(mod1, ~ age + sex + sector, nlevels = 8, show_data = TRUE) 
 #' mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
-#' mod_plot(mod2, post_transform = c(wage = exp)) # undo the log in the display
+#' mod_plot(mod2, post_transform = c(wage = exp), interval = "confidence") # undo the log in the display
 #' mod3 <- glm(married == "Married" ~ age + sex * sector,
 #'             data = mosaicData::CPS85, family = "binomial")
-#' mod_plot(mod3, type = "response")
-#' # Adding the raw data requires an as.numeric() trick when it's TRUE/FALSE
-#' mod_plot(mod3, ~ age + sex + sector, nlevels = 10, type = "response") + 
-#'   geom_point(data = mosaicData::CPS85, 
-#'   aes(x = age, y = as.numeric(married == "Married")), alpha = .1)
+#' mod_plot(mod3)
+#' mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 #' }
 #' @export
 mod_plot <- function(model=NULL, formula = NULL, data = NULL, 
-                   nlevels = 3, at = list(), prob_of = NULL,
-                   intervals = c("none", "confidence", "prediction"),
-                   post_transform = NULL, ...) {
+                   nlevels = 3, at = list(), class_level = NULL,
+                   interval = c("none", "confidence", "prediction"),
+                   post_transform = NULL, size = 1, alpha = 0.8, ...) {
+  
+  all_models <- NULL
+  if (inherits(model, "bootstrap_ensemble")) {
+    model <- model$original_model
+    all_models <- models$replications # a list of models
+  }
   
   # Deal with the arguments
   dots <- handle_dots_as_variables(model, ...)
@@ -52,155 +50,111 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
       # Override the values in <at> with any set as inline arguments.
   at[names(inline_values)] <- NULL
   at <- c(at, inline_values)
-  intervals <- match.arg(intervals)
-  
-  # Can we plot this model
-  if (is.null(model)) {
-    stop("Must provide a model for graphing.")
-  } else if (inherits(model, 
-                      c("rpart", "glm", "lm", "groupwiseModel",
-                        "randomForest", "gbm"))) {
-    # nothing to do
-  } else {
-    stop("Model of type", class(model)[1], "not set up for mod_plot().")
+  interval <- match.arg(interval)
+  if (length(extras) > 0) {
+    if ("intervals" %in% names(extras))
+      stop("The name for the argument is \"interval\", not intervals.")
+    stop("You've given some extraneous arguments. ")
   }
-  if( inherits(model, "gbm")) stop("gbm models still not working.")
+
 
   # If data not explicitly provided, get from model
   levels_data <- 
     if (is.null(data)) data_from_model(model) else data
   
-  # try to figure out what are the possible levels of variables
-  response_var_name <- response_var(model)
-  # is the response categorical?  If so, plot the probability of the given level
-  response_values <- 
-    if (response_var_name %in% names(data)) {levels_data[[response_var_name]]}
-    else {eval(parse(text = response_var_name), envir = levels_data)}
-  
-  # if response is categorical, arrange to plot the probability of a
-  # specified level, or if none is specfied, the most common level
-  if (! inherits(response_values, c("numeric", "logical"))) {
-    # It's categorical
-    if (is.null(prob_of)) 
-      prob_of <- names(sort(table(response_values), decreasing = TRUE))[1]
-    if ( ! prob_of %in% response_values) 
-      stop("Level '", prob_of, "' doesn't exist in the response variable.")
-    response_var <- prob_of
-  }
-  
   # Pick out the variables to be displayed, and their roles
   explan_vars <- explanatory_vars(model)
+  response_var_name <- response_var(model)
+  
   if (is.null(formula)) show_vars <- explan_vars
   else show_vars <- all.vars(mosaic::rhs(formula))
-
+  
   # Use the first var as <x>
   # Use the second var as <color>
   # Use the third var as <facet>
   # Use the fourth as the second <facet> variable.
-
+  
   if (length(show_vars) > 4) show_vars <- show_vars[1:4]
-
+  
   # Set a large number of levels for the first explanatory variable,
   # then nlevels for the remaining ones.
   how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
   names(how_many) <- show_vars
   eval_levels <- reference_values(levels_data[explan_vars], n = how_many, at = at )
-
-  # set up so that glms are plotted, by default, as the response rather than the link
-  if (inherits(model, "glm") && ( ! "type" %in% names(extras))) {
-    extras$type = "response"
-  }
-  if ( ! inherits(model, c("lm", "glm", "nls")) && intervals != "none" ) {
-    warning("No intervals available for model type", class(model))
-    intervals = "none"
-  }
   
   # Evaluate the model at the specified levels
-  eval_arguments <- c(list(model = model, data = eval_levels, append = FALSE), extras)
-  new_model_vals <- do.call(mod_eval, eval_arguments)
+  model_vals <- mod_eval(model = model, data = eval_levels, interval = interval,
+                         append = FALSE)
   
-  # Need to replace this bit to correspond to use of mod_eval()
-  # model_vals <- 
-  #   do.call(predict,c(list(model, newdata = eval_levels), 
-  #                     extras))
-  # if (inherits(model, "rpart") && inherits(model_vals, c("data.frame", "matrix"))) {
-  #   # handle the matrix values from predict.rpart()
-  #   keepers <- colnames(model_vals) == prob_of
-  #   model_vals <- model_vals[,keepers] # just the first class
-  # }
-  # if ( ! is.null(post_transform)) model_vals <- post_transform[[1]](model_vals)
-  # 
-  # get the confidence or prediction intervals
-  # if (intervals == "none") {
-  #   # do nothing
-  #   Intervals <- NULL
-  # } else {
-  #   if ( ! inherits(model, c("lm", "glm", "nls"))) {
-  #     warning("Intervals not yet available for models of class ", class(model))
-  #     Intervals <- NULL
-  #   } else {
-  #     Intervals <-
-  #       do.call(predict, c(list(model, newdata = eval_levels, interval = intervals)))
-  #     if ( ! is.null(post_transform)) {
-  #       the_transform <- post_transform[[1]]
-  #       for (k in 1:length(Intervals))
-  #         Intervals[[k]] <- the_transform(Intervals[[k]])
-  #     }
-  #   }
-  # }
-
-  # convert any quantiles for numerical levels to discrete
-  first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
-  eval_levels <- convert_to_discrete(eval_levels)
-  # Deal with the response variable being a complex name
-  # e.g. when it includes operations on a data variable.
-  clean_response_name <- response_var_name
-  if( ! response_var_name %in% names(data))
-    clean_response_name <- "clean"
-  eval_levels[[clean_response_name]] <- model_vals
-
-  if ( ! is.null(Intervals))
-    Intervals <- cbind(eval_levels[show_vars], data.frame(Intervals))
-  
-  # figure out the components of the plot
-
-  P <- 
-    if (length(show_vars) > 1 ) {
-      ggplot(data = eval_levels, 
-             aes_string(x = show_vars[1], 
-                        color = show_vars[2], 
-                        y = clean_response_name),
-             group = NA)
+  # If it's the probability from a classifier, pick out the selected level
+  if ( ! "model_output" %in% names(model_vals)) {
+    if (is.null(class_level)) {
+      class_level = names(model_vals)[1]
+      model_vals <- data.frame(model_output = model_vals[[1]])
     } else {
-    ggplot(data = eval_levels,
-           aes_string(x = show_vars[1], 
-                      y = clean_response_name), 
-           group = NA) 
+      if (class_level %in% names(model_vals))
+        model_vals <- data.frame(model_output = model_vals[[class_level]])
+      else
+        stop("Class level \"", class_level, "\" is not in the model output.")
+    
     }
+    response_var_name <- paste(response_var_name, "==", class_level)
+  }
+  
+  # Apply the transform, if any
+  if ( ! is.null(post_transform)) {
+    the_transform <- post_transform[[1]]
+    for (k in 1:ncol(model_vals))
+      model_vals[[k]] <- the_transform(model_vals[[k]])
+  }
+
+  if (any(names(model_vals) %in% names(eval_levels)))
+      stop("Name conflict in output of `mod_eval()`, Eval_levels has response var name in it.")
+  model_vals <- cbind(eval_levels, model_vals)
+
+  # figure out the components of the plot
+  
+  
+  if (!require(ggplot2)) stop("Must install ggplot2 package for these graphics")
+  
+  P <- if (length(show_vars) > 1 ) {
+    ggplot(data = model_vals, 
+           aes_string(x = show_vars[1], color = show_vars[2], y = "model_output"),
+           group = show_vars[2])
+  } else {
+    ggplot(data = model_vals,
+           aes_string(x = show_vars[1], y = "model_output")) 
+  }
  
-    
-    
+  first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
   
   if (length(show_vars) == 1) {
     if (first_var_quantitative) {
-      P <- P + geom_line() 
+      P <- P + geom_line(size = size, alpha = alpha) 
     }
     else {
-      P <- P + geom_point()
+      P <- P + geom_point(size = size, alpha = alpha)
     }
   } else { # more than one explanatory variable
     if (first_var_quantitative) {
-      
-      P <- P + geom_line(
-        aes_string(color = show_vars[2], linetype = show_vars[2]), 
-        alpha = 0.8)
+      if (is.numeric(eval_levels[[show_vars[2]]]))
+        for_aes <- aes_string(color = show_vars[2])
+      else 
+        for_aes <- aes_string(color = show_vars[2], linetype = show_vars[2])
+      P <- P + geom_line(for_aes, alpha = alpha, size = size)
     } else {
       P <- P + geom_point(
-        aes_string(color = show_vars[2], linetype = show_vars[2]), alpha = 0.8) +
-        geom_line(aes_string(group = show_vars[2], color = show_vars[2]), alpha = 0.8)
+        aes_string(color = show_vars[2]), 
+                   alpha = alpha, size = size) 
+      # +
+      #   geom_line(
+      #     aes_string(group = show_vars[2], color = show_vars[2],
+      #                linetype = show_vars[2]), 
+      #     alpha = alpha, size = size)
     }
   }
 
+  # The mode for confidence intervals
   if (first_var_quantitative) {
     Qfun <- geom_ribbon
   } else {
@@ -208,19 +162,17 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   }
   
   Q <- NULL # nothing to show, unless ...
-  if ( ! is.null(Intervals)) {
+  if (interval != "none") {
     if (length(show_vars) > 1) {
-      Q <- Qfun(data = Intervals, 
+      Q <- Qfun(data = model_vals, 
                 aes_string(x = show_vars[1], 
-                           y = "NULL", # don't need this
-                           ymax = "upr", ymin = "lwr", fill = show_vars[2]), 
-                color = NA, alpha = 0.2) 
+                           ymax = "upper", ymin = "lower", fill = show_vars[2]), 
+                color = NA, alpha = alpha/4) 
     } else {
-      Q <- Qfun(data = Intervals, 
-                aes_string(x = show_vars[1], 
-                           y = "NULL", # don't need this
-                           ymax = "upr", ymin = "lwr"), 
-                color = "black", alpha = 0.2) #, fill = "blue")
+      Q <- Qfun(data = model_val, 
+                aes_string(x = show_vars[1],
+                           ymax = "upper", ymin = "lower"), 
+                color = "black", alpha = alpha/4)
     }
   }
   

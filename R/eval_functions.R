@@ -53,9 +53,9 @@ eval_glm <- function(model, data = NULL, interval = c("none", "confidence")) {
   
   fun <- switch(
     link_type$link,
-    "identity", eval_lm,
-    "log", eval_poisson,
-    "logit", eval_logistic
+    "identity" = eval_lm,
+    "log" = eval_poisson,
+    "logit" = eval_logistic
   )
   
   fun(model = model, data = data, interval = interval)
@@ -148,13 +148,13 @@ eval_rpart <- function(model, data = NULL, interval = "none") {
 # the master list for the functions to evaluate models
 
 architectures <- tibble::tribble(
-  ~mod_class, ~eval_fun,
+  ~mod_class, ~eval_fun, ~has_data,
   # the order matters
-  "glm",      eval_glm,
-  "lm",       eval_linear,
-  "rlm",      eval_linear,
-  "rpart",    eval_rpart,
-  "randomForest", eval_randomForest
+  "glm",      eval_glm, data_from_model.lm,
+  "lm",       eval_linear, data_from_model.lm,
+  "rlm",      eval_linear, data_from_model.lm, 
+  "rpart",    eval_rpart, data_from_model.rpart,
+  "randomForest", eval_randomForest, data_from_model.randomForest
   
 )
 
@@ -164,8 +164,13 @@ get_eval_function <- function(model) {
   if (length(inds) == 0) 
     stop("No mosaicModel evaluation function found for a model of class ", 
          paste('"', class(model), '"', collapse = ", "))
-  # return the earliest one in the architecture list
-  architectures$eval_fun[min(inds)]
+  
+  # return the earliest function in the architecture list and other information
+  res <- list(eval_fun = architectures$eval_fun[[min(inds)]],
+              has_data = architectures$has_data[[min(inds)]])
+  res$intervals <- eval(formals(res$eval_fun)$interval) # what kinds of intervals are available
+  
+  res
 }
 
 # YOU NEED TO TIE THIS BACK INTO mod_eval() 
