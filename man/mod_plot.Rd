@@ -46,7 +46,7 @@ mod_plot(mod1, n = Inf, interval = "confidence") +
   geom_point(data = mosaicData::CPS85, aes(y = wage), alpha = 0.2)
 mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 # show the data used for fitting along with the model
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8, show_data = TRUE) 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8) 
 mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
 mod_plot(mod2, post_transform = c(wage = exp), interval = "confidence") # undo the log in the display
 mod3 <- glm(married == "Married" ~ age + sex * sector,
@@ -55,5 +55,8 @@ mod_plot(mod3)
 mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 mod_plot(mod4)
 mod_plot(mod4, class_level = "manag")
+mod5 <- randomForest::randomForest(sector ~ age + sex + married, data = mosaicData::CPS85)
+mod_plot(mod5)
+mod_plot(mod5, class_level = "manag")
 }
 }

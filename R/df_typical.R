@@ -54,3 +54,48 @@ df_typical <- function(data = NULL,
   eval_levels
 }
 
+#' Compute sensible values from a data set for use as a baseline
+#'
+#'
+#' @param data a data frame
+#' @param n number of values for specified variables: could be a single number or
+#' a list assigning a number of levels for individual variables
+#' @param at optional values at which to set values: a list whose names are the
+#' variables whose values are to be set.
+#'
+#' @details Variables not listed in \code{at} will be assigned levels using these principles:
+#' Categorical variables: the most populated levels.
+#' Quantitative variables: central quantiles, e.g. median for n=1, 
+
+reference_values <- function(data, n = 1, at = list()) {
+  var_names <- names(data)
+  # n might be a list.  If so, the default should be 1
+  n_default <- ifelse(inherits(n, "list"), 1, n)
+  n_values <- as.list(rep(n_default, length(var_names)))
+  names(n_values) <- var_names
+  if (inherits(n, "list")) # override any appearing in the n-list
+    n_values[names(n)] <- n
+  
+  ranges <- conversions <- as.list(rep(NA, length(var_names)))
+  names(ranges) <- var_names
+  for (k in 1:length(var_names)) {
+    # get the appropriate number of levels for each variable
+    if (var_names[k] %in% names(at)) {
+      ranges[[k]] <- at[[var_names[k]]]
+      #conversions[[k]] <- ifelse(is.numeric(ranges[[k]]), "as.discrete", NA)
+    } else {
+      ranges[[k]] <- n_levels(data[[var_names[k]]], n_values[[ var_names[k] ]])
+      #conversions[[k]] <- attr(ranges[[k]], "convert")
+    }
+  }
+  res <- do.call(expand.grid, c(ranges, stringsAsFactors = FALSE))
+  #attr(res, "convert") <- conversions
+  
+  vnames <- names(res)
+  for (name in vnames) {
+    if (inherits(data[[name]], "factor") && !inherits(res[[name]], "factor"))
+      res[[name]] <- factor(res[[name]], levels = levels(data[[name]]))
+  }
+  
+  res
+}

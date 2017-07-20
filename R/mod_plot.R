@@ -25,7 +25,7 @@
 #'   geom_point(data = mosaicData::CPS85, aes(y = wage), alpha = 0.2)
 #' mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 #' # show the data used for fitting along with the model
-#' mod_plot(mod1, ~ age + sex + sector, nlevels = 8, show_data = TRUE) 
+#' mod_plot(mod1, ~ age + sex + sector, nlevels = 8) 
 #' mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
 #' mod_plot(mod2, post_transform = c(wage = exp), interval = "confidence") # undo the log in the display
 #' mod3 <- glm(married == "Married" ~ age + sex * sector,
@@ -34,6 +34,9 @@
 #' mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 #' mod_plot(mod4)
 #' mod_plot(mod4, class_level = "manag")
+#' mod5 <- randomForest::randomForest(sector ~ age + sex + married, data = mosaicData::CPS85)
+#' mod_plot(mod5)
+#' mod_plot(mod5, class_level = "manag")
 #' }
 #' @export
 mod_plot <- function(model=NULL, formula = NULL, data = NULL, 
@@ -84,7 +87,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   # then nlevels for the remaining ones.
   how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
   names(how_many) <- show_vars
-  eval_levels <- reference_values(levels_data[explan_vars], n = how_many, at = at )
+  eval_levels <- df_typical(data = levels_data[explan_vars], n = how_many, at = at)
   
   # Evaluate the model at the specified levels
   model_vals <- mod_eval(model = model, data = eval_levels, interval = interval,

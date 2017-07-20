@@ -54,11 +54,12 @@ is to use the \code{on_training = TRUE} argument. These are equivalent unless th
 some random component among the explanatory terms, as with \code{mosaic::rand()}, \code{mosaic::shuffle()} and so on.
 }
 \examples{
-\dontrun{mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
+\dontrun{
+mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_eval(mod1)
 mod2 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
-mod_eval(mod2, nlevels = 2, type = "response")
-mod_eval(mod2, nlevels = 2, type = "response", sex = "F") 
+mod_eval(mod2, nlevels = 2)
+mod_eval(mod2, nlevels = 2, sex = "F") 
 }
 }

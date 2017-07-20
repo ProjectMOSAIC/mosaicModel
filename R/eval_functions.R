@@ -1,8 +1,19 @@
-#' Internal functions for evaluating models
+# Internal functions for evaluating models
+# 
+# These functions are the interface to the various model types for `mod_eval()`, and through 
+# that to all the other `mod_` functions that need to evaluate models, e.g. `mod_effect()`, `mod_cv()`, and so on.
+# 
+#' @param model A model object of the classes permitted
+#' @param data Usually, a data table specifying the inputs to the model. But if
+#' not specified, the training data will be used.
+#' @param interval One of "none", "confidence", or "prediction". Not all model
+#' types support "prediction" or even "confidence".
+#' 
+#' 
+#' @details All of the `eval_` functions are ex
 #' These functions return a numerical vector (for regression types) or
 #' a matrix of probabilities (for classifiers)
 #'
-#' @export  
 eval_randomForest <- function(model, data = NULL,
                               interval = c("none", "confidence", "prediction")) {
   if (!inherits(model, "randomForest")) 
@@ -23,7 +34,6 @@ eval_randomForest <- function(model, data = NULL,
   res
 }
 
-#' @export
 eval_linear <- function(model, data = NULL, interval = c("none", "confidence", "prediction")) {
   if (!inherits(model, c("lm"))) 
     stop("model not a recognized linear type of model")
@@ -44,7 +54,6 @@ eval_linear <- function(model, data = NULL, interval = c("none", "confidence", "
   tibble::remove_rownames(res)
 }
 
-#' @export
 eval_glm <- function(model, data = NULL, interval = c("none", "confidence")) {
   if (!inherits(model, c("glm"))) 
     stop("model not a recognized logistic type of model")
@@ -61,7 +70,6 @@ eval_glm <- function(model, data = NULL, interval = c("none", "confidence")) {
   fun(model = model, data = data, interval = interval)
 }
 
-#' @export
 eval_logistic <- function(model, data = NULL, interval = c("none", "confidence")) {
   if (!inherits(model, c("glm"))) 
     stop("model not a recognized logistic type of model")
@@ -92,7 +100,6 @@ eval_logistic <- function(model, data = NULL, interval = c("none", "confidence")
   tibble::remove_rownames(res)
 }
 
-#' @export
 eval_poisson <- function(model, data = NULL, interval = c("none", "confidence")) {
   if (!inherits(model, c("glm"))) 
     stop("model not a recognized poisson type of model")
@@ -121,8 +128,6 @@ eval_poisson <- function(model, data = NULL, interval = c("none", "confidence"))
   tibble::remove_rownames(res)
 }
 
-
-#' @export
 eval_rpart <- function(model, data = NULL, interval = "none") {
   if (!inherits(model, c("rpart"))) 
     stop("model not a recognized rpart type of model")
@@ -145,35 +150,5 @@ eval_rpart <- function(model, data = NULL, interval = "none") {
   tibble::remove_rownames(res)
 }
 
-# the master list for the functions to evaluate models
 
-architectures <- tibble::tribble(
-  ~mod_class, ~eval_fun, ~has_data,
-  # the order matters
-  "glm",      eval_glm, data_from_model.lm,
-  "lm",       eval_linear, data_from_model.lm,
-  "rlm",      eval_linear, data_from_model.lm, 
-  "rpart",    eval_rpart, data_from_model.rpart,
-  "randomForest", eval_randomForest, data_from_model.randomForest
-  
-)
-
-get_eval_function <- function(model) {
-  # find the ones that match
-  inds <- which(architectures$mod_class %in% class(model))
-  if (length(inds) == 0) 
-    stop("No mosaicModel evaluation function found for a model of class ", 
-         paste('"', class(model), '"', collapse = ", "))
-  
-  # return the earliest function in the architecture list and other information
-  res <- list(eval_fun = architectures$eval_fun[[min(inds)]],
-              has_data = architectures$has_data[[min(inds)]])
-  res$intervals <- eval(formals(res$eval_fun)$interval) # what kinds of intervals are available
-  
-  res
-}
-
-# YOU NEED TO TIE THIS BACK INTO mod_eval() 
-
-# AND THEN, get mod_plot() to use mod_eval()
-
+# FOR K-nearest neighbors

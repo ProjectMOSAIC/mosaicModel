@@ -39,6 +39,7 @@ the levels are specified explicitly in an argument.
 }
 \examples{
 \dontrun{
+df_typical(mosaicData::Galton, nlevels = 2, father = 70, mother = 68, nkids = 3)
 df_typical(mosaicData::Galton, nlevels = 2)
 mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 df_typical(model = mod1, nlevels = 3)
