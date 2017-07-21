@@ -1,6 +1,13 @@
 #' Interval statistics for use with df_stats()
 #' 
-#' @param level Confidence level, e.g. 0.95
+#' Function builders for calculating intervals. These must *always* be evaluated
+#' with the *result* being handed as a argument to `df_stats()`.
+#'
+#' @param level Number in 0 to 1 specifying the confidence level for the interval. (Default: 0.95)
+#' 
+#' @rdname intervals
+#' @aliases ci.mean ci.median ci.sd 
+#' 
 #' @export
 coverage <- function(level = 0.95) {
   function(x, na.rm = TRUE) {
@@ -47,7 +54,7 @@ ci.median <- function(level = 0.95) {
     res <- as.numeric(x[round(ci_index)])
     
     #names(res) <- paste("ci_median", c("lower", "upper"), sep = "_")
-    names(res) <- c("lower", "upper") # Do we prefer a short form?
+    names(res) <- c("lower", "upper") 
     res
   }
 }
@@ -64,12 +71,21 @@ ci.sd <- function(level = 0.95) {
       stats::sd(x, na.rm = TRUE)^2 /
       qchisq(c(top, bottom), df = n - 1)
     res <- sqrt(res)
-    names(res) <- paste("ci_sd", c("lower", "upper"), sep = "_")
-    names <- c("lower", "upper") # Do we prefer a short form?
+    #names(res) <- paste("ci_sd", c("lower", "upper"), sep = "_")
+    names <- c("lower", "upper") 
     res 
   }
 }
 
+#' Function builder for proportions.
+#' 
+#' Evaluate this and hand the result to `df_stats()`
+#' @param nm The level for which to find the proportion
+#' 
+#' @examples
+#' \dontrun{
+#' df_stats(mtcars, ~ cyl, proportion(6))
+#' }
 #' @export
 proportion <- function(nm = NULL) {
   function(x) {
@@ -81,6 +97,16 @@ proportion <- function(nm = NULL) {
   }
 }
 
+#' Function builder for confidence intervals on proportions
+#' 
+#' Similar to `proportion`, but 
+#' 
+#' @param level The confidence interval (Default: 0.95)
+#' @param nm The level for which to find the proportion
+#' @examples
+#' \dontrun{
+#' df_stats(mtcars, ~ cyl, cyl_prop = ci.proportion(6, level = 0.90))
+#' }
 #' @export
 ci.proportion <- function(nm = NULL, level = 0.95) {
   level <- check.level(level)
@@ -95,8 +121,8 @@ ci.proportion <- function(nm = NULL, level = 0.95) {
     bottom <- (1 - level) / 2
     top <- 1 - bottom
     res <- qbinom(c(bottom, top), size = length(x), prob = prob) / n
-    names(res) <- paste(nm, c("lower", "upper"), sep = "_")
-    
+    # names(res) <- paste(nm, c("lower", "upper"), sep = "_")
+    names <- c("lower", "upper")
     res 
   }
 } 

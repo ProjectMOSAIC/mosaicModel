@@ -4,6 +4,7 @@
 #' @rdname extract_from_model
 #' @param object the model you are extracting features from.
 #' @param ... additional arguments (not used)
+#' @export
 data_from_model <- function(object, ...) {
   UseMethod("data_from_model")
 }
@@ -61,23 +62,30 @@ formula_from_mod.lm <-
 
 formula_from_mod.gbm <- function(object, ...) {formula(object$Terms) }
 
-data_from_model.lm <-
-  data_from_model.groupwiseModel <-
-  data_from_model.glm <-
-  data_from_model.randomForest <- 
-  data_from_model.gbm <-
-  data_from_model.rpart <- function(object, ...) {
-    dots <- list(...)
-    if ("data" %in% names(dots) && ! is.null(dots$data))
-      return(dots$data)
-    # The above is NOT YET IMPLEMENTED
-    # When/If I add the train function ...
-    # if the object has a data attribute added by train, use that
-    data_in_call <- which("data" == names(object$call))
-    if (length(data_in_call) == 1) {
-      the_data <- eval(object$call[[data_in_call]], envir = parent.frame(3))
-      if (is.data.frame(the_data)) return(the_data)
-    }
+#' @export
+data_from_model.lm <- function(object, ...) {
+  dots <- list(...)
+  if ("data" %in% names(dots) && ! is.null(dots$data))
+    return(dots$data)
+  # The above is NOT YET IMPLEMENTED
+  # When/If I add the train function ...
+  # if the object has a data attribute added by train, use that
+  data_in_call <- which("data" == names(object$call))
+  if (length(data_in_call) == 1) {
+    the_data <- eval(object$call[[data_in_call]], envir = parent.frame(3))
+    if (is.data.frame(the_data)) return(the_data)
   }
+}
+
+#' @export
+data_from_model.groupwiseModel <- data_from_model.lm
+#' @export  
+data_from_model.glm <- data_from_model.lm
+#' @export
+data_from_model.randomForest <- data_from_model.lm
+#' @export
+data_from_model.gbm <- data_from_model.lm
+#' @export
+data_from_model.rpart <- data_from_model.lm
 
 

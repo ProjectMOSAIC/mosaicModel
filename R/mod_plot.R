@@ -11,7 +11,7 @@
 #' @param post_transform a scalar transformation and new name for the response variable, 
 #' e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.
 #' @param size numerical value for line width (default: 1)
-#' @param alpha numerical value in [0,1] for transparency (default: 0.8)
+#' @param alpha numerical value in 0 to 1 for transparency (default: 0.8)
 #' @param class_level character string. If a probability for a classifier is being shown,
 #' which levels of the response variable to use in the plot. (Default: the first one.)
 #' @param ... specific values for explantory variables 

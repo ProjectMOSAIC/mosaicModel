@@ -31,7 +31,7 @@ e.g. \code{post_transform = c(price = exp)} to undo a log transformation of pric
 
 \item{size}{numerical value for line width (default: 1)}
 
-\item{alpha}{numerical value in \link{0,1} for transparency (default: 0.8)}
+\item{alpha}{numerical value in 0 to 1 for transparency (default: 0.8)}
 
 \item{...}{specific values for explantory variables}
 }

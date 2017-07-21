@@ -45,7 +45,7 @@ test_that("eval_glm correctly dispatches models", {
   d.AD <- data.frame(treatment, outcome, counts)
   m1 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson()) 
   m2 <- glm(I(mpg > 20) ~ hp + cyl, data = mtcars, family = binomial())
-  r1 <- mosaicModel:::eval_glm(m1)
+  r1 <- mosaicModel:::eval_glm(m1, data = d.AD)
   r2 <- mosaicModel:::eval_glm(m2, interval = "confidence")
   expect_true(sum(abs(m1$model_output[1:6] - c(21, 13.33333, 15.6667, 21, 13.3333, 15.666667))) < .01,
               "poisson output wrong")
@@ -60,9 +60,9 @@ test_that("poisson regression works", {
   treatment <- gl(3,3)
   d.AD <- data.frame(treatment, outcome, counts)
   m5 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson())
-  r1 <- mosaicModel:::eval_poisson(m5)
-  r2 <- mosaicModel:::eval_poisson(m5, interval = "confidence")
-  r3 <- mosaicModel:::eval_glm(m5)
+  r1 <- mosaicModel:::eval_poisson(m5, data = d.AD)
+  r2 <- mosaicModel:::eval_poisson(m5, data = d.AD, interval = "confidence")
+  r3 <- mosaicModel:::eval_glm(m5, data = d.AD)
   expect_true(sum(abs(r1$model_output[1:6] - c(21, 13.33333, 15.6667, 21, 13.3333, 15.666667))) < .01,
               "poisson output wrong")
 

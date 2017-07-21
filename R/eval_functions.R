@@ -58,6 +58,7 @@ eval_glm <- function(model, data = NULL, interval = c("none", "confidence")) {
   if (!inherits(model, c("glm"))) 
     stop("model not a recognized logistic type of model")
   
+  if (is.null(data)) data <- data_from_model.glm(model)
   link_type <- model[["family"]]
   
   fun <- switch(
