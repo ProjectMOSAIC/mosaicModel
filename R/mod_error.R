@@ -7,7 +7,7 @@
 #' For categorical response variables, an analog of MSPE can be calculated (see details) 
 #' but by default, a mean log-likelihood (mean per case) is computed instead.
 #' 
-#' @param mod The model whose prediction error is to be estimated.
+#' @param model The model whose prediction error is to be estimated.
 #' @param testdata A data frame giving both model inputs and the actual value of the response
 #' variable. If no testing data is provided, the training data will be used and a warning issued.
 #' @param SS Flag to have output be the sum of square errors.
@@ -50,7 +50,7 @@ mod_error <- function(model, testdata, SS = FALSE, LL = TRUE) {
   # mosaic::MSPE(mod, testdata, LL = LL)
   # Needed to change code, but didn't update MSPE in mosaic package
   # This is re-written to use mod_eval() rather than predict()
-  actual <- eval(parse(text = mosaicModel:::response_var(model)), envir = testdata)
+  actual <- eval(parse(text = response_var(model)), envir = testdata)
   model_vals <- mod_eval(model, data = testdata, append = FALSE)
   if (is.numeric(actual)) {
     fun <- ifelse(SS, base::sum, base::mean)

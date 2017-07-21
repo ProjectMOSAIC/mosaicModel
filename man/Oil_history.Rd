@@ -21,6 +21,6 @@ Annual production of crude oil, in millions of barrels (mbbl).
 }
 \examples{
 model <- lm(log(mbbl) ~ year, data = Oil_history)
-fmodel(model)
+mod_plot(model)
 }
 \keyword{datasets}

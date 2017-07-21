@@ -6,6 +6,9 @@
 \usage{
 coverage(level = 0.95)
 }
+\arguments{
+\item{level}{Confidence level, e.g. 0.95}
+}
 \description{
 Interval statistics for use with df_stats()
 }

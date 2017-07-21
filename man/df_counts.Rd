@@ -4,7 +4,7 @@
 \alias{df_counts}
 \title{Formula interface to counts}
 \usage{
-df_counts(formula, data, ..., wide = FALSE, margins = FALSE)
+df_counts(formula, data, wide = FALSE, margins = FALSE)
 }
 \arguments{
 \item{formula}{the formula describing the relationship}
@@ -13,13 +13,11 @@ df_counts(formula, data, ..., wide = FALSE, margins = FALSE)
 
 \item{wide}{reformat the output as a cross-tabulation. This makes sense only when there are just two variables}
 
-\item{margins}{show the marginal probabilities. Makes the most sense if \code{wide = TRUE}.}
-
-\item{format}{Used just for internal purposes.}
+\item{margins}{show the marginal counts. Makes the most sense if \code{wide = TRUE}.}
 }
 \description{
 Counts the number of cases in a data frame broken down by the
-variables in the formula. Formats this in the same way as \code{df_props}.
+variables in the formula.
 }
 \seealso{
 \code{df_props}

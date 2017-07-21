@@ -1,5 +1,6 @@
 #' Interval statistics for use with df_stats()
 #' 
+#' @param level Confidence level, e.g. 0.95
 #' @export
 coverage <- function(level = 0.95) {
   function(x, na.rm = TRUE) {

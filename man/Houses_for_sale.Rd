@@ -22,9 +22,9 @@ of case studies and included in this package for convenience.
 \examples{
 mod_1 <- lm(price ~ fireplaces, data = Houses_for_sale)
 mod_2 <- lm(price ~ fireplaces + living_area, data = Houses_for_sale)
-effect_size(mod_1, ~ fireplaces)
-effect_size(mod_2, ~ fireplaces)
-fmodel(mod_2, ~ living_area + fireplaces)
+mod_effect(mod_1, ~ fireplaces)
+mod_effect(mod_2, ~ fireplaces)
+mod_plot(mod_2, ~ living_area + fireplaces)
 }
 \references{
 Dick De Veaux (2015) "How much is a fireplace worth?" Stats 101: A resource for teaching introductory statistics, American Statistical Association

@@ -28,8 +28,8 @@ architectures <- tibble::tribble(
   ~mod_class, ~eval_fun, ~has_data,
   # the order matters
   "glm",      eval_glm, data_from_model.lm,
-  "lm",       eval_linear, data_from_model.lm,
-  "rlm",      eval_linear, data_from_model.lm, 
+  "lm",       eval_lm, data_from_model.lm,
+  "rlm",      eval_lm, data_from_model.lm, 
   "rpart",    eval_rpart, data_from_model.rpart,
   "randomForest", eval_randomForest, data_from_model.randomForest
   

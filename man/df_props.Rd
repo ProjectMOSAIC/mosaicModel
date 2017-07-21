@@ -14,6 +14,8 @@ df_props(formula, data, as.percent = FALSE, ..., wide = FALSE,
 
 \item{as.percent}{show proportions in percent (e.g. multiply by 100)}
 
+\item{...}{statistics functions to be applied to the data, e.g. mean, sd, confidence(0.95)}
+
 \item{wide}{reformat the output as a cross-tabulation. This makes sense only when there are just two variables}
 
 \item{margins}{show the marginal probabilities. Makes the most sense if \code{wide = TRUE}.}
@@ -33,10 +35,10 @@ Using \code{|} in the formula specifies a conditional proportion
 }
 }
 \examples{
-mtcars \%>\% df_props( ~ cyl + gear) 
-mtcars \%>\% df_props( ~ cyl | gear)
-mtcars \%>\% df_props( ~ cyl + gear, wide = TRUE)
-mtcars \%>\% df_props( ~ cyl + gear, margins = TRUE)
-mtcars \%>\% df_props( ~ cyl | gear, margins = TRUE)
+df_props(mtcars, ~ cyl + gear) 
+df_props(mtcars, ~ cyl | gear)
+df_props(mtcars, ~ cyl + gear, wide = TRUE)
+df_props(mtcars, ~ cyl + gear, margins = TRUE)
+df_props(mtcars ~ cyl | gear, margins = TRUE)
 
 }

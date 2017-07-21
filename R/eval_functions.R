@@ -3,17 +3,17 @@
 # These functions are the interface to the various model types for `mod_eval()`, and through 
 # that to all the other `mod_` functions that need to evaluate models, e.g. `mod_effect()`, `mod_cv()`, and so on.
 # 
-#' @param model A model object of the classes permitted
-#' @param data Usually, a data table specifying the inputs to the model. But if
-#' not specified, the training data will be used.
-#' @param interval One of "none", "confidence", or "prediction". Not all model
-#' types support "prediction" or even "confidence".
-#' 
-#' 
-#' @details All of the `eval_` functions are ex
-#' These functions return a numerical vector (for regression types) or
-#' a matrix of probabilities (for classifiers)
-#'
+# @param model A model object of the classes permitted
+# @param data Usually, a data table specifying the inputs to the model. But if
+# not specified, the training data will be used.
+# @param interval One of "none", "confidence", or "prediction". Not all model
+# types support "prediction" or even "confidence".
+# 
+# 
+# @details All of the `eval_` functions are ex
+# These functions return a numerical vector (for regression types) or
+# a matrix of probabilities (for classifiers)
+#
 eval_randomForest <- function(model, data = NULL,
                               interval = c("none", "confidence", "prediction")) {
   if (!inherits(model, "randomForest")) 
@@ -27,14 +27,14 @@ eval_randomForest <- function(model, data = NULL,
       as.data.frame(
         predict(model, newdata = data, type = "prob")))
   } else if (model$type == "regression") {
-    res <- data_frame(model_output = 
+    res <- data.frame(model_output = 
       predict(model, newdata = data, type = "response"))
   }
   
   res
 }
 
-eval_linear <- function(model, data = NULL, interval = c("none", "confidence", "prediction")) {
+eval_lm <- function(model, data = NULL, interval = c("none", "confidence", "prediction")) {
   if (!inherits(model, c("lm"))) 
     stop("model not a recognized linear type of model")
   

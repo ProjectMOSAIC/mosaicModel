@@ -30,6 +30,6 @@ baby's health.
 }
 \examples{
 mod_1 <- lm(baby_wt ~ gestation + mother_wt, data = Birth_weight)
-effect_size(mod_1, ~ gestation)
+mod_effect(mod_1, ~ gestation)
 }
 \keyword{datasets}

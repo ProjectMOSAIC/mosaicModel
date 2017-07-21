@@ -48,6 +48,7 @@ kfold_trial <- function(model,
 # helper for reference levels
 # get an appropriate set of levels
 n_levels <- function(values, n) {
+  var_name <- substitute(values)
   n <- pmax(ceiling(abs(n)), 1)
   unique_vals <- unique(values)
   if (n == Inf) { # flag for "all levels". But don't go crazy if variable is quantitative
@@ -73,7 +74,7 @@ n_levels <- function(values, n) {
     if (n == 1) {
       return(signif(med, 2))
     }
-    outliers <- mosaicModel:::has_outlier(values)
+    outliers <- has_outlier(values)
     order_of_magnitude <- 0
     common_digits <- range(log10(abs(unique_vals[unique_vals != 0])))
     if (1 > diff(common_digits) && sign(min(unique_vals)) == sign(max(unique_vals))) {

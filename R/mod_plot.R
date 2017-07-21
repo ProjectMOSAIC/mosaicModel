@@ -27,14 +27,16 @@
 #' # show the data used for fitting along with the model
 #' mod_plot(mod1, ~ age + sex + sector, nlevels = 8) 
 #' mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
-#' mod_plot(mod2, post_transform = c(wage = exp), interval = "confidence") # undo the log in the display
+#' mod_plot(mod2, post_transform = c(wage = exp), 
+#'      interval = "confidence") # undo the log in the display
 #' mod3 <- glm(married == "Married" ~ age + sex * sector,
 #'             data = mosaicData::CPS85, family = "binomial")
 #' mod_plot(mod3)
 #' mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 #' mod_plot(mod4)
 #' mod_plot(mod4, class_level = "manag")
-#' mod5 <- randomForest::randomForest(sector ~ age + sex + married, data = mosaicData::CPS85)
+#' mod5 <- randomForest::randomForest(
+#'          sector ~ age + sex + married, data = mosaicData::CPS85)
 #' mod_plot(mod5)
 #' mod_plot(mod5, class_level = "manag")
 #' }
@@ -47,7 +49,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   all_models <- NULL
   if (inherits(model, "bootstrap_ensemble")) {
     model <- model$original_model
-    all_models <- models$replications # a list of models
+    all_models <- model$replications # a list of models
   }
   
   # Deal with the arguments
@@ -87,7 +89,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   # then nlevels for the remaining ones.
   how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
   names(how_many) <- show_vars
-  eval_levels <- df_typical(data = levels_data[explan_vars], n = how_many, at = at)
+  eval_levels <- df_typical(data = levels_data[explan_vars], nlevels = how_many, at = at)
   
   # Evaluate the model at the specified levels
   model_vals <- mod_eval(model = model, data = eval_levels, interval = interval,
@@ -120,9 +122,6 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   model_vals <- cbind(eval_levels, model_vals)
 
   # figure out the components of the plot
-  
-  
-  if (!require(ggplot2)) stop("Must install ggplot2 package for these graphics")
   
   P <- if (length(show_vars) > 1 ) {
     ggplot(data = model_vals, 
@@ -176,7 +175,7 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
                            ymax = "upper", ymin = "lower", fill = show_vars[2]), 
                 color = NA, alpha = alpha/4) 
     } else {
-      Q <- Qfun(data = model_val, 
+      Q <- Qfun(data = model_vals, 
                 aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower"), 
                 color = "black", alpha = alpha/4)

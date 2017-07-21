@@ -20,5 +20,5 @@
 #' 
 #' @examples
 #' model <- lm(log(mbbl) ~ year, data = Oil_history)
-#' fmodel(model)
+#' mod_plot(model)
 "Oil_history"
