@@ -1,0 +1,78 @@
+---
+title: "Using mosaicModel"
+author: "Daniel Kaplan"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The `mosaicModel` package provides a basic interface for training, interpreting, and displaying statistical models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically listed under the name "machine learning."
+
+* `mod_eval()` -- evaluate a model, that is, turn inputs into model values. For many model architectures, you can also get prediction or confidence intervals on the outputs.
+* `mod_effect()` -- calculate effect sizes, that is, how a change in an input variable changes the output
+* `mod_plot()` -- produce a graphical display of the "shape" of a model. There can be as many as 4 input variables shown, along with the output.
+* `mod_error()` -- find the mean square prediction error (or the log likelihood)
+* `mod_ensemble()` -- create an ensemble of bootstrap replications of the model, that is, models fit to resampled data from the original model.
+* `mod_cv()` -- carry out cross validation on one or more models. 
+* `mod_fun()` -- extract a function from a model that implements the inputs-to-output relationship.
+* `mod_train()` -- train models using a formula/data specification. Many commonly used model architectures already have a formula/data interface, e.g. `lm`, `glm`, `rpart`, etc. The regular training functions (e.g. `lm()`) can be used for those models.
+
+The `mod_architectures()` function lists which model architectures are available.
+
+## Training models
+
+The formula/data specification.
+
+Classifiers and regression models
+
+The UPCOMING `mod_train()` function.
+
+## Evaluating models
+
+* Will generate "typical inputs" to get a quick idea of model outputs
+* Output in dataframe format, with the input values and the corresponding model output.
+    * For regression models, the output is always called `model_output` and confidence/prediction intervals are always labelled `lower` and `upper`.
+    * For classifiers, whenever possible the output is in the form of the probability of each possible class. 
+    
+## Bootstrapping
+
+* Create the ensemble.
+* Other functions in the series will work with the ensemble.
+
+## Cross-validation
+
+* For model selection: Analogy to ANOVA
+
+
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold', fig.cap = "The caption of this figure."}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+
