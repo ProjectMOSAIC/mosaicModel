@@ -2,26 +2,24 @@
 % Please edit documentation in R/mod_train.R
 \name{mod_train}
 \alias{mod_train}
-\title{Training statistical models}
+\title{Training interface for model architectures}
 \usage{
-mod_train(data, formula = formula(data), architecture = "lm")
+mod_train(architecture = NULL, formula, data = NULL, ...)
 }
 \arguments{
-\item{data}{the data to use for training}
+\item{architecture}{A character string specifying the desired architecture.}
 
-\item{formula}{the formula describing the structure of the relationship among variables}
+\item{formula}{A formula specifying the response and explanatory variables as well as any additional
+model terms (such as interactions).}
 
-\item{architecture}{the model architecture, given as a function name, quoted or not, e.g. lm or "lm"}
+\item{data}{The dataframe to be used for fitting.}
+
+\item{...}{Other parameters of importance for individual model architectures}
 }
 \description{
-This function coordinates four components in building statistical models:
-\enumerate{
-\item the data to use for training
-\item the response variable and
-\item the explanatory variables, specified as a model formula
-\item the architecture of the model.
-}
-}
-\details{
-This is a light wrapper on the architecture-specific function fitting programs
+Many model fitting functions in R such as \code{lm}, \code{glm}, and \code{rpart} use a dataframe/formula
+interface, where the response and explanatory variables are contained in a single dataframe
+and the formula describes what variables and terms are to be included in the model. But some
+architectures, e.g. \code{knn}, \code{lda/qda}, etc. do not adopt this convention. This function provides
+a way to use the dataframe/formula interface for such architectures.
 }

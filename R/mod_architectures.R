@@ -13,7 +13,7 @@
 #' TO ADD A NEW ARCHITECTURE
 #' 1. Create the appropriate eval_ function
 #' 2. Either register the model class and eval_ function in the `architectures` table above
-#'     or add it to an oversight eval_ fucntion such as eval_glm
+#'     or add it to an oversight eval_ function such as eval_glm
 #' 3. Create a data_from_model() method for the new class. If it's not possible to extract 
 #'     the data from the model object, throw an error in your method.
 #' 4. Similarly, create methods for explanatory_vars(), response_var(), 
@@ -21,7 +21,7 @@
 
 #' @export
 mod_architectures <- function() {
-  return(architectures$mod_class)
+  return(training_functions$mod_class)
 }
 
 architectures <- tibble::tribble(
