@@ -38,7 +38,13 @@ df_typical <- function(data = NULL,
   
   # try to figure out what are the possible levels of variables
   if ( (! is.null(model)) && is.null(data)) data <- data_from_model(model)
-  explan_vars <- if (! is.null(model)) explanatory_vars(model) else names(data)
+  missing_from_data <- ! names(at) %in% names(data)
+  if (any(missing_from_data)) 
+    stop("Explanatory variable",
+         ifelse(length(at)>1, "s", ""), " ", 
+         paste0("'", paste(names(at), collapse=", "), "'"), 
+         " not in the data table")
+  explan_vars <- if (is.null(model)) names(at) else base::union(explanatory_vars(model), names(at))
 
   # Set a large number of levels for the first explanatory variable,
   # then nlevels for the remaining ones.

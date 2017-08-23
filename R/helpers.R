@@ -108,45 +108,6 @@ has_outlier <- function(values, whisker = 3) {
 }
 
 
-# make reference levels for a model evaluation
-# create_eval_levels <- function(model, formula, from = NULL, at = NULL, data = NULL){
-#   # grab the explanatory variable to use for the difference
-#   change_var <- all.vars(mosaic::rhs(formula))
-#   
-#   if (is.null(data)) data <- data_from_model(model, data = data)
-#   response <- response_var(model)
-#   explan_vars <- explanatory_vars(model)
-#   
-#   centers <- as.list(rep(NA, length(explan_vars)))
-#   names(centers) <- explan_vars
-#   for (var_name in explan_vars) {
-#     values <- data[[var_name]]
-#     centers[[var_name]] <-
-#       if (is.numeric(values)) {
-#         median(values, na.rm = TRUE)
-#       } else {
-#         # get the most popular level
-#         popular <- names(sort(table(values), decreasing = TRUE))[1]
-#         if (is.factor(values)) {
-#           popular <- factor(popular, levels = levels(values))
-#         }
-#         popular
-#       }
-#   }
-#   if ( ! is.null(from)) centers[[change_var]] <- from
-#   
-#   # loop over <at> and update any nominal values
-#   for (k in seq_along(at)) {
-#     nm <- names(at)[k]
-#     if ( ! nm %in% explan_vars) stop(nm, "isn't an explanatory variable.")
-#     centers[[nm]] <- at[[k]]
-#     if (is.factor(data[[nm]]))
-#       centers[[nm]] <- factor(centers[[nm]], levels = levels(data[[nm]]))
-#   }
-#   # input values for the explanatory variables
-#   reference_values(data[,explan_vars, drop = FALSE], at = centers)
-# }
-
 get_step = function(ref_vals, change_var, data, step = NULL, from = NULL) {
   if (is.null(step)) { # Need to set the step
     vals <- data[[change_var]]
@@ -169,7 +130,7 @@ get_step = function(ref_vals, change_var, data, step = NULL, from = NULL) {
 # and those that don't ($extras)
 
 handle_dots_as_variables <- function(model, ...) {
-  xvars <- explanatory_vars(model)
+  xvars <- base::union(explanatory_vars(model), names(data_from_model(model)))
   All <- list(...)
   res <- list()
   res$at <- All[names(All) %in% xvars]
