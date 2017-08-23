@@ -20,7 +20,7 @@ TO ADD A NEW ARCHITECTURE
 \enumerate{
 \item Create the appropriate eval_ function
 \item Either register the model class and eval_ function in the \code{architectures} table above
-or add it to an oversight eval_ fucntion such as eval_glm
+or add it to an oversight eval_ function such as eval_glm
 \item Create a data_from_model() method for the new class. If it's not possible to extract
 the data from the model object, throw an error in your method.
 \item Similarly, create methods for explanatory_vars(), response_var(),

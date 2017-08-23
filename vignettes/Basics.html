@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel Kaplan" />
 
-<meta name="date" content="2017-07-21" />
+<meta name="date" content="2017-08-23" />
 
 <title>Using mosaicModel</title>
 
@@ -70,11 +70,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Using mosaicModel</h1>
 <h4 class="author"><em>Daniel Kaplan</em></h4>
-<h4 class="date"><em>2017-07-21</em></h4>
+<h4 class="date"><em>2017-08-23</em></h4>
 
 
 
-<p>The <code>mosaicModel</code> package provides a basic interface for training, interpreting, and displaying statistical models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically listed under the name “machine learning.”</p>
+<p>The <code>mosaicModel</code> package provides a basic interface for learning about training, interpreting, and displaying statistical models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically classed as “machine learning.”</p>
 <ul>
 <li><code>mod_eval()</code> – evaluate a model, that is, turn inputs into model values. For many model architectures, you can also get prediction or confidence intervals on the outputs.</li>
 <li><code>mod_effect()</code> – calculate effect sizes, that is, how a change in an input variable changes the output</li>
@@ -85,7 +85,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><code>mod_fun()</code> – extract a function from a model that implements the inputs-to-output relationship.</li>
 <li><code>mod_train()</code> – train models using a formula/data specification. Many commonly used model architectures already have a formula/data interface, e.g. <code>lm</code>, <code>glm</code>, <code>rpart</code>, etc. The regular training functions (e.g. <code>lm()</code>) can be used for those models.</li>
 </ul>
+<div id="available-model-architectures" class="section level2">
+<h2>Available model architectures</h2>
+<p>“Architecture” is used to refer to the class of models. For instance, a linear model</p>
 <p>The <code>mod_architectures()</code> function lists which model architectures are available.</p>
+</div>
 <div id="training-models" class="section level2">
 <h2>Training models</h2>
 <p>The formula/data specification.</p>
