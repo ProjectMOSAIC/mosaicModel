@@ -103,7 +103,7 @@ mod_effect <- function(model, formula, step = NULL,
   output_form <- from_inputs
   output_form[[change_var]] <- NULL # remove it temporarily
   output_form <- rev(output_form) 
-  output_form[[paste0("to:", change_var)]] <- to_inputs[[change_var]]
+  output_form[[paste0("to_", change_var)]] <- to_inputs[[change_var]]
   output_form[[change_var]] <- from_inputs[[change_var]]
   output_form <- rev(output_form) 
   
