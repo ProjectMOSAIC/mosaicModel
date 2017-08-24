@@ -48,8 +48,13 @@ df_typical <- function(data = NULL,
 
   # Set a large number of levels for the first explanatory variable,
   # then nlevels for the remaining ones.
-  how_many <- as.list(c(rep(nlevels, length(explan_vars))))
-  names(how_many) <- explan_vars
+  if (length(nlevels) == 1) {
+    # replicate for all the explanatory variables
+    how_many <- as.list(c(rep(nlevels, length(explan_vars))))
+    names(how_many) <- explan_vars
+  } else {
+    how_many = nlevels
+  }
   eval_levels <- reference_values(data[explan_vars], n = how_many, at = at )
   vnames <- names(eval_levels)
   for (name in vnames) {

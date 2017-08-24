@@ -92,8 +92,10 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("non
       model_vals <- this_eval_fun(model$replications[[k]], data = eval_levels, interval = interval)
       if (append) output[[k]] <- dplyr::bind_cols(eval_levels, model_vals)
       else output[[k]] <- model_vals
+      
+      output[[k]][[".trial"]] <- k
     }
-    output <- dplyr::bind_rows(output, id = ".trial")
+    output <- dplyr::bind_rows(output)
   } else {
     model_vals <- this_eval_fun(model, data = eval_levels, interval = interval)
     

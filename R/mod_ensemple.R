@@ -24,7 +24,7 @@ mod_ensemble <- function(model, nreps = 2, data = NULL) {
   res$original_model <- model
   res$data <- data
   fit_call <- res$call <- model$call
-  fit_call[[3]] <- as.name("train_data")
+  fit_call[["data"]] <- as.name("train_data")
   res$replications <- list()
   res$oob <-list() # out of bag cases for each replication
   for (k in 1:nreps) {

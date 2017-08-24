@@ -21,10 +21,8 @@
 #' \dontrun{
 #' mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 #' mod_plot(mod1)
-#' mod_plot(mod1, n = Inf, interval = "confidence") + 
-#'   geom_point(data = mosaicData::CPS85, aes(y = wage), alpha = 0.2)
+#' mod_plot(mod1, n = Inf, interval = "confidence") 
 #' mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
-#' # show the data used for fitting along with the model
 #' mod_plot(mod1, ~ age + sex + sector, nlevels = 8) 
 #' mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
 #' mod_plot(mod2, post_transform = c(wage = exp), 
@@ -32,6 +30,8 @@
 #' mod3 <- glm(married == "Married" ~ age + sex * sector,
 #'             data = mosaicData::CPS85, family = "binomial")
 #' mod_plot(mod3)
+#' E3 <- mod_ensemble(mod3, 10)
+#' mod_plot(E3)
 #' mod4 <- rpart::rpart(sector ~ age + sex + married, data = mosaicData::CPS85)
 #' mod_plot(mod4)
 #' mod_plot(mod4, class_level = "manag")
@@ -48,12 +48,13 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   
   all_models <- NULL
   if (inherits(model, "bootstrap_ensemble")) {
-    model <- model$original_model
-    all_models <- model$replications # a list of models
+    orig_model <- model$original_model
+  } else {
+    orig_model <- model
   }
   
   # Deal with the arguments
-  dots <- handle_dots_as_variables(model, ...)
+  dots <- handle_dots_as_variables(orig_model, ...)
   extras <- dots$extras
   inline_values <- dots$at
       # Override the values in <at> with any set as inline arguments.
@@ -69,11 +70,11 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
 
   # If data not explicitly provided, get from model
   levels_data <- 
-    if (is.null(data)) data_from_model(model) else data
+    if (is.null(data)) data_from_model(orig_model) else data
   
   # Pick out the variables to be displayed, and their roles
-  explan_vars <- explanatory_vars(model)
-  response_var_name <- response_var(model)
+  explan_vars <- explanatory_vars(orig_model)
+  response_var_name <- response_var(orig_model)
   
   if (is.null(formula)) show_vars <- explan_vars
   else show_vars <- all.vars(mosaic::rhs(formula))
@@ -89,11 +90,13 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   # then nlevels for the remaining ones.
   how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
   names(how_many) <- show_vars
-  eval_levels <- df_typical(data = levels_data[explan_vars], nlevels = how_many, at = at)
+  eval_levels <- df_typical(data = levels_data[explan_vars],
+                            model = orig_model,
+                            nlevels = how_many, at = at)
   
   # Evaluate the model at the specified levels
   model_vals <- mod_eval(model = model, data = eval_levels, interval = interval,
-                         append = FALSE)
+                         append = TRUE)
   
   # If it's the probability from a classifier, pick out the selected level
   if ( ! "model_output" %in% names(model_vals)) {
@@ -117,11 +120,14 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
       model_vals[[k]] <- the_transform(model_vals[[k]])
   }
 
-  if (any(names(model_vals) %in% names(eval_levels)))
-      stop("Name conflict in output of `mod_eval()`, Eval_levels has response var name in it.")
-  model_vals <- cbind(eval_levels, model_vals)
+  # if (any(names(model_vals) %in% names(eval_levels)))
+  #     stop("Name conflict in output of `mod_eval()`, Eval_levels has response var name in it.")
+  # model_vals <- cbind(eval_levels, model_vals)
 
   # figure out the components of the plot
+  if (length(show_vars) > 1) {
+    model_vals[[show_vars[2]]] <- as.factor(model_vals[[show_vars[2]]])
+  }
   
   P <- if (length(show_vars) > 1 ) {
     ggplot(data = model_vals, 
@@ -143,23 +149,25 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
     }
   } else { # more than one explanatory variable
     if (first_var_quantitative) {
-      if (is.numeric(eval_levels[[show_vars[2]]]))
+      if (is.numeric(model_vals[[show_vars[2]]]))
         for_aes <- aes_string(color = show_vars[2])
       else 
         for_aes <- aes_string(color = show_vars[2], linetype = show_vars[2])
-      P <- P + geom_line(for_aes, alpha = alpha, size = size)
+      if (inherits(model, "bootstrap_ensemble")) {
+        for (k in unique(model_vals[[".trial"]])) {
+          P <- P + geom_line(data = model_vals[model_vals$.trial == k,],
+                             for_aes, alpha = alpha, size = size)
+        }
+      } else {
+        P <- P + geom_line(for_aes, alpha = alpha, size = size)
+      }
     } else {
       P <- P + geom_point(
         aes_string(color = show_vars[2]), 
-                   alpha = alpha, size = size) 
-      # +
-      #   geom_line(
-      #     aes_string(group = show_vars[2], color = show_vars[2],
-      #                linetype = show_vars[2]), 
-      #     alpha = alpha, size = size)
+        alpha = alpha, size = size) 
     }
   }
-
+  
   # The mode for confidence intervals
   if (first_var_quantitative) {
     Qfun <- geom_ribbon
