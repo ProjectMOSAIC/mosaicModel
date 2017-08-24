@@ -87,5 +87,7 @@ data_from_model.randomForest <- data_from_model.lm
 data_from_model.gbm <- data_from_model.lm
 #' @export
 data_from_model.rpart <- data_from_model.lm
+#' @export
+data_from_model.bootstrap_ensemble <- function(object, ...) data_from_model(object$original_model, ...)
 
 

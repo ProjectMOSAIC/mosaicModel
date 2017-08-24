@@ -8,6 +8,10 @@
 #' @rdname intervals
 #' @aliases ci.mean ci.median ci.sd 
 #' 
+#' @examples
+#' cover <- coverage(0.95)
+#' df_stats(hp ~ cyl, data = mtcars, c95 = cover)
+#' 
 #' @export
 coverage <- function(level = 0.95) {
   function(x, na.rm = TRUE) {

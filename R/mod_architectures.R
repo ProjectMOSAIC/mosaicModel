@@ -35,9 +35,9 @@ architectures <- tibble::tribble(
   
 )
 
-
-
 get_eval_function <- function(model) {
+  if (inherits(model, "bootstrap_ensemble")) 
+    return(get_eval_function(model$original_model))
   # find the ones that match
   inds <- which(architectures$mod_class %in% class(model))
   if (length(inds) == 0) 

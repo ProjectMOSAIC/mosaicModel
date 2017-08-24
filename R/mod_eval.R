@@ -56,41 +56,50 @@
 #' @export
 mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("none", "prediction", "confidence"),
                    nlevels = 3, ..., on_training = FALSE) {
-  dots <- handle_dots_as_variables(model, ...)
-  extras <- dots$extras
-  at <- dots$at
   
   interval <- match.arg(interval)
-  # Override the values in <at> with any set as inline arguments.
-  #at[names(inline_values)] <- NULL
-  #at <- c(at, inline_values)
   
   if (is.null(model)) {
     stop("Must provide a model to evaluate.")
   } 
-  
-  # Get the proper evaluation function
-  for_this_model <- get_eval_function(model)
-  this_eval_fun <- for_this_model$eval_fun
-  # Check that the intervals are actually available
-  if ( ! interval %in% for_this_model$intervals)
-    stop("Interval of type ", interval, " not available for models of class ", class(model)[1])
   
   eval_levels <- 
     if (on_training) {
       data_from_model(model)
     } else { # If no data provided, get typical levels
       if (is.null(data)) {
+        dots <- handle_dots_as_variables(model, ...)
+        extras <- dots$extras
+        at <- dots$at
         df_typical(model = model, data = data, nlevels = nlevels, at = at)
       } else {
         data
       }
     }
+
+  # Get the proper evaluation function
+  for_this_model <- get_eval_function(model)
+
+  this_eval_fun <- for_this_model$eval_fun
+  # Check that the intervals are actually available
+  if ( ! interval %in% for_this_model$intervals)
+    stop("Interval of type ", interval, " not available for models of class ", class(model)[1])
   
-  model_vals <- this_eval_fun(model, data = eval_levels, interval = interval)
-  
-  if (append) output <- cbind(eval_levels, model_vals)
-  else  output <- model_vals
+  if (inherits(model, "bootstrap_ensemble")) {
+    nreps <- length(model$replications)
+    output <- as.list(numeric(nreps))
+    for (k in 1:nreps) {
+      model_vals <- this_eval_fun(model$replications[[k]], data = eval_levels, interval = interval)
+      if (append) output[[k]] <- dplyr::bind_cols(eval_levels, model_vals)
+      else output[[k]] <- model_vals
+    }
+    output <- dplyr::bind_rows(output, id = ".trial")
+  } else {
+    model_vals <- this_eval_fun(model, data = eval_levels, interval = interval)
+    
+    if (append) output <- cbind(eval_levels, model_vals)
+    else  output <- model_vals
+  }
 
   output
 }

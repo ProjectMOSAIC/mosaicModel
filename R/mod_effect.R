@@ -46,12 +46,6 @@
 mod_effect <- function(model, formula, step = NULL, 
                         bootstrap = FALSE, to = step, nlevels = 1, 
                        data = NULL, at = NULL, class_level = NULL, ... ) {
-  dots <- handle_dots_as_variables(model, ...)
-  inline_vals <- dots$at
-  # combine values set inline with those set in <at>, overriding the ones in <at>
-  at[names(inline_vals)] <- NULL
-  at <- c(at, inline_vals)
-  extras <- dots$extras
   
   if (inherits(model, "bootstrap_ensemble")) {
     ensemble <- model$replications # that is, the list of bootstrapped models
@@ -63,6 +57,13 @@ mod_effect <- function(model, formula, step = NULL,
     ensemble_flag <- FALSE
   }
 
+  dots <- handle_dots_as_variables(original_model, ...)
+  inline_vals <- dots$at
+  # combine values set inline with those set in <at>, overriding the ones in <at>
+  at[names(inline_vals)] <- NULL
+  at <- c(at, inline_vals)
+  extras <- dots$extras
+  
   
   change_var <- all.vars(mosaic::rhs(formula))[1]
   # set up so that glms are evaluated, by default, as the response rather than the link
@@ -137,7 +138,7 @@ mod_effect <- function(model, formula, step = NULL,
     } else {
       data.frame(change = offset_vals[[output_column]] - base_vals[[output_column]])
     }
-    if (ensemble_flag) output_form$bootstrap_rep <- k
+    if (ensemble_flag) output_form$.trial <- k
     
     Result <- rbind(Result, cbind(res, output_form))
   }

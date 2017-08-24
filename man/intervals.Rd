@@ -16,3 +16,8 @@ coverage(level = 0.95)
 Function builders for calculating intervals. These must \emph{always} be evaluated
 with the \emph{result} being handed as a argument to \code{df_stats()}.
 }
+\examples{
+cover <- coverage(0.95)
+df_stats(hp ~ cyl, data = mtcars, c95 = cover)
+
+}
