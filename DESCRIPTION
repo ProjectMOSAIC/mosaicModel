@@ -12,9 +12,9 @@ LazyData: TRUE
 LazyLoad: TRUE
 RoxygenNote: 6.0.1
 Depends: R (>= 3.1)
-Suggests: mosaic, mosaicData, magrittr, splines,
+Suggests: mosaic, mosaicData, magrittr, 
     testthat, rpart, randomForest, knitr,
     rmarkdown
-Imports: dplyr, ggplot2, lazyeval, tibble, tidyr
+Imports: dplyr, ggplot2, lazyeval, tibble, tidyr, splines
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

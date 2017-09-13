@@ -14,9 +14,13 @@ explanatory_vars <- function(object, ...) {
   UseMethod("explanatory_vars")
 }
 
+
+explanatory_vars.Zelig <- function(object, ...) {
+  all.vars(object$formula[[3]])
+}
+
 explanatory_vars.lm <-
-  explanatory_vars.gwm <-
-  explanatory_vars.groupwiseModel <-
+  explanatory_vars.train <- # for caret-package models
   explanatory_vars.rpart <-
   explanatory_vars.randomForest <-
   # Need to fix this so that the items as stored in the model, 
@@ -33,8 +37,11 @@ response_var <- function(object, ...) {
   UseMethod("response_var")
 }
 
+response_var.Zelig <- function(object, ...) {
+  object$formula[[2]]
+}
 response_var.lm <-
-  response_var.groupwiseModel <-
+  response_var.train <- # for caret-package models
   response_var.rpart <-
   response_var.randomForest <-
   response_var.glm <- function(object, ...) { deparse(object$terms[[2]])}
@@ -54,11 +61,14 @@ formula_from_mod <- function(object, ...) {
   UseMethod("formula_from_mod")
 }
 
+formula_from_mod.Zelig <- function(object, ...) {
+  object$formula
+}
 formula_from_mod.lm <-
-  formula_from_mod.groupwiseModel <-
   formula_from_mod.rpart <-
   formula_from_mod.randomForest <-
   formula_from_mod.glm <- function(object, ...) {formula(object$terms)}
+formula_from_mod.Zelig_ls <- function(object, ...) {object$formula}
 
 formula_from_mod.gbm <- function(object, ...) {formula(object$Terms) }
 
@@ -76,9 +86,8 @@ data_from_model.lm <- function(object, ...) {
     if (is.data.frame(the_data)) return(the_data)
   }
 }
-
 #' @export
-data_from_model.groupwiseModel <- data_from_model.lm
+data_from_model.train <- data_from_model.lm # for caret-package models
 #' @export  
 data_from_model.glm <- data_from_model.lm
 #' @export
@@ -89,5 +98,9 @@ data_from_model.gbm <- data_from_model.lm
 data_from_model.rpart <- data_from_model.lm
 #' @export
 data_from_model.bootstrap_ensemble <- function(object, ...) data_from_model(object$original_model, ...)
-
+#' @export
+data_from_model.default <- function(object, ...) {
+  # A kluge for dealing with the Zelig objects. Still speculative.
+  if (inherits(object, "Zelig-ls")) return(object$originaldata)
+}
 

@@ -11,22 +11,185 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The `mosaicModel` package provides a basic interface for learning about training, interpreting, and displaying statistical models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically classed as "machine learning."
+```{r setup, include = FALSE}
+library(ggformula)
+library(tidyverse)
+library(mosaicModel)
+library(randomForest)
+library(caret)
+knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
+```
+
+The `mosaicModel` package provides a basic interface for interpreting and displaying models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically classed as "machine learning."
 
 * `mod_eval()` -- evaluate a model, that is, turn inputs into model values. For many model architectures, you can also get prediction or confidence intervals on the outputs.
-* `mod_effect()` -- calculate effect sizes, that is, how a change in an input variable changes the output
 * `mod_plot()` -- produce a graphical display of the "shape" of a model. There can be as many as 4 input variables shown, along with the output.
+* `mod_effect()` -- calculate effect sizes, that is, how a change in an input variable changes the output
 * `mod_error()` -- find the mean square prediction error (or the log likelihood)
 * `mod_ensemble()` -- create an ensemble of bootstrap replications of the model, that is, models fit to resampled data from the original model.
 * `mod_cv()` -- carry out cross validation on one or more models. 
 * `mod_fun()` -- extract a function from a model that implements the inputs-to-output relationship.
-* `mod_train()` -- train models using a formula/data specification. Many commonly used model architectures already have a formula/data interface, e.g. `lm`, `glm`, `rpart`, etc. The regular training functions (e.g. `lm()`) can be used for those models.
+
+`mosaicModel` stays out of the business of training models. You do that using functions, e.g.    
+- the familiar `lm` or `glm` provided by the `stats` package
+- `train` from the `caret` package for machine learning
+- `rpart`, `randomForest`, `rlm`, and other functions provided by other packages
+
+We'll expand the repertoire as demand requires. (See the section on [adding new model architectures](#new-architectures).)
+
+## Introductory examples
+
+This vignette is intended to be a concise introduction to the use of `mosaicModel` rather than a systematic introduction to modeling. To that end, we'll use short, "simple," and readily available data sets, `mtcars` and `iris`, which come already installed in R.
+
+`mtcars` records fuel consumption (`mpg`) of 1973-74 model cars along with a variety of other attributes such as horsepower (`hp`), weight (`wt`), and transmission type (`am`). We'll use `mtcars` for a *regression* problem: How do the different aspects of a car relate to its fuel consumption?
+
+`iris` records sepal width and length and petal width and length for 50 flowers of each of 3 species of iris. We'll use `iris` for a *classification* problem: Given sepal and petal characteristics for a flower, which species is the flower likely to be?
+
+We are not going to concern ourselves here with building good models, just demonstrating how models can be built and evaluated: the techniques you would need for building and refining models to serve your own purposes.
+
+For both the fuel-consumption and iris-species problems, we'll build two models. Refining and improving models is generally a matter of comparing models.
+
+### Fuel consumption
+
+To give a basic idea of the relationships, here's a simple graphic. In the first line, the categorical `transmission` variable is being constructed from the numerically coded `am`.
+
+```{r}
+mtcars <- mtcars %>% mutate(transmission = ifelse(am, "manual", "automatic"))
+gf_point(mpg ~ hp, color = ~ transmission, data = mtcars)
+```
+
+
+```{r}
+fuel_mod_1 <- lm(mpg ~ hp * transmission, data = mtcars)
+fuel_mod_2 <- lm(mpg ~ ns(hp, 2) * transmission, data = mtcars)
+```
+
+The second model includes a nonlinear dependence on horsepower. You can think of `ns` as standing for "not straight" with the integer describing the amount of "curviness" allowed. (For those who know about such things, `ns` generates natural splines.)
+
+For models involving only a very few explanatory variables, a plot of the model can give immediate insight. The `mod_plot` function reduces the work to make such a plot.
+
+```{r out.width = "30%"}
+mod_plot(fuel_mod_1) %>% gf_theme(legend.position = "top")
+mod_plot(fuel_mod_2) %>% gf_theme(legend.position = "top")
+```
+
+Two important additional arguments to `mod_plot` are
+
+- a formula specifying the role of each explanatory variable. For instance, the formula `~ transmission + hp` would put the categorical transmission variable on the x-axis and use `hp` for color. Additional variables, if any, get used for faceting the graphic.
+- An `interval=` argument, which, for many regression model types, can be set to `"prediction"` or `"confidence"`.
+
+
+
+### Iris species
+
+The `iris` dataset has four explanatory variables. Here's species shown as a function of two of the variables:
+
+```{r}
+gf_point(Sepal.Length ~ Petal.Length, color = ~ Species, data = iris) %>%
+  gf_theme(legend.position = "top")
+```
+For later comparison to the models that we'll train, note that when the petal length and sepal length are both large, the flowers are almost always *virginica*. 
+
+Again, to illustrate how the `mosaicModel` package works, we'll build two classifiers for the iris species data: a random forest using two of the available explanatory variables and a k-nearest neighbors classifier. (The period in the formula `Species ~ .` indicates that all variables should be used except the outcome variable.)
+
+```{r}
+library(randomForest)
+iris_mod_1 <- randomForest(Species ~ Sepal.Length + Petal.Length, data = iris)
+library(caret)
+iris_mod_2 <- train(Species ~., data = iris, method = "knn",
+ preProcess = c("center", "scale"),
+ tuneLength = 10)
+```
+
+
+Notice that the model architectures used to create the two models come from two different packages: `caret` and `randomForest`. In general, rather than providing model-training functions, `mosaicModel` lets you use model-training functions from whatever packages you like.
+
+Again, we can plot out the form of the function:
+```{r}
+mod_plot(iris_mod_1) %>% gf_theme(legend.position = "top")
+```
+
+Since this is a classifier, the plot of the model function shows the *probability* of one of the output classes. That's *virginica* here. When the petal length is small, say around 1, the flower is very unlikely to be *virginica*. But for large petal lengths, and especially for large petal lengths and large sepal lengths, the flower is almost certain to be *virginica*. 
+
+If your interest is in a class other than *virginica*, you can specify the class you want with an additional argument, e.g. `class_level = "setosa"`.
+
+The second iris model has four explanatory variables. This is as many as `mod_plot` will display:
+
+```{r out.width = "80%", fig.width = 8, fig.height = 8}
+mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
+```
+The plot shows that the flower species does not depend on either of the two variables displayed on the x-axis and with color: the sepal width and the sepal length. This is why the line is flat and the colors overlap. But you can easily see a dependence on petal width and, to a very limited extent, on petal length.
+
+The choice of which role in the plot is played by which explanatory variable is up to you. Here the dependence on petal length and width are emphasized by using them for x-position and color:
+
+```{r fig.out="40%", fig.keep = "hold"}
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
+```
+
+## Model outputs
+
+The `mod_plot` function creates a graphical display of the output of the model for a range of model inputs. The `mod_eval` function (which `mod_plot` uses internally), produces the output in tabular form, e.g.
+
+```{r}
+mod_eval(fuel_mod_1, transmission = "manual", hp = 200)
+```
+`mod_eval` tries to do something sensible if you don't specify a value (or a range of values) for an explanatory variable.
+```{r}
+mod_eval(fuel_mod_1)
+```
+
+Another interface to evaluate the model is available in the form of a "model function." This interface may be preferred in uses where the objective of modeling is to develop a function that can be applied in, say, calculus operations.
+
+```{r}
+f1 <- mod_fun(fuel_mod_1)
+f1(hp = 200:203, transmission = "manual")
+f2 <- mod_fun(fuel_mod_2)
+f2(hp = 200:203, transmission = "manual")
+```
+
+You can also evaluate classifiers, e.g.
+```{r}
+mod_eval(iris_mod_1, nlevels = 2)
+```
+
+
+## Effect sizes
+
+It's often helpful in interpreting a model to know how the output changes with a change in one of the inputs. Traditionally, model coefficients have been used for this purpose. But not all model architectures produce coefficients (e.g. random forest) and even in those that do use of interactions and nonlinear terms spreads out the information across multiple coefficients. As an alternative, `mod_effect` calculates a model input at one set of values, repeats the calculation after modifying a selected input, and combines the result into a "rate-of-change/slope" or a finite-difference. 
+
+Here, `mod_effect` is calculating the rate of change of fuel consumption (remember, the output of `fuel_mod_1` is in term of `mpg`) with respect to `hp`:
+
+```{r}
+mod_effect(fuel_mod_2, ~ hp)
+```
+Since no specific inputs were specified, `mod_effect` attempted to do something sensible.
+
+You can, of course, specify the inputs you want, for instance:
+```{r}
+mod_effect(fuel_mod_2, ~ hp, hp = c(100, 200), transmission = "manual")
+mod_effect(fuel_mod_2, ~ hp, nlevels = 3)
+```
+
+
 
 ## Available model architectures
 
-"Architecture" is used to refer to the class of models. For instance, a linear model 
+Say that we've picked out a few to integrate with the package so that it's ready to go with a variety of model architectures we think are particularly relevant to teaching statistical modeling and machine learning.
 
-The `mod_architectures()` function lists which model architectures are available.
+
+"Architecture" is used to refer to the class of model. For instance, a linear model, random forests, recursive partitioning. Use the model training functions, such as `lm`, `glm`, `rlm` in the `stats` package or in other packages such as `caret` or `zelig`. 
+
+You can find out which model architectures are available with the command 
+```{r}
+methods(mod_eval_fun)
+```
+
+## Adding new model architectures {#new-architectures}
+
+Explaining how to add new architectures by adding methods
+
+The architectures after the `.` are available. Some of these, for instance `glm`, cover multiple model types (e.g. logistic, poisson, ...).
 
 ## Training models
 

@@ -10,7 +10,8 @@
 #' @param model The model whose prediction error is to be estimated.
 #' @param testdata A data frame giving both model inputs and the actual value of the response
 #' variable. If no testing data is provided, the training data will be used and a warning issued.
-#' @param SS Flag to have output be the sum of square errors.
+#' @param SS If `TRUE`, have output be the *sum* of square errors. Otherwise the mean square error will
+#' be returned.
 #' @param LL Flag to calculate log likelihood when the response variable is categorical. 
 #' 
 #' @details When the response variable is categorical, the model 

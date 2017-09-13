@@ -76,20 +76,12 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("non
         data
       }
     }
-
-  # Get the proper evaluation function
-  for_this_model <- get_eval_function(model)
-
-  this_eval_fun <- for_this_model$eval_fun
-  # Check that the intervals are actually available
-  if ( ! interval %in% for_this_model$intervals)
-    stop("Interval of type ", interval, " not available for models of class ", class(model)[1])
   
   if (inherits(model, "bootstrap_ensemble")) {
     nreps <- length(model$replications)
     output <- as.list(numeric(nreps))
     for (k in 1:nreps) {
-      model_vals <- this_eval_fun(model$replications[[k]], data = eval_levels, interval = interval)
+      model_vals <- mod_eval_fun(model$replications[[k]], data = eval_levels, interval = interval)
       if (append) output[[k]] <- dplyr::bind_cols(eval_levels, model_vals)
       else output[[k]] <- model_vals
       
@@ -97,7 +89,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("non
     }
     output <- dplyr::bind_rows(output)
   } else {
-    model_vals <- this_eval_fun(model, data = eval_levels, interval = interval)
+    model_vals <- mod_eval_fun(model, data = eval_levels, interval = interval)
     
     if (append) output <- cbind(eval_levels, model_vals)
     else  output <- model_vals

@@ -100,16 +100,13 @@ mod_plot <- function(model=NULL, formula = NULL, data = NULL,
   
   # If it's the probability from a classifier, pick out the selected level
   if ( ! "model_output" %in% names(model_vals)) {
-    if (is.null(class_level)) {
-      class_level = names(model_vals)[1]
-      model_vals <- data.frame(model_output = model_vals[[1]])
-    } else {
-      if (class_level %in% names(model_vals))
-        model_vals <- data.frame(model_output = model_vals[[class_level]])
-      else
-        stop("Class level \"", class_level, "\" is not in the model output.")
+    if (is.null(class_level)) class_level = names(model_vals)[ncol(model_vals)] # default
+     
+    if (class_level %in% names(model_vals))
+      model_vals$model_output <- model_vals[[class_level]]
+    else
+      stop("Class level \"", class_level, "\" is not in the model output.")
     
-    }
     response_var_name <- paste(response_var_name, "==", class_level)
   }
   

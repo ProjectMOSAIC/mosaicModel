@@ -1,3 +1,7 @@
+
+#' @importFrom splines ns
+#' @export ns
+
 # returns a vector of predictions or likelihoods
 kfold_trial <- function(model, 
                         k=10, 
@@ -53,7 +57,7 @@ n_levels <- function(values, n) {
   unique_vals <- unique(values)
   if (n == Inf) { # flag for "all levels". But don't go crazy if variable is quantitative
     res <- if (is.numeric(values)) { # enough to make a nice plot
-      if (length(unique_vals) < 100) unique_vals
+      if (length(unique_vals) < 10) unique_vals
       else seq(min(values, na.rm = TRUE), 
                max(values, na.rm = TRUE), length = 100)
     } else {
@@ -73,25 +77,27 @@ n_levels <- function(values, n) {
     med <- median(values, na.rm = TRUE)
     if (n == 1) {
       return(signif(med, 2))
+    } else {
+      return(pretty(values, n))
     }
-    outliers <- has_outlier(values)
-    order_of_magnitude <- 0
-    common_digits <- range(log10(abs(unique_vals[unique_vals != 0])))
-    if (1 > diff(common_digits) && sign(min(unique_vals)) == sign(max(unique_vals))) {
-      order_of_magnitude <- sign(max(unique_vals)) * signif(10^mean(common_digits), floor(-log10(diff(common_digits))))
-    }
-    to_two_digits <- signif(values - order_of_magnitude, 2L) 
-    
-    trim <- ifelse(n < 10, .1, ifelse(n > 100, .01, 0.05))
-    # if no outliers, do the whole range
-    if ( ! any(outliers)) where <- seq(0, 1, length = n)
-    else if (all(outliers)) where <- seq(trim, 1-trim, length = n)
-    else if (outliers[1]) where <- seq(trim, 1, length = n)
-    else where <- seq(0, 1-trim, length = n)
-    
-    candidate1 <- quantile(to_two_digits, where, type = 3, na.rm = TRUE)
-
-    return(unique(candidate1 + order_of_magnitude))
+    # outliers <- has_outlier(values)
+    # order_of_magnitude <- 0
+    # common_digits <- range(log10(abs(unique_vals[unique_vals != 0])))
+    # if (1 > diff(common_digits) && sign(min(unique_vals)) == sign(max(unique_vals))) {
+    #   order_of_magnitude <- sign(max(unique_vals)) * signif(10^mean(common_digits), floor(-log10(diff(common_digits))))
+    # }
+    # to_two_digits <- signif(values - order_of_magnitude, 2L) 
+    # 
+    # trim <- ifelse(n < 10, .1, ifelse(n > 100, .01, 0.05))
+    # # if no outliers, do the whole range
+    # if ( ! any(outliers)) where <- seq(0, 1, length = n)
+    # else if (all(outliers)) where <- seq(trim, 1-trim, length = n)
+    # else if (outliers[1]) where <- seq(trim, 1, length = n)
+    # else where <- seq(0, 1-trim, length = n)
+    # 
+    # candidate1 <- quantile(to_two_digits, where, type = 3, na.rm = TRUE)
+    # 
+    # return(unique(candidate1 + order_of_magnitude))
   } 
 
   stop("\"", var_name, "\" is neither numerical nor categorical. Can't figure out typical levels.")
@@ -112,8 +118,9 @@ get_step = function(ref_vals, change_var, data, step = NULL, from = NULL) {
   if (is.null(step)) { # Need to set the step
     vals <- data[[change_var]]
     
-    if (is.numeric(vals)) step <- sd(vals, na.rm = TRUE)
-    else {
+    if (is.numeric(vals)){
+      step <- pretty(c(.5, 1.5) * sd(vals, na.rm = TRUE), 2)[2]
+    } else {
       if ( ! is.null(from)) 
         vals <- vals[ ! vals %in% from]
       else {
