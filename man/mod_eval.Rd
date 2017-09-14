@@ -5,7 +5,8 @@
 \title{Evaluate a model for specified inputs}
 \usage{
 mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
-  "prediction", "confidence"), nlevels = 2, ..., on_training = FALSE)
+  "prediction", "confidence"), nlevels = 2, bootstrap = 0, ...,
+  on_training = FALSE)
 }
 \arguments{
 \item{model}{the model to display graphically}
@@ -21,6 +22,10 @@ types are available for all model architectures.}
 \item{nlevels}{how many levels to construct for input variables. (default: 3)
 For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
 with the result, use the ... to specify exactly what levels you want for any variable.}
+
+\item{bootstrap}{if > 1, the number of bootstrap trials to run to construct a
+standard error on the model output for each value of the inputs. This is an alternative to
+\code{interval}; you can't use both.}
 
 \item{...}{arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
 Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that

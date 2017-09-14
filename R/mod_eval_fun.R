@@ -158,24 +158,9 @@ mod_eval_fun.train <- function(model, data = NULL, interval = "none") { # caret-
   tibble::remove_rownames(res)
 }
 
+#' @export
+mod_eval_fun.lda <- function(model, data = NULL, interval = "none") {
+  res <- as.data.frame(predict(model, newdata = data)$posterior)
 
-# mod_eval_fun.Zelig <- function(model, data = NULL, interval = "none") {
-#   stop("Sorry, but Zelig models are not yet supported.")
-#   warning("Fix mod_eval_fun.Zelig to handle confidence intervals")
-#   interval <- match.arg(interval, choices = c("none"))
-#   
-#   if (is.null(data)) data <- data_from_model(model) 
-#   
-#   ## Trying fruitlessly to figure out how to do this.
-#   x.out <- setx(model, data = data[1:3, ], cond = TRUE)
-#   res <- sim(model, x = x.out)
-#   one <- (res$sim.out$range[[1]]$ev[[1]]) # simulations for one input
-#   two <- (res$range) # the inputs
-#   outs <- lapply(res$sim.out$range, FUN = function(x) mean(x[["ev"]][[1]], na.rm = TRUE))
-#   
-#   
-#   
-#   tibble::remove_rownames(res$data)
-# }
-
-# For GBM
+  tibble::remove_rownames(res)
+}

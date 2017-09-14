@@ -17,8 +17,8 @@ to which the effect size is to be calculated.}
 for a categorical change var. This will be either a character string or a number,
 depending on the type of variable specified in the formula.}
 
-\item{bootstrap}{If \code{TRUE}, calculate a standard error using bootstrapping. Alternatively, you can
-specify the number of bootstrap replications (default:10).}
+\item{bootstrap}{The number of bootstrap replications to construct.
+If greater than 1, calculate a standard error using that number of replications.}
 
 \item{to}{a synonym for step. (In English, "to" is more appropriate for a
 categorical input, "step" for a quantitative. But you can use either.)}
@@ -36,6 +36,12 @@ Unlike \code{...} or \code{at}, no new combinations will be created.}
 
 \item{...}{additional arguments for evaluation levels of explanatory
 variables.}
+}
+\value{
+a data frame giving the effect size and the values of the explanatory variables at which
+the effect size was calculated. There will also be a column \code{to_} showing the value jumped to for the
+variable with respect to which the effect size is calculated. When \code{bootstrap} is greater than 1, there will
+be a standard error reported on the effect size; see the variable ending in \code{_se}.
 }
 \description{
 Like a derivative or finite-difference

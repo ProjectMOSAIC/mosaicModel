@@ -22,6 +22,9 @@
 #' when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.
 #' @param interval the type of interval to use: "none", "confidence", "prediction". But not all
 #' types are available for all model architectures.
+#' @param bootstrap if > 1, the number of bootstrap trials to run to construct a 
+#' standard error on the model output for each value of the inputs. This is an alternative to
+#' `interval`; you can't use both.
 #' @param nlevels how many levels to construct for input variables. (default: 3)
 #' For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
 #' with the result, use the ... to specify exactly what levels you want for any variable.  
@@ -55,14 +58,11 @@
 #' mod_eval(mod2, nlevels = 2, sex = "F") 
 #' }
 #' @export
-mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("none", "prediction", "confidence"),
-                   nlevels = 2, ..., on_training = FALSE) {
+mod_eval <- function(model = NULL, data = NULL, append = TRUE, 
+                     interval = c("none", "prediction", "confidence"),
+                   nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
   
   interval <- match.arg(interval)
-  
-  if (is.null(model)) {
-    stop("Must provide a model to evaluate.")
-  } 
   
   eval_levels <- 
     if (on_training) {
@@ -77,6 +77,35 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("non
         data
       }
     }
+  
+  if (bootstrap > 1) {
+    sofar <- NULL
+    ensemble <- mod_ensemble(model, bootstrap)
+    Bootstrap_reps <- 
+      mod_eval(ensemble, data=eval_levels, append = FALSE, 
+               interval = "none", on_training = on_training, ...)
+    res <- Bootstrap_reps %>% group_by(.trial) %>% mutate(.row = row_number()) %>%
+      ungroup() %>% group_by(.row) %>% select(-.trial)
+    res <- res %>% 
+      summarise_all(c(mn = function(x){mean(x, na.rm=TRUE)}, 
+                      se = function(x){sd(x, na.rm=TRUE)})) %>%
+      select(-.row)
+    if (names(res)[2] == "se") # handle naming for regression case
+      names(res) <- c("model_output", "model_output_se")
+    nclasses <- ncol(res) / 2
+    if (nclasses > 1) # reorder multiple columns nicely into mean, sd for each class
+      res <- res[,rep(c(0,nclasses), nclasses) + rep(1:nclasses, each = 2)]
+    names(res) <- gsub("_mn$","", names(res))
+    if (append) res <- bind_cols(eval_levels, res)
+    
+    return(res)
+  }
+  
+  if (is.null(model)) {
+    stop("Must provide a model to evaluate.")
+  } 
+  
+
   
   if (inherits(model, "bootstrap_ensemble")) {
     nreps <- length(model$replications)

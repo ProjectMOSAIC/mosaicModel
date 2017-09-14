@@ -22,9 +22,10 @@
 #' only to classifiers. (Default: Use the first level.)
 #' Unlike \code{...} or \code{at}, no new combinations will be created.
 #' 
-#' @value a data frame giving the effect size and the values of the explanatory variables at which
+#' @return a data frame giving the effect size and the values of the explanatory variables at which
 #' the effect size was calculated. There will also be a column `to_` showing the value jumped to for the 
-#' variable with respect to which the effect size is calculated. When `bootstrap`
+#' variable with respect to which the effect size is calculated. When `bootstrap` is greater than 1, there will
+#' be a standard error reported on the effect size; see the variable ending in `_se`.
 #' @details 
 #' When you want to force or restrict the effect size calculation to specific values for 
 #' explanatory variables, list those variables and levels as a vector in ...

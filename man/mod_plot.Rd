@@ -4,9 +4,10 @@
 \alias{mod_plot}
 \title{Plot out model values}
 \usage{
-mod_plot(model = NULL, formula = NULL, data = NULL, nlevels = 3,
-  at = list(), class_level = NULL, interval = c("none", "confidence",
-  "prediction"), post_transform = NULL, size = 1, alpha = 0.8, ...)
+mod_plot(model = NULL, formula = NULL, data = NULL, bootstrap = 0,
+  nlevels = 3, at = list(), class_level = NULL, interval = c("none",
+  "confidence", "prediction"), post_transform = NULL, size = 1,
+  alpha = 0.8, ...)
 }
 \arguments{
 \item{model}{the model to display graphically.
@@ -15,6 +16,9 @@ Can also be an ensemble produced with \code{mod_ensemble()}}
 \item{formula}{setting the y ~ x + color variables}
 
 \item{data}{optional data set from which to extract levels for explanatory variables}
+
+\item{bootstrap}{when > 1, this will generate bootstrap replications of the model
+and plot all of them. Use as an alternative to \code{interval} for confidence intervals.}
 
 \item{nlevels}{how many levels to display for those variables shown at discrete levels}
 

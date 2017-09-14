@@ -114,13 +114,13 @@ If your interest is in a class other than *virginica*, you can specify the class
 The second iris model has four explanatory variables. This is as many as `mod_plot` will display:
 
 ```{r out.width = "80%", fig.width = 8, fig.height = 8}
-mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
+#mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
 ```
 The plot shows that the flower species does not depend on either of the two variables displayed on the x-axis and with color: the sepal width and the sepal length. This is why the line is flat and the colors overlap. But you can easily see a dependence on petal width and, to a very limited extent, on petal length.
 
 The choice of which role in the plot is played by which explanatory variable is up to you. Here the dependence on petal length and width are emphasized by using them for x-position and color:
 
-```{r fig.out="40%", fig.keep = "hold"}
+```{r fig.out="40%", fig.keep = "hold", eval = FALSE}
 mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
 mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
 ```
@@ -178,7 +178,7 @@ mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
 Advice: Whatever you may have learned in calculus about limits, a finite step size is generally what you want, particularly for jagged kinds of model functions like random forests or knn. For instance, compare the effect size of `Sepal.Length` in `iris_mod_2` using a "small" step size and a step size on the order of the
 standard deviation of `Sepal.Length`.
 
-```{r}
+```{r eval = FALSE}
 mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
 mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
 ```
@@ -199,7 +199,7 @@ mod_error(fuel_mod_2, testdata = mtcars[1:10,])
 ```
 
 You have your choice of several measures of error. (See the documentation for `mod_error()`.) For instance, the following two commands calculate for the second iris model the classification error rate (about 3%) and the log-likelihood. (Of course, these two measures of error are on entirely different scales, so there's no point in comparing them to each other. Generally, you compare the same error measure across two or more models.) 
-```{r}
+```{r eval=FALSE}
 mod_error(iris_mod_2, error_type = "class_error")
 mod_error(iris_mod_2, error_type = "LL")
 ```
@@ -221,10 +221,11 @@ mod_effect(ensemble_iris_1, ~ Petal.Length)
 mod_eval(ensemble_iris_1, nlevels = 1)
 ```
 
-For effect sizes, the interest is often in knowing the standard error (just as it is for the coefficients of linear regression models). A shortcut for this is to use the original model, but specify a number of bootstrap replications as an argument to `mod_effect()`.
+For effect sizes, the interest is often in knowing the standard error (just as it is for the coefficients of linear regression models). A shortcut for this is to use the original model, but specify a number of bootstrap replications as an argument to `mod_effect()` or `mod_eval()` or `mod_plot()`.
 
 ```{r}
 mod_effect(fuel_mod_2, ~ transmission, bootstrap = 10, hp = c(50,150,250))
+mod_eval(fuel_mod_2, bootstrap = 50, hp = c(50,150))
 ```
 
 ## Cross validation
@@ -248,9 +249,6 @@ The result suggests a lower bias but higher variance for the second fuel model c
 
 ## Available model architectures
 
-Say that we've picked out a few to integrate with the package so that it's ready to go with a variety of model architectures we think are particularly relevant to teaching statistical modeling and machine learning.
-
-
 "Architecture" is used to refer to the class of model. For instance, a linear model, random forests, recursive partitioning. Use the model training functions, such as `lm`, `glm`, `rlm` in the `stats` package or in other packages such as `caret` or `zelig`. 
 
 You can find out which model architectures are available with the command 
@@ -258,21 +256,86 @@ You can find out which model architectures are available with the command
 methods(mod_eval_fun)
 ```
 
+Note that the `train` method refers to models built with the `caret` package's function `train()`. One of the major points of `caret` is to allow the user to optimize the parameters for the training. If you do this in constructing a model, be aware that the training and optimizing will occur every time a bootstrap replication or cross-validation run is made. This can dramatically expand the time required for the operations. One way to find out how much the required time is expanded is to make a small bootstrap ensemble with `mod_ensemble()`. Or, to avoid the retraining with `caret` models, you can pull the `finalModel` component out of the object created by `train()`. But while the train object will often work, the `finalModel` may be of a type not recognized by this package. See the section on [new model architectures]{#new-architectures}.
+
 ## Adding new model architectures {#new-architectures}
 
-Explaining how to add new architectures by adding methods
+The package authors would like to have this package ready-to-run with commonly used model architectures. If you have a suggestion, please forward it.
 
-Illustration using a new model type: lda
+R programmers can add their own model architectures by adding S3 methods for these functions:
 
-data_from_model
-response_var
-response_values
-explanatory_vars
-formula_from_mod
-mod_eval_fun
 
-Break these into separate .R files
+- `formula_from_mod`
+   - `response_var`, `explanatory_vars` -- if the `formula_from_mod` method works for your model, these will also work.
+- `data_from_model`
+   - `response_values` -- this is built from `formula_from_mod` and `data_from_model`, so there's no work to be done here.
+- `mod_eval_fun` evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
+- `construct_fitting_call`
 
-Add bootstrap argument to mod_eval(), just like it's in mod_effect()
+The code for the generic and some methods are in the source .R files of the same name. This may give you some idea of how to write your own methods.
 
-construct_fitting_call
+It often happens that there is a sensible default method that covers lots of model architectures. You can try this out directly by running `mosaicModel:::data_from_model.default()` (or a similar name) on the model architecture you want to support.
+
+To illustrate, let's add a set of methods for the `MASS` package's `lda` and `qda` model architectures for classification.
+
+Step 1 is to create a model of the architecture you're interested in. Remember that you will need to attach any packages needed for that kind of model.
+
+```{r}
+library(MASS)
+my_mod <- qda(Species ~ Petal.Length + Petal.Width, data = iris)
+```
+
+Sometimes, the author of a package has uses a model object that follows conventions. If so, the default method will work. For `lda`/`qda` both of these methods work. Try it out like this:
+
+```{r}
+formula_from_mod(my_mod)
+data_from_model(my_mod) %>% head(2)
+```
+
+Since these two are working for `lda`/`qda`, the `response_var`, `explanatory_vars` and `response_values` will automatically work.
+
+This leaves two methods:
+
+```{r error = TRUE}
+construct_fitting_call(my_mod, data_name = "placeholder")
+```
+This function returns a "call," which is unfamiliar to many R users. That we didn't get an error and that the call is analogous to the way the original `my_mod` was built means that things are working using the default methods. 
+
+Last one. At the time this vignette was being written there was no appropriate `mod_eval_fun` method, so calling the generic generated an error.
+```{r eval = FALSE}
+mod_eval_fun(my_mod)
+```
+```
+Error in mod_eval_fun.default(my_mod) : The modelMosaic package doesn't have access to an evaluation function for this kind of model object.
+```
+
+So we'll have to implement this. This is typical, since `mod_eval_fun` is analogous to `predict` and there's no standard form for `predict` for the variety of model types supported by R.
+
+To start, let's see if there is a `predict` method defined:
+```{r}
+methods(class = "lda")
+```
+
+Yes. Look at the help page for `predict.lda` to see what the argument names are. `newdata =` is often the name of the argument for specifying the model inputs, but sometimes it's `x` or `data` or whatever.
+
+Since `lda`/`qda` is a classifier, the form of output we would like to produce is a table of probabilities for each class level for each input class. Let's look at the output of `predict`:
+
+```{r}
+predict(my_mod) %>% str()
+```
+
+This is something of a detective story, but a person very familiar with `lda` and with R will see that the `predict` method produces a list of two items. The second one called `posterior` and is a matrix with 150 rows and 3 columns, corresponding to the size of the training data.
+
+Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_eval_fun.lda` function from `mosaicModel`.
+
+```{r}
+mod_eval_fun.lda
+```
+
+The arguments to the function are the same as for all the `mod_eval_fun` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out.
+
+```{r error = TRUE}
+mosaicModel:::mod_eval_fun.lda(my_mod) %>% head(2)
+```
+
+STILL NOT WORKING.

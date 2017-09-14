@@ -8,6 +8,8 @@
 #' @param at named list giving specific values at which to hold the variables. You can accomplish 
 #' this without forming a list by using \code{...}. See examples.
 #' @param interval show confidence or prediction intervals: values "none", "confidence", "prediction"
+#' @param bootstrap when > 1, this will generate bootstrap replications of the model
+#' and plot all of them. Use as an alternative to `interval` for confidence intervals.
 #' @param post_transform a scalar transformation and new name for the response variable, 
 #' e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.
 #' @param size numerical value for line width (default: 1)
@@ -41,14 +43,24 @@
 #' mod_plot(mod5, class_level = "manag")
 #' }
 #' @export
-mod_plot <- function(model=NULL, formula = NULL, data = NULL, 
-                   nlevels = 3, at = list(), class_level = NULL,
-                   interval = c("none", "confidence", "prediction"),
-                   post_transform = NULL, size = 1, alpha = 0.8, ...) {
+mod_plot <- function(model=NULL, formula = NULL, 
+                     data = NULL, bootstrap = 0,
+                     nlevels = 3, at = list(), class_level = NULL,
+                     interval = c("none", "confidence", "prediction"),
+                     post_transform = NULL, size = 1, alpha = 0.8, ...) {
   
   all_models <- NULL
   if (inherits(model, "bootstrap_ensemble")) {
     orig_model <- model$original_model
+  } else if (bootstrap > 1) {
+    ensemble <- mod_ensemble(model, nreps = bootstrap, data = data)
+    res <- 
+      mod_plot(ensemble, formula = formula, data = data, bootstrap = 0, nlevels = nlevels,
+               at = at, class_level = class_level, interval = "none", 
+               post_transform = post_transform,
+               size = size, alpha = alpha, ...)
+    return(res)
+    
   } else {
     orig_model <- model
   }
