@@ -4,7 +4,7 @@
 \alias{mod_effect}
 \title{Calculate effect sizes in a model}
 \usage{
-mod_effect(model, formula, step = NULL, bootstrap = FALSE, to = step,
+mod_effect(model, formula, step = NULL, bootstrap = 0, to = step,
   nlevels = 1, data = NULL, at = NULL, class_level = NULL, ...)
 }
 \arguments{
@@ -18,7 +18,7 @@ for a categorical change var. This will be either a character string or a number
 depending on the type of variable specified in the formula.}
 
 \item{bootstrap}{If \code{TRUE}, calculate a standard error using bootstrapping. Alternatively, you can
-specify the number of bootstrap replications (default:100).}
+specify the number of bootstrap replications (default:10).}
 
 \item{to}{a synonym for step. (In English, "to" is more appropriate for a
 categorical input, "step" for a quantitative. But you can use either.)}

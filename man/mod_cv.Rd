@@ -2,23 +2,23 @@
 % Please edit documentation in R/mod_cv.R
 \name{mod_cv}
 \alias{mod_cv}
-\title{Compare models with k-fold cross-validation}
+\title{Compare models with k-fold cross validation}
 \usage{
 mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse", "sse",
   "mad", "LL", "mLL", "dev", "class_error"))
 }
 \arguments{
-\item{...}{one or more models on which to perform the cross-validation}
+\item{...}{one or more models on which to perform the cross validation}
 
 \item{k}{the k in k-fold. cross-validation will use k-1/k of the data for training.}
 
 \item{ntrials}{how many random partitions to make. Each partition will be one case in the
 output of the function}
 
-\item{output}{The kind of output to produce from each cross-validation. See details.}
+\item{error_type}{The kind of output to produce from each cross-validation. See \code{\link{mod_error}} for details.}
 }
 \description{
-Compare models with k-fold cross-validation
+Compare models with k-fold cross validation
 }
 \details{
 The purpose of cross-validation is to provide "new" data on which to test a model's
@@ -30,10 +30,4 @@ whole of the data set. On each of the k testing sets, a performance output is ca
 most appropriate depends on the kind of model: regression model or classifier. The most basic measure is the mean square error: the
 difference between the actual response variable in the testing data and the output of the model
 when presented with inputs from the testing data. This is appropriate in many regression models.
-
-For classification models, two different outputs are appropriate. The first is the error rate: the frequency
-with which the classifier produces an incorrect output when presented with inputs from the testing data. This
-is a rather course measure. A more graded measure is the likelihood: the probability of the response values
-from the test data given the model. (The "class" method is exactly the same as "error rate", but provided
-for compatibility purposes with other software under development.)
 }

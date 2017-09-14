@@ -1,10 +1,10 @@
-#' Compare models with k-fold cross-validation
+#' Compare models with k-fold cross validation
 #'
-#' @param ... one or more models on which to perform the cross-validation
+#' @param ... one or more models on which to perform the cross validation
 #' @param k the k in k-fold. cross-validation will use k-1/k of the data for training.
 #' @param ntrials how many random partitions to make. Each partition will be one case in the 
 #' output of the function
-#' @param output The kind of output to produce from each cross-validation. See details.
+#' @param error_type The kind of output to produce from each cross-validation. See \code{\link{mod_error}} for details.
 #' 
 #' @details The purpose of cross-validation is to provide "new" data on which to test a model's 
 #' performance. In k-fold cross-validation, the data set used to train the model is broken into 
@@ -16,11 +16,7 @@
 #' difference between the actual response variable in the testing data and the output of the model 
 #' when presented with inputs from the testing data. This is appropriate in many regression models.
 #'
-#' For classification models, two different outputs are appropriate. The first is the error rate: the frequency
-#' with which the classifier produces an incorrect output when presented with inputs from the testing data. This 
-#' is a rather course measure. A more graded measure is the likelihood: the probability of the response values
-#' from the test data given the model. (The "class" method is exactly the same as "error rate", but provided 
-#' for compatibility purposes with other software under development.)  
+
 #' 
 #' @export 
 mod_cv <- function(..., k = 10, ntrials = 5, 
@@ -41,7 +37,9 @@ mod_cv <- function(..., k = 10, ntrials = 5,
     for (this_trial in 1:ntrials) {
       # get the model outputs for each test group against
       # the rest of the data
-      pred_error_results[this_trial] <- kfold_trial(this_mod, type = error_type)
+      tmp <- kfold_trial(this_mod, type = error_type)
+      if (this_trial == 1) error_type <- names(tmp)[1]
+      pred_error_results[this_trial] <- tmp
     }
     from_this_mod <- data.frame(pred_error_results, model = full_names[counter],
                                 stringsAsFactors = FALSE)

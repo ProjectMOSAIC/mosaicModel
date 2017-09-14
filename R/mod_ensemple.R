@@ -16,16 +16,14 @@
 #' @export
 mod_ensemble <- function(model, nreps = 2, data = NULL) {
   # not yet dealing with poly(x,2) situations
-  # does this have to be something where model was built by train()?
   if (is.null(data)) 
     data <- data_from_model(model)
-  architecture <- model$call[[1]]
   res <- list()
   res$original_model <- model
   res$data <- data
-  fit_call <- res$call <- model$call
+  res$call <- construct_fitting_call(model, ".orig.training.data.") 
+  fit_call <- construct_fitting_call(model, data_name = "train_data")
   fit_call[["data"]] <- as.name("train_data")
-  res$replications <- list()
   res$oob <-list() # out of bag cases for each replication
   for (k in 1:nreps) {
     this_rep <- list()

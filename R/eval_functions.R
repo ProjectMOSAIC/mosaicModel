@@ -125,6 +125,19 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none") {
 }
 
 #' @export
+mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none") {
+  interval <- match.arg(interval, choices = c("none"))
+  
+  if (is.null(data)) data <- data_from_model(model) 
+  
+  res <- as.data.frame(
+      predict(model, newdata = data, type = "prob" )
+  )
+  
+  tibble::remove_rownames(res)
+}
+
+#' @export
 mod_eval_fun.train <- function(model, data = NULL, interval = "none") { # caret-package
   interval <- match.arg(interval, choices = c("none"))
   

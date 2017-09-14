@@ -9,6 +9,10 @@ data_from_model <- function(object, ...) {
   UseMethod("data_from_model")
 }
 
+construct_fitting_call <- function(object, data_name = "training", ...) {
+  UseMethod("construct_fitting_call")
+}
+
 #' @rdname extract_from_model
 explanatory_vars <- function(object, ...) {
   UseMethod("explanatory_vars")
@@ -23,6 +27,7 @@ explanatory_vars.lm <-
   explanatory_vars.train <- # for caret-package models
   explanatory_vars.rpart <-
   explanatory_vars.randomForest <-
+  explanatory_vars.knn3 <-
   # Need to fix this so that the items as stored in the model, 
   # e.g., as.factor(month), get returned.
   explanatory_vars.glm <- function(object, ...) all.vars(object$terms[[3]])
@@ -44,6 +49,7 @@ response_var.lm <-
   response_var.train <- # for caret-package models
   response_var.rpart <-
   response_var.randomForest <-
+  response_var.knn3 <- 
   response_var.glm <- function(object, ...) { deparse(object$terms[[2]])}
 
 response_var.bootstrap_ensemble <- function(object, ...) {
@@ -67,6 +73,7 @@ formula_from_mod.Zelig <- function(object, ...) {
 formula_from_mod.lm <-
   formula_from_mod.rpart <-
   formula_from_mod.randomForest <-
+  formula_from_mod.knn3 <-
   formula_from_mod.glm <- function(object, ...) {formula(object$terms)}
 formula_from_mod.Zelig_ls <- function(object, ...) {object$formula}
 
@@ -97,6 +104,13 @@ data_from_model.gbm <- data_from_model.lm
 #' @export
 data_from_model.rpart <- data_from_model.lm
 #' @export
+data_from_model.knn3 <- function(object, ...) {
+  res <- data.frame(object$learn$y, object$learn$X)
+  names(res)[1] <- response_var(object)
+  
+  res
+}
+#' @export
 data_from_model.bootstrap_ensemble <- function(object, ...) data_from_model(object$original_model, ...)
 #' @export
 data_from_model.default <- function(object, ...) {
@@ -104,3 +118,25 @@ data_from_model.default <- function(object, ...) {
   if (inherits(object, "Zelig-ls")) return(object$originaldata)
 }
 
+
+construct_fitting_call.default <- function(object, data_name, ...) {
+  # set up the call for fitting the model to the training data
+  if (! "call" %in% names(object))
+    stop("No 'call' component to model, so the model can't be retrained.")
+  architecture <- object$call[[1]]
+  fit_call <- object$call
+  if (data_name != "") fit_call[["data"]] <- as.name(data_name)
+  
+  fit_call
+}
+
+construct_fitting_call.knn3 <- function(object, data_name = "training", ...) {
+  res <- call("knn3")
+  formula <- object$terms
+  attributes(formula) <- NULL
+  res[[2]] <- formula
+  res[["data"]] <- as.name(data_name)
+  res[["k"]] <- object$k
+    
+  res
+}

@@ -22,8 +22,9 @@
 #' when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.
 #' @param interval the type of interval to use: "none", "confidence", "prediction". But not all
 #' types are available for all model architectures.
-#' @param nlevels how many levels to construct for input variables.
-#' For quantitative variables, this is a suggestion. \code{pretty()} will refine your choice. (default: 3) 
+#' @param nlevels how many levels to construct for input variables. (default: 3)
+#' For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
+#' with the result, use the ... to specify exactly what levels you want for any variable.  
 #' @param ... arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
 #' Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that
 #' the evaluation will occur at all combinations of the various levels.
@@ -55,7 +56,7 @@
 #' }
 #' @export
 mod_eval <- function(model = NULL, data = NULL, append = TRUE, interval = c("none", "prediction", "confidence"),
-                   nlevels = 3, ..., on_training = FALSE) {
+                   nlevels = 2, ..., on_training = FALSE) {
   
   interval <- match.arg(interval)
   

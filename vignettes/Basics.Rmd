@@ -96,9 +96,7 @@ Again, to illustrate how the `mosaicModel` package works, we'll build two classi
 library(randomForest)
 iris_mod_1 <- randomForest(Species ~ Sepal.Length + Petal.Length, data = iris)
 library(caret)
-iris_mod_2 <- train(Species ~., data = iris, method = "knn",
- preProcess = c("center", "scale"),
- tuneLength = 10)
+iris_mod_2 <- knn3(Species ~., data = iris, k = 15)
 ```
 
 
@@ -177,7 +175,15 @@ By default, the step size for a quantitative variable is approximately the stand
 mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
 ```
 
-Advice: Whatever you may have learned in calculus about limits, a finite step size is generally what you want, particularly for jagged kinds of model functions like random forests or knn.
+Advice: Whatever you may have learned in calculus about limits, a finite step size is generally what you want, particularly for jagged kinds of model functions like random forests or knn. For instance, compare the effect size of `Sepal.Length` in `iris_mod_2` using a "small" step size and a step size on the order of the
+standard deviation of `Sepal.Length`.
+
+```{r}
+mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
+mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
+```
+The zero effect size for the small step is an artifact. The k-nearest neighbors model is piecewise constant.
+
 
 ## Model error
 
@@ -192,10 +198,53 @@ Use the `testdata = ` argument to do the calculations on specified testing data,
 mod_error(fuel_mod_2, testdata = mtcars[1:10,])
 ```
 
-But in general, you may find the `mod_cv()` function more convenient.
+You have your choice of several measures of error. (See the documentation for `mod_error()`.) For instance, the following two commands calculate for the second iris model the classification error rate (about 3%) and the log-likelihood. (Of course, these two measures of error are on entirely different scales, so there's no point in comparing them to each other. Generally, you compare the same error measure across two or more models.) 
+```{r}
+mod_error(iris_mod_2, error_type = "class_error")
+mod_error(iris_mod_2, error_type = "LL")
+```
+
+## Bootstrapping
+
+Bootstrapping provides a broadly applicable way to characterize the sampling uncertainty in model output or effect sizes. To use bootstrapping, use `mod_ensemble()` to create an ensemble of models all with the same architecture and parameters as the original but trained to individual resampling trials.
+
+```{r}
+ensemble_fuel_1 <- mod_ensemble(fuel_mod_1, nreps = 10)
+ensemble_iris_1 <- mod_ensemble(iris_mod_1, nreps = 10)
+```
+
+Now you can use other functions from the package, but putting the ensemble in the argument slot for the model, for instance:
+
+```{r}
+mod_plot(ensemble_fuel_1)
+mod_effect(ensemble_iris_1, ~ Petal.Length)
+mod_eval(ensemble_iris_1, nlevels = 1)
+```
+
+For effect sizes, the interest is often in knowing the standard error (just as it is for the coefficients of linear regression models). A shortcut for this is to use the original model, but specify a number of bootstrap replications as an argument to `mod_effect()`.
+
+```{r}
+mod_effect(fuel_mod_2, ~ transmission, bootstrap = 10, hp = c(50,150,250))
+```
 
 ## Cross validation
 
+Cross validation refers to a process of dividing the available data into two parts: 
+
+1. A *training* set used to construct the model.
+2. A *testing* set used to evaluate model performance.
+
+This division between training and testing produces an unbiased estimate of error (as opposed to the traditional methods such as R^2 that need to be adjusted for degrees of freedom, etc.).
+
+The `mod_cv()` function automates this process, using a method called *k-fold cross validation*. A common use is to compare the performance of models.
+
+```{r}
+performance <- mod_cv(fuel_mod_1, fuel_mod_2, ntrials = 10)
+performance
+performance %>%
+  gf_point(mse ~ model)
+```
+The result suggests a lower bias but higher variance for the second fuel model compared to the first.
 
 ## Available model architectures
 
@@ -213,57 +262,17 @@ methods(mod_eval_fun)
 
 Explaining how to add new architectures by adding methods
 
-The architectures after the `.` are available. Some of these, for instance `glm`, cover multiple model types (e.g. logistic, poisson, ...).
+Illustration using a new model type: lda
 
-## Training models
+data_from_model
+response_var
+response_values
+explanatory_vars
+formula_from_mod
+mod_eval_fun
 
-The formula/data specification.
+Break these into separate .R files
 
-Classifiers and regression models
+Add bootstrap argument to mod_eval(), just like it's in mod_effect()
 
-The UPCOMING `mod_train()` function.
-
-## Evaluating models
-
-* Will generate "typical inputs" to get a quick idea of model outputs
-* Output in dataframe format, with the input values and the corresponding model output.
-    * For regression models, the output is always called `model_output` and confidence/prediction intervals are always labelled `lower` and `upper`.
-    * For classifiers, whenever possible the output is in the form of the probability of each possible class. 
-    
-## Bootstrapping
-
-* Create the ensemble.
-* Other functions in the series will work with the ensemble.
-
-## Cross-validation
-
-* For model selection: Analogy to ANOVA
-
-
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold', fig.cap = "The caption of this figure."}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-
+construct_fitting_call

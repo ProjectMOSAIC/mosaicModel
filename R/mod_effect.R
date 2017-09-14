@@ -8,8 +8,8 @@
 #' @param step the numerical stepsize for the change var, or a comparison category
 #' for a categorical change var. This will be either a character string or a number,
 #' depending on the type of variable specified in the formula.
-#' @param bootstrap If \code{TRUE}, calculate a standard error using bootstrapping. Alternatively, you can 
-#' specify the number of bootstrap replications (default:100).
+#' @param bootstrap The number of bootstrap replications to construct. 
+#' If greater than 1, calculate a standard error using that number of replications.
 #' @param to a synonym for step. (In English, "to" is more appropriate for a 
 #' categorical input, "step" for a quantitative. But you can use either.)
 #' @param nlevels integer specifying the number of levels to use for "typical" inputs. (Default: up to 3)
@@ -22,7 +22,9 @@
 #' only to classifiers. (Default: Use the first level.)
 #' Unlike \code{...} or \code{at}, no new combinations will be created.
 #' 
-#'
+#' @value a data frame giving the effect size and the values of the explanatory variables at which
+#' the effect size was calculated. There will also be a column `to_` showing the value jumped to for the 
+#' variable with respect to which the effect size is calculated. When `bootstrap`
 #' @details 
 #' When you want to force or restrict the effect size calculation to specific values for 
 #' explanatory variables, list those variables and levels as a vector in ...
@@ -44,13 +46,30 @@
 
 #' @export
 mod_effect <- function(model, formula, step = NULL, 
-                        bootstrap = FALSE, to = step, nlevels = 1, 
+                        bootstrap = 0, to = step, nlevels = 1, 
                        data = NULL, at = NULL, class_level = NULL, ... ) {
   
   if (inherits(model, "bootstrap_ensemble")) {
     ensemble <- model$replications # that is, the list of bootstrapped models
     original_model <- model$original_model
     ensemble_flag  <- TRUE
+  } else if (bootstrap > 1) {
+    ensemble <- mod_ensemble(model, bootstrap)
+    Bootstrap_reps <- 
+      mod_effect(ensemble, formula, at = at, nlevels = nlevels, 
+                 step = step, to = to, data = data, 
+                 class_level = class_level, ...)
+    res <- Bootstrap_reps %>% group_by(.trial) %>% mutate(.row = row_number()) %>%
+      ungroup() %>% group_by(.row) 
+    effect_name <- names(res)[1]
+    names(res)[1] <- "slope"
+    res <- res %>%
+      summarise(.slope = mean(slope, na.rm = TRUE),
+                .slope_se = sd(slope, na.rm = TRUE)) %>% select(-.row) 
+    names(res) <- paste0(effect_name, c("_mean", "_se"))
+    explanatory_vals <- Bootstrap_reps[,-1] %>% filter(.trial == 1) %>%
+      select(-.trial)
+    return(bind_cols(res, explanatory_vals))        
   } else {
     ensemble <- list(model) # Just the one model to be evaluated
     original_model <- model
@@ -143,15 +162,7 @@ mod_effect <- function(model, formula, step = NULL,
     Result <- rbind(Result, cbind(res, output_form))
   }
 
-  if ( ! ensemble_flag && bootstrap) {
-    if (is.logical(bootstrap)) bootstrap = 100  # set the default
-    model <- mod_ensemble(model, bootstrap)
-    Bootstrap_reps <- mod_effect(model, formula, at = at, step = step, to = to, data = data, ...)
-    # find the sd for each set of replications
-    set_number <- rep(1:(nrow(Bootstrap_reps) / bootstrap), length_out = nrow(Bootstrap_reps))
-    std_errors <- mosaic::sd(Bootstrap_reps[[1]] ~ set_number)
-    Result <- cbind(Result[1], stderr_effect = signif(std_errors,2), Result[2:length(Result)])
-  }
+
   # If a classifier, show the name of the level whose probability is being shown
   names(Result)[1] <- paste0(names(Result)[1], output_name_append)
 

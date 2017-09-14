@@ -10,12 +10,8 @@ kfold_trial <- function(model, k=10, type) {
   constructed <- grep("\\(.*\\)", names(data))
   if (length(constructed) > 0) data[[constructed]] <- NULL # get rid of them
   
-  # set up the call for fitting the model to the training data
-  if (! "call" %in% names(model))
-    stop("No 'call' component to model, so the model can't be retrained.")
-  architecture <- model$call[[1]]
-  fit_call <- model$call
-  fit_call[["data"]] <- as.name("training")
+
+  fit_call <- construct_fitting_call(model, data_name = "training")
   # construct the groups for the k-fold divisions
   groups <- sample(rep(1:k, length.out = nrow(data) ))
   # Create a holder for the result
@@ -29,10 +25,15 @@ kfold_trial <- function(model, k=10, type) {
     
     this_model <- eval(fit_call)
     
-    output[group == groups] <- mod_error(this_model, testdata = testing, error_type = type)
+    tmp <- mod_error(this_model, testdata = testing, error_type = type)
+    
+    output[group == groups] <- tmp
   }
   
-  output
+  res = mean(output)
+  names(res) <- names(tmp)[1] # name the result after the type of error actually used
+  
+  res
 }
 
 # helper for reference levels
@@ -64,7 +65,11 @@ n_levels <- function(values, n) {
     if (n == 1) {
       return(signif(med, 2))
     } else {
-      return(pretty(values, n))
+      res <- pretty(quantile(values, c(.1, .9)), n-1)
+      if (n == 2) res <- res[c(1, length(res))] 
+      if (length(res) > n) res <- res[-1]
+      if (length(res) > n) res <- res[-length(res)]
+      return(res)
     }
     # outliers <- has_outlier(values)
     # order_of_magnitude <- 0

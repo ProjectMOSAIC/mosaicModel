@@ -13,10 +13,18 @@ mod_error(model, testdata, error_type = c("default", "mse", "sse", "mad",
 \item{testdata}{A data frame giving both model inputs and the actual value of the response
 variable. If no testing data is provided, the training data will be used and a warning issued.}
 
-\item{SS}{If \code{TRUE}, have output be the \emph{sum} of square errors. Otherwise the mean square error will
-be returned.}
-
-\item{LL}{Flag to calculate log likelihood when the response variable is categorical.}
+\item{error_type}{The measure of error you are interested in. By default, this is mean-square error for
+regression models and log-likelihood for classifiers. The choices are:
+\itemize{
+\item \code{"mse"} -- mean square error
+\item \code{"sse"} -- sum of square errors
+\item \code{"mad"} -- mean absolute deviation
+\item \code{"LL"}  -- log-likelihood
+\item \code{"mLL"} -- mean log-likehood (per case in the testing data)
+\item \code{"dev"} -- deviance. (Plus a constant, which is often zero. The constant is fixed for a given testing data set,
+regardless of the model. So differences between deviances of two models are correct.)
+\item \code{"class_error"} -- classification error rate.
+}}
 }
 \description{
 Compares model predictions to the actual value of the response variable.
@@ -30,13 +38,13 @@ but by default, a mean log-likelihood (mean per case) is computed instead.
 When the response variable is categorical, the model
 (called a 'classifier' in such situations) must be capable of
 computing \emph{probabilities} for each output rather than just a bare category.
-This is true for many commonly
-encountered model architectures.
+This is true for many commonly encountered classifier model architectures.
 
-The analog of the square prediction value for classifiers is (1-p)^2, where p is the
+The analog of the mean squared error for classifiers is the mean of (1-p)^2, where p is the
 probability assigned by the model to the actual output. This is a rough approximation
 to the log-likelihood. By default, the log-likelihood will be calculated, but for pedagogical
-reasons you may prefer (1-p)^2, in which case set \code{LL = FALSE}.
+reasons you may prefer (1-p)^2, in which case set \code{error_type = "mse"}. Classifiers can assign a probability
+of zero to the actual output, in which case the log-likelihood is \code{-Inf}. The \code{"mse"} error type avoids this.
 }
 \examples{
 mod <- lm(mpg ~ hp + wt, data = mtcars)
@@ -44,7 +52,7 @@ mod_error(mod) # In-sample prediction error.
 \dontrun{
 classifier <- rpart::rpart(Species ~ ., data = iris)
 mod_error(classifier)
-mod_error(classifier, LL = FALSE) 
+mod_error(classifier, error_type = "LL") 
 # More typically
 inds <- sample(1:nrow(iris), size = 100)
 Training <- iris[inds, ]
@@ -53,6 +61,6 @@ classifier <- rpart::rpart(Species ~ ., data = Training)
 # This may well assign zero probability to events that appeared in the
 # Testing data 
 mod_error(classifier, testdata = Testing)
-mod_error(classifier, testdata = Testing, LL = FALSE)
+mod_error(classifier, testdata = Testing, error_type = "mse")
 }
 }

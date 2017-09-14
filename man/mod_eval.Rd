@@ -5,7 +5,7 @@
 \title{Evaluate a model for specified inputs}
 \usage{
 mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
-  "prediction", "confidence"), nlevels = 3, ..., on_training = FALSE)
+  "prediction", "confidence"), nlevels = 2, ..., on_training = FALSE)
 }
 \arguments{
 \item{model}{the model to display graphically}
@@ -18,8 +18,9 @@ model value in the output. Default: \code{TRUE}.}
 \item{interval}{the type of interval to use: "none", "confidence", "prediction". But not all
 types are available for all model architectures.}
 
-\item{nlevels}{how many levels to construct for input variables.
-For quantitative variables, this is a suggestion. \code{pretty()} will refine your choice. (default: 3)}
+\item{nlevels}{how many levels to construct for input variables. (default: 3)
+For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
+with the result, use the ... to specify exactly what levels you want for any variable.}
 
 \item{...}{arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
 Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that
