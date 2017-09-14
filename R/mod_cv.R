@@ -24,23 +24,14 @@
 #' 
 #' @export 
 mod_cv <- function(..., k = 10, ntrials = 5, 
-                     output = c("mse", "likelihood", "error_rate", "class")) {
-  output <- match.arg(output)
+                   error_type = c("default", "mse", "sse", "mad", "LL", "mLL", "dev", "class_error")) {
+  error_type = match.arg(error_type)
   
   # Get just the names of the models
   full_names <- as.character(lapply(lazyeval::lazy_dots(...), FUN = function(x) x$expr))
   # Now for the models themselves
   models <- list(...)
   # model can be a list. If so, repeat over all the models.
-  
-  # Just a first stab at the problem.
-  type <- switch(output, 
-                 "mse" = "response",
-                 "likelihood" = "likelihood",
-                 "error_rate" = "class",
-                 "class" = "class" # same as error_rate
-                 )
-  
   
   result = NULL
   for (counter in 1:length(models)) {
@@ -50,71 +41,15 @@ mod_cv <- function(..., k = 10, ntrials = 5,
     for (this_trial in 1:ntrials) {
       # get the model outputs for each test group against
       # the rest of the data
-      mod_output <- kfold_trial(this_mod, type = type)
-      pred_error_results[this_trial] <-
-        if( type == "class") {
-          mean(truth != mod_output, na.rm = TRUE)
-        } else if (type == "likelihood") {
-          sum(log(mod_output), na.rm = FALSE )
-        } else mean((truth - mod_output)^2, na.rm = TRUE)
+      pred_error_results[this_trial] <- kfold_trial(this_mod, type = error_type)
     }
     from_this_mod <- data.frame(pred_error_results, model = full_names[counter],
                                 stringsAsFactors = FALSE)
-    names(from_this_mod)[1] <- output # e.g. "mse", "likelihood", etc.
+    names(from_this_mod)[1] <- error_type
 
     result <- rbind(result, from_this_mod)
   }
 
   
   result
-}
-
-
-class_helper <- function(mod, data) {
-  # find the classifier output for each case
-  if (inherits(mod, "rpart")) {
-    which_class <- predict(mod, newdata = data, type = "class")
-    which_class <- as.character(which_class)
-  } else if (inherits(mod, "glm")) {
-    probs <- predict(mod, newdata = data, type = "response")
-    which_class <- probs >= 0.5
-  } else {
-    warning("No likelihood_helper function for models of class", class(mod))
-    which_class <- NA
-  }
-  
-  which_class
-}
-
-
-likelihood_helper <- function(mod, data) {
-  # calculate likelihood of each model output
-  actual <- eval(parse(text = response_var(mod)), envir = data)
-  if (inherits(mod, "rpart")) {
-    # class_preds <- predict(mod, newdata = data, type = "vector")
-    probs <- predict(mod, newdata = data, type = "prob")
-    L <- probs[cbind(1:nrow(data), actual)]
-  } else if (inherits(mod, "glm")) {
-    probs <- predict(mod, newdata = data, type = "response")
-    L <- ifelse(actual, probs, 1 - probs)
-  } else {
-    warning("No likelihood_helper function for models of class", class(mod))
-    L <- NA
-  }
-  
-  L
-}
-
-mse_helper <- function(mod, data) {
-  # calculate likelihood of each model output
-  actual <- eval(parse(text = response_var(mod)), envir = data)
-  if ( ! is.numeric(actual)) stop("Can't calculate MSE on a classifier.")
-  
-  if (inherits(mod, "rpart")) {
-    L <- predict(mod, newdata = data, type = "vector")
-  } else {
-    L <- predict(mod, newdata = data, type = "response")
-  } 
-  
-  L
 }

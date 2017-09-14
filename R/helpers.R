@@ -3,16 +3,7 @@
 #' @export ns
 
 # returns a vector of predictions or likelihoods
-kfold_trial <- function(model, 
-                        k=10, 
-                        type = c("response", "prob", "likelihood", "class")) {
-  # This isn't working for null models
-  # null_mod <- lm(net ~ 1, data = Runners)
-  # null_output <- kfold_trial(null_mod)
-  
-  
-  
-  type <- match.arg(type)
+kfold_trial <- function(model, k=10, type) {
   # Grab the data and the call from the model.
   data <- data_from_model(model)
   # For cross validation, we don't want the constructed terms
@@ -20,6 +11,8 @@ kfold_trial <- function(model,
   if (length(constructed) > 0) data[[constructed]] <- NULL # get rid of them
   
   # set up the call for fitting the model to the training data
+  if (! "call" %in% names(model))
+    stop("No 'call' component to model, so the model can't be retrained.")
   architecture <- model$call[[1]]
   fit_call <- model$call
   fit_call[["data"]] <- as.name("training")
@@ -36,14 +29,7 @@ kfold_trial <- function(model,
     
     this_model <- eval(fit_call)
     
-    output[group == groups] <- 
-      if (type == "likelihood") {
-        likelihood_helper(this_model, data = testing)
-      } else if (type == "class") {
-        class_helper(this_model, data = testing)
-      } else {
-        mse_helper(this_model, data = testing)
-      }
+    output[group == groups] <- mod_error(this_model, testdata = testing, error_type = type)
   }
   
   output

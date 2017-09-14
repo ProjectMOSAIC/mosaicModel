@@ -43,28 +43,87 @@
 #' mod_error(classifier, testdata = Testing, LL = FALSE)
 #' }
 #' @export
-mod_error <- function(model, testdata, SS = FALSE, LL = TRUE) {
+mod_error <- function(model, testdata, 
+                      error_type = c("default", "mse", "sse", "mad", "LL", "mLL", "dev", "class_error")) {
+  error_type = match.arg(error_type)
+  
   if (missing(testdata)) {
     testdata <- data_from_model(model)
     warning("Calculating error from training data.")
   }
-  # mosaic::MSPE(mod, testdata, LL = LL)
-  # Needed to change code, but didn't update MSPE in mosaic package
-  # This is re-written to use mod_eval() rather than predict()
+  # error functions
+  mse <- function(actual, model_output) { 
+    mean((actual - model_output)^2, na.rm = TRUE)
+  }
+  sse <- function(actual, model_output) {
+    sum((actual - model_output)^2, na.rm = TRUE)
+  }
+  mad <- function(actual, model_output) {
+    mean(abs((actual - model_output)[[1]]), na.rm = TRUE)
+  }
+  LL <- function(actual, model_output) {
+    probs <- p_of_actual(model_output, actual)
+    sum(log(probs))
+  }
+  mLL <- function(actual, model_output) {
+    probs <- p_of_actual(model_output, actual)
+    mean(log(probs))
+  }
+  dev <- function(actual, model_output) {
+    -2 * LL(actual, model_output)
+  }
+  class_error <- function(actual, model_output) {
+    # fraction of times the right classification was made
+    winner <- max.col(model_output, ties.method = "first")
+    winner <- names(model_output)[winner]
+    mean(winner != actual, na.rm = TRUE)
+  }
+  bad_regression_error <- function(...) {
+    stop("Invalid error type for regression model.")
+  }
+  bad_classifier_error <- function(...) {
+    stop("Invalid error type for classifier.")
+  }
+  mean_prob <- function(actual, model_output) { # mean of (1-p)^2
+    probs <- p_of_actual(model_output, actual)
+    mean((1-probs)^2, na.rm = TRUE)
+  }
+  sum_prob <- function(actual, model_output) { # mean of (1-p)^2
+    probs <- p_of_actual(model_output, actual)
+    sum((1-probs)^2, na.rm = TRUE)
+  }
+  # get the response values from the test data
   actual <- eval(parse(text = response_var(model)), envir = testdata)
   model_vals <- mod_eval(model, data = testdata, append = FALSE)
   if (is.numeric(actual)) {
-    fun <- ifelse(SS, base::sum, base::mean)
-    res <- fun((actual - model_vals)^2, na.rm = TRUE)
+    if (error_type == "default") {
+      warning('Setting error_type = "mse"')
+      error_type <- "mse"
+    }
+    fun <- switch(tolower(error_type),
+                  mse = mse,
+                  sse = sse,
+                  mad = mad,
+                  ll = bad_regression_error,
+                  mll = bad_regression_error,
+                  dev = bad_regression_error,
+                  class_error = bad_regression_error)
+    res <- fun(actual, model_vals)             
   }
   else {
-    probs <- p_of_actual(model_vals, actual)
-    res <- if (LL) {
-      - mean(log(probs))
+    if (error_type == "default") {
+      warning('Setting error_type = "LL"')
+      error_type <- "LL"
     }
-    else {
-      res <- stats::var(1 - probs, na.rm = TRUE)
-    }
+    fun <- switch(tolower(error_type),
+                  mse = mean_prob,
+                  sse = sum_prob,
+                  mad = bad_classifier_error,
+                  ll = m,
+                  mll = mse,
+                  dev = sse,
+                  class_error = class_error)
+    res <- fun(actual, model_vals)             
   }
   res
 }

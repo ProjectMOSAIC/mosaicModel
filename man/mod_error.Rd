@@ -4,7 +4,8 @@
 \alias{mod_error}
 \title{Mean square prediction error}
 \usage{
-mod_error(model, testdata, SS = FALSE, LL = TRUE)
+mod_error(model, testdata, error_type = c("default", "mse", "sse", "mad",
+  "LL", "mLL", "dev", "class_error"))
 }
 \arguments{
 \item{model}{The model whose prediction error is to be estimated.}
@@ -12,7 +13,8 @@ mod_error(model, testdata, SS = FALSE, LL = TRUE)
 \item{testdata}{A data frame giving both model inputs and the actual value of the response
 variable. If no testing data is provided, the training data will be used and a warning issued.}
 
-\item{SS}{Flag to have output be the sum of square errors.}
+\item{SS}{If \code{TRUE}, have output be the \emph{sum} of square errors. Otherwise the mean square error will
+be returned.}
 
 \item{LL}{Flag to calculate log likelihood when the response variable is categorical.}
 }

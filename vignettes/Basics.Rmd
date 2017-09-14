@@ -171,6 +171,30 @@ mod_effect(fuel_mod_2, ~ hp, hp = c(100, 200), transmission = "manual")
 mod_effect(fuel_mod_2, ~ hp, nlevels = 3)
 ```
 
+By default, the step size for a quantitative variable is approximately the standard deviation. You can set the step to whatever value you want with the `step = ` argument.
+
+```{r}
+mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
+```
+
+Advice: Whatever you may have learned in calculus about limits, a finite step size is generally what you want, particularly for jagged kinds of model functions like random forests or knn.
+
+## Model error
+
+Sometimes you want to know how the model performs. The `mod_error()` function will compute the mean square error for a regression model and the log likelihood for a classification model.
+```{r}
+mod_error(fuel_mod_2)
+```
+
+Use the `testdata = ` argument to do the calculations on specified testing data, as in cross validation.
+
+```{r}
+mod_error(fuel_mod_2, testdata = mtcars[1:10,])
+```
+
+But in general, you may find the `mod_cv()` function more convenient.
+
+## Cross validation
 
 
 ## Available model architectures
