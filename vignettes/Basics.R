@@ -26,19 +26,17 @@ gf_point(Sepal.Length ~ Petal.Length, color = ~ Species, data = iris) %>%
 library(randomForest)
 iris_mod_1 <- randomForest(Species ~ Sepal.Length + Petal.Length, data = iris)
 library(caret)
-iris_mod_2 <- train(Species ~., data = iris, method = "knn",
- preProcess = c("center", "scale"),
- tuneLength = 10)
+iris_mod_2 <- knn3(Species ~., data = iris, k = 15)
 
 ## ------------------------------------------------------------------------
 mod_plot(iris_mod_1) %>% gf_theme(legend.position = "top")
 
 ## ----out.width = "80%", fig.width = 8, fig.height = 8--------------------
-mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
+#mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
 
-## ----fig.out="40%", fig.keep = "hold"------------------------------------
-mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
-mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
+## ----fig.out="40%", fig.keep = "hold", eval = FALSE----------------------
+#  mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
+#  mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
 
 ## ------------------------------------------------------------------------
 mod_eval(fuel_mod_1, transmission = "manual", hp = 200)
@@ -65,16 +63,72 @@ mod_effect(fuel_mod_2, ~ hp, nlevels = 3)
 ## ------------------------------------------------------------------------
 mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
 
+## ----eval = FALSE--------------------------------------------------------
+#  mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
+#  mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
+
 ## ------------------------------------------------------------------------
 mod_error(fuel_mod_2)
 
 ## ------------------------------------------------------------------------
 mod_error(fuel_mod_2, testdata = mtcars[1:10,])
 
+## ----eval=FALSE----------------------------------------------------------
+#  mod_error(iris_mod_2, error_type = "class_error")
+#  mod_error(iris_mod_2, error_type = "LL")
+
+## ------------------------------------------------------------------------
+ensemble_fuel_1 <- mod_ensemble(fuel_mod_1, nreps = 10)
+ensemble_iris_1 <- mod_ensemble(iris_mod_1, nreps = 10)
+
+## ------------------------------------------------------------------------
+mod_plot(ensemble_fuel_1)
+mod_effect(ensemble_iris_1, ~ Petal.Length)
+mod_eval(ensemble_iris_1, nlevels = 1)
+
+## ------------------------------------------------------------------------
+mod_effect(fuel_mod_2, ~ transmission, bootstrap = 10, hp = c(50,150,250))
+mod_eval(fuel_mod_2, bootstrap = 50, hp = c(50,150))
+
+## ------------------------------------------------------------------------
+performance <- mod_cv(fuel_mod_1, fuel_mod_2, ntrials = 10)
+performance
+performance %>%
+  gf_point(mse ~ model)
+
 ## ------------------------------------------------------------------------
 methods(mod_eval_fun)
 
-## ---- fig.show='hold', fig.cap = "The caption of this figure."-----------
-plot(1:10)
-plot(10:1)
+## ------------------------------------------------------------------------
+library(MASS)
+my_mod <- lda(Species ~ Petal.Length + Petal.Width, data = iris)
+
+## ------------------------------------------------------------------------
+formula_from_mod(my_mod)
+data_from_model(my_mod) %>% head(2)
+
+## ----error = TRUE--------------------------------------------------------
+construct_fitting_call(my_mod, data_name = "placeholder")
+
+## ----eval = FALSE--------------------------------------------------------
+#  mod_eval_fun(my_mod)
+
+## ------------------------------------------------------------------------
+methods(class = "lda")
+
+## ------------------------------------------------------------------------
+predict(my_mod) %>% str()
+
+## ------------------------------------------------------------------------
+mod_eval_fun.lda
+
+## ----error = TRUE--------------------------------------------------------
+mod_eval_fun.lda(my_mod, data = iris[c(30, 80, 120),])
+
+## ------------------------------------------------------------------------
+mod_effect(my_mod, ~ Petal.Length, bootstrap = 10,  
+           class_level = "virginica")
+
+## ------------------------------------------------------------------------
+mod_plot(my_mod, bootstrap = 10, class_level = "virginica")
 

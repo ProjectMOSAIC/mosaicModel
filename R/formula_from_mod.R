@@ -17,4 +17,7 @@ formula_from_mod.default <- function(model, ...) {
   if ("Terms" %in% names(model)) return(formula(model$Terms))
   stop("Model architecture '", class(model), "' not recognized by mosaicModel package.")
 }
-
+#' @export
+formula_from_mod.bootstrap_ensemble <- function(model, ...) {
+  formula_from_mod(model$original_model)
+}

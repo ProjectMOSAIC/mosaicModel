@@ -65,11 +65,12 @@ mod_effect <- function(model, formula, step = NULL,
     effect_name <- names(res)[1]
     names(res)[1] <- "slope"
     res <- res %>%
-      summarise(.slope = mean(slope, na.rm = TRUE),
-                .slope_se = sd(slope, na.rm = TRUE)) %>% select(-.row) 
+      dplyr::summarise(.slope = mean(slope, na.rm = TRUE),
+                .slope_se = sd(slope, na.rm = TRUE)) %>% 
+      dplyr::select(-.row) 
     names(res) <- paste0(effect_name, c("_mean", "_se"))
-    explanatory_vals <- Bootstrap_reps[,-1] %>% filter(.trial == 1) %>%
-      select(-.trial)
+    explanatory_vals <- Bootstrap_reps[,-1] %>% dplyr::filter(.trial == 1) %>%
+      dplyr::select(-.trial)
     return(bind_cols(res, explanatory_vals))        
   } else {
     ensemble <- list(model) # Just the one model to be evaluated

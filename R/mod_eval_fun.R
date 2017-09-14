@@ -164,3 +164,5 @@ mod_eval_fun.lda <- function(model, data = NULL, interval = "none") {
 
   tibble::remove_rownames(res)
 }
+#' @export
+mod_eval_fun.qda <- mod_eval_fun.lda

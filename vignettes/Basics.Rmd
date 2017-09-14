@@ -13,6 +13,7 @@ vignette: >
 
 ```{r setup, include = FALSE}
 library(ggformula)
+library(MASS)
 library(tidyverse)
 library(mosaicModel)
 library(randomForest)
@@ -266,9 +267,7 @@ R programmers can add their own model architectures by adding S3 methods for the
 
 
 - `formula_from_mod`
-   - `response_var`, `explanatory_vars` -- if the `formula_from_mod` method works for your model, these will also work.
 - `data_from_model`
-   - `response_values` -- this is built from `formula_from_mod` and `data_from_model`, so there's no work to be done here.
 - `mod_eval_fun` evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
 - `construct_fitting_call`
 
@@ -282,7 +281,7 @@ Step 1 is to create a model of the architecture you're interested in. Remember t
 
 ```{r}
 library(MASS)
-my_mod <- qda(Species ~ Petal.Length + Petal.Width, data = iris)
+my_mod <- lda(Species ~ Petal.Length + Petal.Width, data = iris)
 ```
 
 Sometimes, the author of a package has uses a model object that follows conventions. If so, the default method will work. For `lda`/`qda` both of these methods work. Try it out like this:
@@ -332,10 +331,19 @@ Once located, do what you need in order to coerce the output to a data frame and
 mod_eval_fun.lda
 ```
 
-The arguments to the function are the same as for all the `mod_eval_fun` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out.
+The arguments to the function are the same as for all the `mod_eval_fun` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)
 
 ```{r error = TRUE}
-mosaicModel:::mod_eval_fun.lda(my_mod) %>% head(2)
+mod_eval_fun.lda(my_mod, data = iris[c(30, 80, 120),])
 ```
 
-STILL NOT WORKING.
+Now things should work.
+
+```{r}
+mod_effect(my_mod, ~ Petal.Length, bootstrap = 10,  
+           class_level = "virginica")
+```
+
+```{r}
+mod_plot(my_mod, bootstrap = 10, class_level = "virginica")
+```

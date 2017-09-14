@@ -84,12 +84,16 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     Bootstrap_reps <- 
       mod_eval(ensemble, data=eval_levels, append = FALSE, 
                interval = "none", on_training = on_training, ...)
-    res <- Bootstrap_reps %>% group_by(.trial) %>% mutate(.row = row_number()) %>%
-      ungroup() %>% group_by(.row) %>% select(-.trial)
+    res <- Bootstrap_reps %>% 
+      dplyr::group_by(.trial) %>% 
+      dplyr::mutate(.row = row_number()) %>%
+      dplyr::ungroup() %>% 
+      dplyr::group_by(.row) %>% 
+      dplyr::select(-.trial)
     res <- res %>% 
-      summarise_all(c(mn = function(x){mean(x, na.rm=TRUE)}, 
+      dplyr::summarise_all(c(mn = function(x){mean(x, na.rm=TRUE)}, 
                       se = function(x){sd(x, na.rm=TRUE)})) %>%
-      select(-.row)
+      dplyr::select(-.row)
     if (names(res)[2] == "se") # handle naming for regression case
       names(res) <- c("model_output", "model_output_se")
     nclasses <- ncol(res) / 2
