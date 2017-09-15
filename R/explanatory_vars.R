@@ -16,6 +16,6 @@ response_var <- function(model, ...) {
 }
 #' @export
 response_values <- function(model, ...) { 
-  eval(parse(text = response_var(model)), envir = data_from_model(model))
+  eval(parse(text = response_var(model)), envir = data_from_mod(model))
 }
 

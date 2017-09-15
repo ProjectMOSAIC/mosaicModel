@@ -17,7 +17,7 @@
 mod_ensemble <- function(model, nreps = 2, data = NULL) {
   # not yet dealing with poly(x,2) situations
   if (is.null(data)) 
-    data <- data_from_model(model)
+    data <- data_from_mod(model)
   res <- list()
   res$original_model <- model
   res$data <- data

@@ -55,7 +55,7 @@ mod_error <- function(model, testdata,
   error_type = match.arg(error_type)
   
   if (missing(testdata)) {
-    testdata <- data_from_model(model)
+    testdata <- data_from_mod(model)
     warning("Calculating error from training data.")
   }
   # error functions

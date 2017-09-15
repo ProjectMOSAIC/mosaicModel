@@ -8,15 +8,15 @@
 #' @details not all model architectures keep track of the training data
 #' If a model architecture isn't recognized, you'll have to add a method for that class. See vignette.
 #' @export
-data_from_model <- function(model, ...) {
-  UseMethod("data_from_model")
+data_from_mod <- function(model, ...) {
+  UseMethod("data_from_mod")
 }
 
 
 #' @export
-data_from_model.bootstrap_ensemble <- function(model, ...) data_from_model(model$original_model, ...)
+data_from_mod.bootstrap_ensemble <- function(model, ...) data_from_mod(model$original_model, ...)
 #' @export
-data_from_model.default <- function(model, ...) {
+data_from_mod.default <- function(model, ...) {
   error_string <- paste0("Model architecture '",
                          paste(class(model), collapse = "', "),
                          "'not recognized by mosaicModel.")
@@ -31,7 +31,7 @@ data_from_model.default <- function(model, ...) {
 }
 
 #' @export
-data_from_model.knn3 <- function(model, ...) {
+data_from_mod.knn3 <- function(model, ...) {
   res <- data.frame(model$learn$y, model$learn$X)
   names(res)[1] <- response_var(model)
   

@@ -267,13 +267,13 @@ R programmers can add their own model architectures by adding S3 methods for the
 
 
 - `formula_from_mod`
-- `data_from_model`
+- `data_from_mod`
 - `mod_eval_fun` evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
 - `construct_fitting_call`
 
 The code for the generic and some methods are in the source .R files of the same name. This may give you some idea of how to write your own methods.
 
-It often happens that there is a sensible default method that covers lots of model architectures. You can try this out directly by running `mosaicModel:::data_from_model.default()` (or a similar name) on the model architecture you want to support.
+It often happens that there is a sensible default method that covers lots of model architectures. You can try this out directly by running `mosaicModel:::data_from_mod.default()` (or a similar name) on the model architecture you want to support.
 
 To illustrate, let's add a set of methods for the `MASS` package's `lda` and `qda` model architectures for classification.
 
@@ -288,7 +288,7 @@ Sometimes, the author of a package has uses a model object that follows conventi
 
 ```{r}
 formula_from_mod(my_mod)
-data_from_model(my_mod) %>% head(2)
+data_from_mod(my_mod) %>% head(2)
 ```
 
 Since these two are working for `lda`/`qda`, the `response_var`, `explanatory_vars` and `response_values` will automatically work.

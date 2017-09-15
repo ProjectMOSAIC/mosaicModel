@@ -37,7 +37,7 @@ df_typical <- function(data = NULL,
   at <- c(extras, at)
   
   # try to figure out what are the possible levels of variables
-  if ( (! is.null(model)) && is.null(data)) data <- data_from_model(model)
+  if ( (! is.null(model)) && is.null(data)) data <- data_from_mod(model)
   missing_from_data <- ! names(at) %in% names(data)
   if (any(missing_from_data)) 
     stop("Explanatory variable",

@@ -96,7 +96,7 @@ mod_effect <- function(model, formula, step = NULL,
   }
   from_inputs <- to_inputs <- 
     if (is.null(data) || length(at) > 0) {
-      data <- data_from_model(original_model)
+      data <- data_from_mod(original_model)
       df_typical(model = original_model, data = data, nlevels = nlevels, at = at)
     } else {
       # if data explicitly stated, use exactly those inputs

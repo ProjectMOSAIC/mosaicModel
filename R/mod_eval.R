@@ -66,7 +66,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
   
   eval_levels <- 
     if (on_training) {
-      data_from_model(model)
+      data_from_mod(model)
     } else { # If no data provided, get typical levels
       if (is.null(data)) {
         dots <- handle_dots_as_variables(model, ...)

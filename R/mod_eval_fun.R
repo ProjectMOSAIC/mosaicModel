@@ -26,7 +26,7 @@ mod_eval_fun.default <- function(model, data=NULL, interval="none", ...) {
 mod_eval_fun.lm <- function(model, data=NULL, interval="none", ...) {
   interval <- match.arg(interval, c("none", "confidence", "prediction"))
   
-  if (is.null(data)) data <- data_from_model(model)
+  if (is.null(data)) data <- data_from_mod(model)
   
   res <- as.data.frame(
     predict(model, newdata = data, type = "response", interval = interval )
@@ -45,7 +45,7 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval="none", ...) 
   interval <- match.arg(interval,
                         choices = c("none", "confidence", "prediction"))
   
-  if (is.null(data)) data <- data_from_model(model)
+  if (is.null(data)) data <- data_from_mod(model)
   
   if (model$type == "classification") {
     res <- tibble::remove_rownames(
@@ -62,7 +62,7 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval="none", ...) 
 #' @export
 mod_eval_fun.glm <- function(model, data=NULL, interval="none", ...) {
   interval <- match.arg(interval, choices = c("none", "confidence"))
-  if (is.null(data)) data <- data_from_model(model) 
+  if (is.null(data)) data <- data_from_mod(model) 
   
   vals <- predict(model, newdata = data, 
                   type = "link", se.fit = interval == "confidence")
@@ -88,7 +88,7 @@ mod_eval_fun.glm <- function(model, data=NULL, interval="none", ...) {
 mod_eval_fun.rpart <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval, choices = c("none"))
   
-  if (is.null(data)) data <- data_from_model(model) 
+  if (is.null(data)) data <- data_from_mod(model) 
   
   if (model$method == "class") { # classifier
     res <- as.data.frame(
@@ -108,7 +108,7 @@ mod_eval_fun.rpart <- function(model, data = NULL, interval = "none", ...) {
 mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none") {
   interval <- match.arg(interval, choices = c("none"))
   
-  if (is.null(data)) data <- data_from_model(model) 
+  if (is.null(data)) data <- data_from_mod(model) 
   
   if (model$type == "classification") { # classifier
     res <- as.data.frame(
@@ -128,7 +128,7 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none") {
 mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none") {
   interval <- match.arg(interval, choices = c("none"))
   
-  if (is.null(data)) data <- data_from_model(model) 
+  if (is.null(data)) data <- data_from_mod(model) 
   
   res <- as.data.frame(
       predict(model, newdata = data, type = "prob" )
@@ -141,7 +141,7 @@ mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none") {
 mod_eval_fun.train <- function(model, data = NULL, interval = "none") { # caret-package
   interval <- match.arg(interval, choices = c("none"))
   
-  if (is.null(data)) data <- data_from_model(model) 
+  if (is.null(data)) data <- data_from_mod(model) 
   
   if (model$modelInfo$type[1] == "Regression") { 
     res <- as.data.frame(

@@ -5,7 +5,7 @@
 # returns a vector of predictions or likelihoods
 kfold_trial <- function(model, k=10, type) {
   # Grab the data and the call from the model.
-  data <- data_from_model(model)
+  data <- data_from_mod(model)
   # For cross validation, we don't want the constructed terms
   constructed <- grep("\\(.*\\)", names(data))
   if (length(constructed) > 0) data[[constructed]] <- NULL # get rid of them
@@ -128,7 +128,7 @@ get_step = function(ref_vals, change_var, data, step = NULL, from = NULL) {
 # and those that don't ($extras)
 
 handle_dots_as_variables <- function(model, ...) {
-  xvars <- base::union(explanatory_vars(model), names(data_from_model(model)))
+  xvars <- base::union(explanatory_vars(model), names(data_from_mod(model)))
   All <- list(...)
   res <- list()
   res$at <- All[names(All) %in% xvars]

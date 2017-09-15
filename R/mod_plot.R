@@ -82,7 +82,7 @@ mod_plot <- function(model=NULL, formula = NULL,
 
   # If data not explicitly provided, get from model
   levels_data <- 
-    if (is.null(data)) data_from_model(orig_model) else data
+    if (is.null(data)) data_from_mod(orig_model) else data
   
   # Pick out the variables to be displayed, and their roles
   explan_vars <- explanatory_vars(orig_model)
@@ -125,8 +125,13 @@ mod_plot <- function(model=NULL, formula = NULL,
   # Apply the transform, if any
   if ( ! is.null(post_transform)) {
     the_transform <- post_transform[[1]]
-    for (k in 1:ncol(model_vals))
-      model_vals[[k]] <- the_transform(model_vals[[k]])
+    if ("model_output" %in% names(model_vals)) {
+      model_vals[["model_output"]] <- the_transform(model_vals[["model_output"]])
+    } else {
+      for (column in setdiff(names(model_vals), explanatory_vars(orig_model))) {
+        model_vals[[column]] <- the_transform(model_vals[[column]])
+      }
+    }
   }
 
   # if (any(names(model_vals) %in% names(eval_levels)))
