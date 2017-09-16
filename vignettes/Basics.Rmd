@@ -31,12 +31,13 @@ The `mosaicModel` package provides a basic interface for interpreting and displa
 * `mod_cv()` -- carry out cross validation on one or more models. 
 * `mod_fun()` -- extract a function from a model that implements the inputs-to-output relationship.
 
-`mosaicModel` stays out of the business of training models. You do that using functions, e.g.    
+`mosaicModel` stays out of the business of training models. You do that using functions, e.g.
+
 - the familiar `lm` or `glm` provided by the `stats` package
 - `train` from the `caret` package for machine learning
 - `rpart`, `randomForest`, `rlm`, and other functions provided by other packages
 
-We'll expand the repertoire as demand requires. (See the section on [adding new model architectures](#new-architectures).)
+The package authors will try to expand the repertoire as demand requires. (See the section on [adding new model architectures](#new-architectures).)
 
 ## Introductory examples
 
@@ -52,9 +53,10 @@ For both the fuel-consumption and iris-species problems, we'll build two models.
 
 ### Fuel consumption
 
-To give a basic idea of the relationships, here's a simple graphic. In the first line, the categorical `transmission` variable is being constructed from the numerically coded `am`.
 
-```{r}
+To give a basic idea of the relationships in the `mtcars` data, here's a simple graphic along with the command to make it using the `ggformula` package. (Note: in the first line of the command, we're adding a categorical variable, `transmission`, to the existing quantitative variables in `mtcars` so that the examples can show both quantitative and categorical variables. 
+
+```{r fuel_intro, fig.cap = "A simple display of the `mtcars` data used in the example."}
 mtcars <- mtcars %>% mutate(transmission = ifelse(am, "manual", "automatic"))
 gf_point(mpg ~ hp, color = ~ transmission, data = mtcars)
 ```
@@ -147,7 +149,7 @@ f2 <- mod_fun(fuel_mod_2)
 f2(hp = 200:203, transmission = "manual")
 ```
 
-You can also evaluate classifiers, e.g.
+You can also evaluate classifiers using the model-function approach, e.g.
 ```{r}
 mod_eval(iris_mod_1, nlevels = 2)
 ```
@@ -328,7 +330,7 @@ This is something of a detective story, but a person very familiar with `lda` an
 Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_eval_fun.lda` function from `mosaicModel`.
 
 ```{r}
-mod_eval_fun.lda
+mosaicModel:::mod_eval_fun.lda
 ```
 
 The arguments to the function are the same as for all the `mod_eval_fun` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)

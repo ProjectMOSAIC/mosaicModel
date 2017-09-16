@@ -6,7 +6,7 @@ test_that("lm methods work", {
   mod <- lm(mpg ~ hp + cyl, data = mtcars)
   dat <- data.frame(hp = 100, cyl=6)
   res1 <- mod_eval_fun(mod)
-  expect_equal(nrow(res), nrow(mtcars))
+  expect_equal(nrow(res1), nrow(mtcars))
   res <- mod_eval_fun(mod, data = dat)
   expect_equal(nrow(res), nrow(dat))
   res <- mod_eval_fun(mod, data = dat, interval = "confidence")
