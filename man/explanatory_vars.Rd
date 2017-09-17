@@ -2,7 +2,7 @@
 % Please edit documentation in R/explanatory_vars.R
 \name{explanatory_vars}
 \alias{explanatory_vars}
-\title{Get the names of the explanatory variables in a model}
+\title{Get the names of the explanatory or response variables in a model}
 \usage{
 explanatory_vars(model, ...)
 }
@@ -12,5 +12,7 @@ explanatory_vars(model, ...)
 \item{...}{(not used)}
 }
 \description{
-This will typically \emph{not} be used by the end_user.
+This will typically \emph{not} be used by the end_user. These functions let you
+interrogate any model architecture that's covered by mosaicModel about the response and
+explanatory variables. These are used internally in functions such as \code{mod_plot}.
 }

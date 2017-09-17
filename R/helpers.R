@@ -1,7 +1,3 @@
-
-#' @importFrom splines ns
-#' @export ns
-
 # returns a vector of predictions or likelihoods
 kfold_trial <- function(model, k=10, type) {
   # Grab the data and the call from the model.

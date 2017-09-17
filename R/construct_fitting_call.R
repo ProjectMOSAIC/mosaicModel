@@ -3,6 +3,10 @@
 #' This will typically *not* be used by the end-user.
 #' 
 #' @param model the model in question
+#' @param data_name character string specifying the name of the data 
+#' frame used for the refitting. This object *must* be defined in the environment in which the 
+#' call is being made.
+#
 #' @param ... (not used)
 #' 
 #' 

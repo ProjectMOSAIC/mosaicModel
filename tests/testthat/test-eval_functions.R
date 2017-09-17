@@ -19,7 +19,9 @@ test_that("lm methods work", {
 })
 
 test_that("glm methods work", {
-  mod <- glm(I(mpg > 20) ~ hp + cyl, data = mtcars, family = binomial)
+  expect_warning(
+    mod <- glm(I(mpg > 20) ~ hp + cyl, data = mtcars, family = binomial)
+  )
   res <- mod_eval_fun(mod, data = mtcars, interval = "confidence")
   expect_equal(nrow(res), nrow(mtcars))
   expect_equal(names(res), conf_names)
@@ -30,12 +32,10 @@ test_that("glm methods work", {
   treatment <- gl(3,3)
   d.AD <- data.frame(treatment, outcome, counts)
   mod2 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson)
-  res <- mod_eval_fun(mod2, data = d.AD, interval = "confidence")
-  res2 <- mod_eval_fun(mod2, interval = "confidence")
-  expect_equal(res, res2)
-  expect_equal(nrow(res), nrow(d.AD))
-  expect_equal(names(res), conf_names)
-  expect_error(mod_eval_fun(mod, data = d.AD, interval = "prediction"))
+  res2 <- mod_eval_fun(mod2, data = d.AD, interval = "confidence")
+  expect_equal(nrow(res2), nrow(d.AD))
+  expect_equal(names(res2), conf_names)
+  expect_error(mod_eval_fun(mod2, data = d.AD, interval = "prediction"))
   expect_true(sum(abs(res2$model_output[1:6] - c(21, 13.33333, 15.6667, 21, 13.3333, 15.666667))) < .01,
               "poisson output wrong")
 })

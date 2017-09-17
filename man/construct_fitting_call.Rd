@@ -9,6 +9,10 @@ construct_fitting_call(model, data_name = "training", ...)
 \arguments{
 \item{model}{the model in question}
 
+\item{data_name}{character string specifying the name of the data
+frame used for the refitting. This object \emph{must} be defined in the environment in which the
+call is being made.}
+
 \item{...}{(not used)}
 }
 \description{

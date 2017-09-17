@@ -62,6 +62,7 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval="none", ...) 
 #' @export
 mod_eval_fun.glm <- function(model, data=NULL, interval="none", ...) {
   interval <- match.arg(interval, choices = c("none", "confidence"))
+  
   if (is.null(data)) data <- data_from_mod(model) 
   
   vals <- predict(model, newdata = data, 
@@ -105,7 +106,7 @@ mod_eval_fun.rpart <- function(model, data = NULL, interval = "none", ...) {
 }
 
 #' @export
-mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none") {
+mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval, choices = c("none"))
   
   if (is.null(data)) data <- data_from_mod(model) 
@@ -125,7 +126,7 @@ mod_eval_fun.randomForest <- function(model, data = NULL, interval = "none") {
 }
 
 #' @export
-mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none") {
+mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval, choices = c("none"))
   
   if (is.null(data)) data <- data_from_mod(model) 
@@ -138,7 +139,7 @@ mod_eval_fun.knn3 <- function(model, data = NULL, interval = "none") {
 }
 
 #' @export
-mod_eval_fun.train <- function(model, data = NULL, interval = "none") { # caret-package
+mod_eval_fun.train <- function(model, data = NULL, interval = "none", ...) { # caret-package
   interval <- match.arg(interval, choices = c("none"))
   
   if (is.null(data)) data <- data_from_mod(model) 
@@ -159,7 +160,9 @@ mod_eval_fun.train <- function(model, data = NULL, interval = "none") { # caret-
 }
 
 #' @export
-mod_eval_fun.lda <- function(model, data = NULL, interval = "none") {
+mod_eval_fun.lda <- function(model, data = NULL, interval = "none", ...) {
+  if (is.null(data)) data <- data_from_mod(model)
+  
   res <- as.data.frame(predict(model, newdata = data)$posterior)
 
   tibble::remove_rownames(res)

@@ -1,12 +1,14 @@
 ## ----setup, include = FALSE----------------------------------------------
 library(ggformula)
+library(MASS)
 library(tidyverse)
 library(mosaicModel)
 library(randomForest)
 library(caret)
+library(splines)
 knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
 
-## ------------------------------------------------------------------------
+## ----fuel_intro, fig.cap = "A simple display of the `mtcars` data used in the example."----
 mtcars <- mtcars %>% mutate(transmission = ifelse(am, "manual", "automatic"))
 gf_point(mpg ~ hp, color = ~ transmission, data = mtcars)
 
@@ -105,7 +107,7 @@ my_mod <- lda(Species ~ Petal.Length + Petal.Width, data = iris)
 
 ## ------------------------------------------------------------------------
 formula_from_mod(my_mod)
-data_from_model(my_mod) %>% head(2)
+data_from_mod(my_mod) %>% head(2)
 
 ## ----error = TRUE--------------------------------------------------------
 construct_fitting_call(my_mod, data_name = "placeholder")
@@ -120,7 +122,7 @@ methods(class = "lda")
 predict(my_mod) %>% str()
 
 ## ------------------------------------------------------------------------
-mod_eval_fun.lda
+mosaicModel:::mod_eval_fun.lda
 
 ## ----error = TRUE--------------------------------------------------------
 mod_eval_fun.lda(my_mod, data = iris[c(30, 80, 120),])

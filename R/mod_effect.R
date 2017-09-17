@@ -60,8 +60,11 @@ mod_effect <- function(model, formula, step = NULL,
       mod_effect(ensemble, formula, at = at, nlevels = nlevels, 
                  step = step, to = to, data = data, 
                  class_level = class_level, ...)
-    res <- Bootstrap_reps %>% group_by(.trial) %>% mutate(.row = row_number()) %>%
-      ungroup() %>% group_by(.row) 
+    res <- Bootstrap_reps %>% 
+      dplyr::group_by(.trial) %>% 
+      dplyr::mutate(.row = row_number()) %>%
+      dplyr::ungroup() %>% 
+      dplyr::group_by(.row) 
     effect_name <- names(res)[1]
     names(res)[1] <- "slope"
     res <- res %>%

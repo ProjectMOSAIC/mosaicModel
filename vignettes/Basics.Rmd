@@ -18,6 +18,7 @@ library(tidyverse)
 library(mosaicModel)
 library(randomForest)
 library(caret)
+library(splines)
 knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
 ```
 
@@ -54,7 +55,7 @@ For both the fuel-consumption and iris-species problems, we'll build two models.
 ### Fuel consumption
 
 
-To give a basic idea of the relationships in the `mtcars` data, here's a simple graphic along with the command to make it using the `ggformula` package. (Note: in the first line of the command, we're adding a categorical variable, `transmission`, to the existing quantitative variables in `mtcars` so that the examples can show both quantitative and categorical variables. 
+To indicate some of the relationships in the `mtcars` data, here's a simple graphic along with the command to make it using the `ggformula` package. (Note: in the first line of the command, we're adding a categorical variable, `transmission`, to the existing quantitative variables in `mtcars` so that the examples can show both quantitative and categorical variables. 
 
 ```{r fuel_intro, fig.cap = "A simple display of the `mtcars` data used in the example."}
 mtcars <- mtcars %>% mutate(transmission = ifelse(am, "manual", "automatic"))
@@ -67,7 +68,7 @@ fuel_mod_1 <- lm(mpg ~ hp * transmission, data = mtcars)
 fuel_mod_2 <- lm(mpg ~ ns(hp, 2) * transmission, data = mtcars)
 ```
 
-The second model includes a nonlinear dependence on horsepower. You can think of `ns` as standing for "not straight" with the integer describing the amount of "curviness" allowed. (For those who know about such things, `ns` generates natural splines.)
+The second model includes a nonlinear dependence on horsepower. You can think of `ns` as standing for "not straight" with the integer describing the amount of "curviness" allowed.
 
 For models involving only a very few explanatory variables, a plot of the model can give immediate insight. The `mod_plot` function reduces the work to make such a plot.
 

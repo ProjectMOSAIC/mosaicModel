@@ -13,8 +13,8 @@
 #' @importFrom ggplot2 aes_string facet_wrap facet_grid geom_errorbar ylab geom_line label_both geom_point geom_ribbon ggplot 
 #' @importFrom dplyr group_by_
 #' @importFrom lazyeval lazy_dots
-#' @importFrom tibble remove_rownames tribble
-#' @importFrom tidyr spread_
+#' @importFrom splines ns
+#' @importFrom mosaicCore df_stats
 #' 
 #' @param model the model to display graphically
 #' @param data optional set of cases from which to extract levels for explanatory variables
