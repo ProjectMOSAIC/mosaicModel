@@ -118,15 +118,17 @@ If your interest is in a class other than *virginica*, you can specify the class
 The second iris model has four explanatory variables. This is as many as `mod_plot` will display:
 
 ```{r out.width = "80%", fig.width = 8, fig.height = 8}
-#mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, class_level = "setosa") %>% 
+  gf_theme(legend.position = "top")
 ```
 The plot shows that the flower species does not depend on either of the two variables displayed on the x-axis and with color: the sepal width and the sepal length. This is why the line is flat and the colors overlap. But you can easily see a dependence on petal width and, to a very limited extent, on petal length.
 
 The choice of which role in the plot is played by which explanatory variable is up to you. Here the dependence on petal length and width are emphasized by using them for x-position and color:
 
-```{r fig.out="40%", fig.keep = "hold", eval = FALSE}
+```{r fig.out="40%", fig.keep = "hold"}
 mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
-mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>%
+  gf_theme(legend.position = "top")
 ```
 
 ## Model outputs
@@ -146,8 +148,6 @@ Another interface to evaluate the model is available in the form of a "model fun
 ```{r}
 f1 <- mod_fun(fuel_mod_1)
 f1(hp = 200:203, transmission = "manual")
-f2 <- mod_fun(fuel_mod_2)
-f2(hp = 200:203, transmission = "manual")
 ```
 
 You can also evaluate classifiers using the model-function approach, e.g.
@@ -182,7 +182,7 @@ mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
 Advice: Whatever you may have learned in calculus about limits, a finite step size is generally what you want, particularly for jagged kinds of model functions like random forests or knn. For instance, compare the effect size of `Sepal.Length` in `iris_mod_2` using a "small" step size and a step size on the order of the
 standard deviation of `Sepal.Length`.
 
-```{r eval = FALSE}
+```{r}
 mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
 mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
 ```
@@ -203,7 +203,7 @@ mod_error(fuel_mod_2, testdata = mtcars[1:10,])
 ```
 
 You have your choice of several measures of error. (See the documentation for `mod_error()`.) For instance, the following two commands calculate for the second iris model the classification error rate (about 3%) and the log-likelihood. (Of course, these two measures of error are on entirely different scales, so there's no point in comparing them to each other. Generally, you compare the same error measure across two or more models.) 
-```{r eval=FALSE}
+```{r}
 mod_error(iris_mod_2, error_type = "class_error")
 mod_error(iris_mod_2, error_type = "LL")
 ```
@@ -220,7 +220,8 @@ ensemble_iris_1 <- mod_ensemble(iris_mod_1, nreps = 10)
 Now you can use other functions from the package, but putting the ensemble in the argument slot for the model, for instance:
 
 ```{r}
-mod_plot(ensemble_fuel_1)
+mod_plot(ensemble_fuel_1) %>% 
+  gf_theme(legend.position = "top")
 mod_effect(ensemble_iris_1, ~ Petal.Length)
 mod_eval(ensemble_iris_1, nlevels = 1)
 ```
@@ -304,23 +305,23 @@ construct_fitting_call(my_mod, data_name = "placeholder")
 This function returns a "call," which is unfamiliar to many R users. That we didn't get an error and that the call is analogous to the way the original `my_mod` was built means that things are working using the default methods. 
 
 Last one. At the time this vignette was being written there was no appropriate `mod_eval_fun` method, so calling the generic generated an error.
-```{r eval = FALSE}
+```{r eval=FALSE}
 mod_eval_fun(my_mod)
 ```
 ```
 Error in mod_eval_fun.default(my_mod) : The modelMosaic package doesn't have access to an evaluation function for this kind of model object.
 ```
 
-So we'll have to implement this. This is typical, since `mod_eval_fun` is analogous to `predict` and there's no standard form for `predict` for the variety of model types supported by R.
+Now, of course, there is a `mod_eval_fun` method for models of class `knn3`. How did we go about implementing it? 
 
-To start, let's see if there is a `predict` method defined:
+To start, let's see if there is a `predict` method defined. This is a pretty common practice among those writing model-training functions. Regretably, there is considerable variety in the programming interface to `predict` methods, so it's quite common to have to implement a wrapper to interface any existing `predict` method to `mosaicModel`.
 ```{r}
 methods(class = "lda")
 ```
 
-Yes. Look at the help page for `predict.lda` to see what the argument names are. `newdata =` is often the name of the argument for specifying the model inputs, but sometimes it's `x` or `data` or whatever.
+Refer to the help page for `predict.lda` to see what the argument names are. `newdata =` is often the name of the argument for specifying the model inputs, but sometimes it's `x` or `data` or whatever.
 
-Since `lda`/`qda` is a classifier, the form of output we would like to produce is a table of probabilities for each class level for each input class. Let's look at the output of `predict`:
+Since `lda`/`qda` is a classifier, the form of output we would like to produce is a table of probabilities for each class level for each input class. This is the standard expected by `mosaicModel`. Let's look at the output of `predict`:
 
 ```{r}
 predict(my_mod) %>% str()
@@ -348,5 +349,6 @@ mod_effect(my_mod, ~ Petal.Length, bootstrap = 10,
 ```
 
 ```{r}
-mod_plot(my_mod, bootstrap = 10, class_level = "virginica")
+mod_plot(my_mod, bootstrap = 10, class_level = "virginica") %>% 
+  gf_theme(legend.position = "top")
 ```

@@ -33,7 +33,7 @@ data_from_mod.default <- function(model, ...) {
 #' @export
 data_from_mod.knn3 <- function(model, ...) {
   res <- data.frame(model$learn$y, model$learn$X)
-  names(res)[1] <- response_var(model)
+  names(res)[1] <- as.character(response_var(model))
   
   res
 }

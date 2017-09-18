@@ -27,4 +27,12 @@
 NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
+if(getRversion() >= "2.15.1")  {
+  utils::globalVariables(c("."))
+  utils::globalVariables(c(".trial"))
+  utils::globalVariables(c(".slope"))
+  utils::globalVariables(c(".row"))
+  utils::globalVariables(c("bind_cols"))
+  utils::globalVariables(c("row_number"))
+  utils::globalVariables(c("slope"))
+}

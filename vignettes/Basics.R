@@ -34,7 +34,8 @@ iris_mod_2 <- knn3(Species ~., data = iris, k = 15)
 mod_plot(iris_mod_1) %>% gf_theme(legend.position = "top")
 
 ## ----out.width = "80%", fig.width = 8, fig.height = 8--------------------
-#mod_plot(iris_mod_2, class_level = "setosa") %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, class_level = "setosa") %>% 
+  gf_theme(legend.position = "top")
 
 ## ----fig.out="40%", fig.keep = "hold", eval = FALSE----------------------
 #  mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
@@ -49,8 +50,6 @@ mod_eval(fuel_mod_1)
 ## ------------------------------------------------------------------------
 f1 <- mod_fun(fuel_mod_1)
 f1(hp = 200:203, transmission = "manual")
-f2 <- mod_fun(fuel_mod_2)
-f2(hp = 200:203, transmission = "manual")
 
 ## ------------------------------------------------------------------------
 mod_eval(iris_mod_1, nlevels = 2)
@@ -84,7 +83,8 @@ ensemble_fuel_1 <- mod_ensemble(fuel_mod_1, nreps = 10)
 ensemble_iris_1 <- mod_ensemble(iris_mod_1, nreps = 10)
 
 ## ------------------------------------------------------------------------
-mod_plot(ensemble_fuel_1)
+mod_plot(ensemble_fuel_1) %>% 
+  gf_theme(legend.position = "top")
 mod_effect(ensemble_iris_1, ~ Petal.Length)
 mod_eval(ensemble_iris_1, nlevels = 1)
 
@@ -132,5 +132,6 @@ mod_effect(my_mod, ~ Petal.Length, bootstrap = 10,
            class_level = "virginica")
 
 ## ------------------------------------------------------------------------
-mod_plot(my_mod, bootstrap = 10, class_level = "virginica")
+mod_plot(my_mod, bootstrap = 10, class_level = "virginica") %>% 
+  gf_theme(legend.position = "top")
 
