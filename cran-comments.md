@@ -8,10 +8,9 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
-* checking dependencies in R code ... NOTE
-  Namespace in Imports field not imported from: 'R6'
 
-  R6 is a build-time dependency.
+  
+There are currently no downstream dependencies for this package
 
 ## Downstream dependencies
 I have also run R CMD check on downstream dependencies of httr 
