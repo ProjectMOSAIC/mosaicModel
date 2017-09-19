@@ -6,6 +6,7 @@ library(mosaicModel)
 library(randomForest)
 library(caret)
 library(splines)
+theme_update(legend.position = "top")
 knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
 
 ## ----fuel_intro, fig.cap = "A simple display of the `mtcars` data used in the example."----
@@ -17,12 +18,12 @@ fuel_mod_1 <- lm(mpg ~ hp * transmission, data = mtcars)
 fuel_mod_2 <- lm(mpg ~ ns(hp, 2) * transmission, data = mtcars)
 
 ## ----out.width = "30%"---------------------------------------------------
-mod_plot(fuel_mod_1) %>% gf_theme(legend.position = "top")
-mod_plot(fuel_mod_2) %>% gf_theme(legend.position = "top")
+mod_plot(fuel_mod_1) 
+mod_plot(fuel_mod_2) 
 
 ## ------------------------------------------------------------------------
-gf_point(Sepal.Length ~ Petal.Length, color = ~ Species, data = iris) %>%
-  gf_theme(legend.position = "top")
+theme_update(legend.position = "top")
+gf_point(Sepal.Length ~ Petal.Length, color = ~ Species, data = iris) 
 
 ## ------------------------------------------------------------------------
 library(randomForest)
@@ -31,16 +32,14 @@ library(caret)
 iris_mod_2 <- knn3(Species ~., data = iris, k = 15)
 
 ## ------------------------------------------------------------------------
-mod_plot(iris_mod_1) %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_1)
 
 ## ----out.width = "80%", fig.width = 8, fig.height = 8--------------------
-mod_plot(iris_mod_2, class_level = "setosa") %>% 
-  gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, class_level = "setosa")
 
 ## ----fig.out="40%", fig.keep = "hold"------------------------------------
-mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
-mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>%
-  gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width)
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width)
 
 ## ------------------------------------------------------------------------
 mod_eval(fuel_mod_1, transmission = "manual", hp = 200)
@@ -84,8 +83,7 @@ ensemble_fuel_1 <- mod_ensemble(fuel_mod_1, nreps = 10)
 ensemble_iris_1 <- mod_ensemble(iris_mod_1, nreps = 10)
 
 ## ------------------------------------------------------------------------
-mod_plot(ensemble_fuel_1) %>% 
-  gf_theme(legend.position = "top")
+mod_plot(ensemble_fuel_1)
 mod_effect(ensemble_iris_1, ~ Petal.Length)
 mod_eval(ensemble_iris_1, nlevels = 1)
 
@@ -126,13 +124,12 @@ predict(my_mod) %>% str()
 mosaicModel:::mod_eval_fun.lda
 
 ## ----error = TRUE--------------------------------------------------------
-mod_eval_fun.lda(my_mod, data = iris[c(30, 80, 120),])
+mod_eval_fun(my_mod, data = iris[c(30, 80, 120),])
 
 ## ------------------------------------------------------------------------
 mod_effect(my_mod, ~ Petal.Length, bootstrap = 10,  
            class_level = "virginica")
 
 ## ------------------------------------------------------------------------
-mod_plot(my_mod, bootstrap = 10, class_level = "virginica") %>% 
-  gf_theme(legend.position = "top")
+mod_plot(my_mod, bootstrap = 10, class_level = "virginica")
 
