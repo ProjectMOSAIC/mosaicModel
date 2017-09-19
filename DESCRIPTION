@@ -1,6 +1,6 @@
 Package: mosaicModel
 Type: Package
-Title: Provide a consistent interface to a range of statistical model architectures
+Title: Provide a Consistent Interface to a Range of Statistical Model Architectures
 Version: 0.3.0
 Author: Kaplan Daniel [aut, cre],
   Pruim Randall [aut, cre]

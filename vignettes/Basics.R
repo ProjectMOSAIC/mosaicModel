@@ -37,9 +37,10 @@ mod_plot(iris_mod_1) %>% gf_theme(legend.position = "top")
 mod_plot(iris_mod_2, class_level = "setosa") %>% 
   gf_theme(legend.position = "top")
 
-## ----fig.out="40%", fig.keep = "hold", eval = FALSE----------------------
-#  mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
-#  mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>% gf_theme(legend.position = "top")
+## ----fig.out="40%", fig.keep = "hold"------------------------------------
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width) %>% gf_theme(legend.position = "top")
+mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width) %>%
+  gf_theme(legend.position = "top")
 
 ## ------------------------------------------------------------------------
 mod_eval(fuel_mod_1, transmission = "manual", hp = 200)
@@ -64,9 +65,9 @@ mod_effect(fuel_mod_2, ~ hp, nlevels = 3)
 ## ------------------------------------------------------------------------
 mod_effect(fuel_mod_2, ~ hp, step = 0.1, nlevels = 1)
 
-## ----eval = FALSE--------------------------------------------------------
-#  mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
-#  mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
+## ------------------------------------------------------------------------
+mod_effect(iris_mod_2, ~ Sepal.Length, step = 0.01, class_level = "virginica" )
+mod_effect(iris_mod_2, ~ Sepal.Length, step = 1, class_level = "virginica")
 
 ## ------------------------------------------------------------------------
 mod_error(fuel_mod_2)
@@ -74,9 +75,9 @@ mod_error(fuel_mod_2)
 ## ------------------------------------------------------------------------
 mod_error(fuel_mod_2, testdata = mtcars[1:10,])
 
-## ----eval=FALSE----------------------------------------------------------
-#  mod_error(iris_mod_2, error_type = "class_error")
-#  mod_error(iris_mod_2, error_type = "LL")
+## ------------------------------------------------------------------------
+mod_error(iris_mod_2, error_type = "class_error")
+mod_error(iris_mod_2, error_type = "LL")
 
 ## ------------------------------------------------------------------------
 ensemble_fuel_1 <- mod_ensemble(fuel_mod_1, nreps = 10)
@@ -112,7 +113,7 @@ data_from_mod(my_mod) %>% head(2)
 ## ----error = TRUE--------------------------------------------------------
 construct_fitting_call(my_mod, data_name = "placeholder")
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  mod_eval_fun(my_mod)
 
 ## ------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 cran-comments.md
 ^README\.Rmd$
+^README\.md$
 ^README-.*\.png$
 ^NEWS\.md$
 ^\.travis\.yml$
