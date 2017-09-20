@@ -23,9 +23,13 @@ theme_update(legend.position = "top")
 knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
 ```
 
-The `mosaicModel` package provides a basic interface for interpreting and displaying models. The interface consists of a handful of high-level functions that operate in a consistent way across different model architectures, including those typically classed as "machine learning."
+The `mosaicModel` package provides a basic interface for interpreting and displaying models. From the early beginnings of R, methods such as `summary`, `plot`, and `predict` provided a consistent vocabulary for generating model output and reports, but the format and contents of those reports depended strongly on the specifics of the model architecture. For example, for architectures such as `lm` and `glm`, the `summary` method produces a regression table showing point estimates and standard errors on model coefficients. But other widely used architectures such as random forests or k-nearest neighbors do not generate coefficients and so need to be displayed and interpreted in other ways. 
 
-* `mod_eval()` -- evaluate a model, that is, turn inputs into model values. For many model architectures, you can also get prediction or confidence intervals on the outputs.
+To provide a general interface for displaying and interpreting models, the `mosaicModel` package provides an alternative structure of operations that make sense for a wide range of model architectures, including those typically grouped under the term "machine learning." 
+
+The package implements operations that can be applied to a wide range of model architectures producing reports  interface consists of a handful of high-level functions that operate in a manner independent of model architecture.
+
+* `mod_eval()` -- evaluate a model, that is, turn inputs into model values and standard errors on those values. 
 * `mod_plot()` -- produce a graphical display of the "shape" of a model. There can be as many as 4 input variables shown, along with the output.
 * `mod_effect()` -- calculate effect sizes, that is, how a change in an input variable changes the output
 * `mod_error()` -- find the mean square prediction error (or the log likelihood)

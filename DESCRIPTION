@@ -1,11 +1,11 @@
 Package: mosaicModel
 Type: Package
-Title: Provide a Consistent Interface to a Range of Statistical Model Architectures
+Title: An Interface to Statistical Modeling Independent of Model Architecture
 Version: 0.3.0
 Author: Kaplan Daniel [aut, cre],
   Pruim Randall [aut, cre]
 Maintainer: Daniel Kaplan <kaplan@macalester.edu>
-Description: Provides functions for training, evaluating, and interpreting a range of statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients.
+Description: Provides functions for evaluating, displaying, and interpreting statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients. The package includes interfaces to both regression and classification architectures, including lm, glm, random forests and recursive partitioning, knn, linear and quadratic discriminant analysis, and models produced by the caret package's train. It's straightforward to add in other other model architectures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: TRUE
