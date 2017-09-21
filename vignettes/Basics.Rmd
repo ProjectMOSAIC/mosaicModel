@@ -23,7 +23,7 @@ theme_update(legend.position = "top")
 knitr::opts_chunk$set(fig.align = "center", fig.show = "hold", out.width = "45%")
 ```
 
-The `mosaicModel` package provides a basic interface for interpreting and displaying models. From the early beginnings of R, methods such as `summary`, `plot`, and `predict` provided a consistent vocabulary for generating model output and reports, but the format and contents of those reports depended strongly on the specifics of the model architecture. For example, for architectures such as `lm` and `glm`, the `summary` method produces a regression table showing point estimates and standard errors on model coefficients. But other widely used architectures such as random forests or k-nearest neighbors do not generate coefficients and so need to be displayed and interpreted in other ways. 
+The `mosaicModel` package provides a basic interface for interpreting and displaying models. From the early beginnings of R, methods such as `summary()`, `plot()`, and `predict()` provided a consistent vocabulary for generating model output and reports, but the format and contents of those reports depended strongly on the specifics of the model architecture. For example, for architectures such as `lm()` and `glm()`, the `summary()` method produces a regression table showing point estimates and standard errors on model coefficients. But other widely used architectures such as random forests or k-nearest neighbors do not generate coefficients and so need to be displayed and interpreted in other ways. 
 
 To provide a general interface for displaying and interpreting models, the `mosaicModel` package provides an alternative structure of operations that make sense for a wide range of model architectures, including those typically grouped under the term "machine learning." 
 
@@ -40,8 +40,8 @@ The package implements operations that can be applied to a wide range of model a
 `mosaicModel` stays out of the business of training models. You do that using functions, e.g.
 
 - the familiar `lm` or `glm` provided by the `stats` package
-- `train` from the `caret` package for machine learning
-- `rpart`, `randomForest`, `rlm`, and other functions provided by other packages
+- `train()` from the `caret` package for machine learning
+- `rpart()`, `randomForest`, `rlm`, and other functions provided by other packages
 
 The package authors will try to expand the repertoire as demand requires. (See the section on [adding new model architectures](#new-architectures).)
 
@@ -73,9 +73,9 @@ fuel_mod_1 <- lm(mpg ~ hp * transmission, data = mtcars)
 fuel_mod_2 <- lm(mpg ~ ns(hp, 2) * transmission, data = mtcars)
 ```
 
-The second model includes a nonlinear dependence on horsepower. You can think of `ns` as standing for "not straight" with the integer describing the amount of "curviness" allowed.
+The second model includes a nonlinear dependence on horsepower. You can think of `ns()` as standing for "not straight" with the integer describing the amount of "curviness" allowed.
 
-For models involving only a very few explanatory variables, a plot of the model can give immediate insight. The `mod_plot` function reduces the work to make such a plot.
+For models involving only a very few explanatory variables, a plot of the model can give immediate insight. The `mod_plot()` function reduces the work to make such a plot.
 
 ```{r out.width = "30%"}
 mod_plot(fuel_mod_1) 
@@ -120,7 +120,7 @@ Since this is a classifier, the plot of the model function shows the *probabilit
 
 If your interest is in a class other than *virginica*, you can specify the class you want with an additional argument, e.g. `class_level = "setosa"`.
 
-The second iris model has four explanatory variables. This is as many as `mod_plot` will display:
+The second iris model has four explanatory variables. This is as many as `mod_plot()` will display:
 
 ```{r out.width = "80%", fig.width = 8, fig.height = 8}
 mod_plot(iris_mod_2, class_level = "setosa")
@@ -136,12 +136,12 @@ mod_plot(iris_mod_2, ~ Petal.Length + Petal.Width + Sepal.Width)
 
 ## Model outputs
 
-The `mod_plot` function creates a graphical display of the output of the model for a range of model inputs. The `mod_eval` function (which `mod_plot` uses internally), produces the output in tabular form, e.g.
+The `mod_plot` function creates a graphical display of the output of the model for a range of model inputs. The `mod_eval()` function (which `mod_plot()` uses internally), produces the output in tabular form, e.g.
 
 ```{r}
 mod_eval(fuel_mod_1, transmission = "manual", hp = 200)
 ```
-`mod_eval` tries to do something sensible if you don't specify a value (or a range of values) for an explanatory variable.
+`mod_eval()` tries to do something sensible if you don't specify a value (or a range of values) for an explanatory variable.
 ```{r}
 mod_eval(fuel_mod_1)
 ```
@@ -163,12 +163,12 @@ mod_eval(iris_mod_1, nlevels = 2)
 
 It's often helpful in interpreting a model to know how the output changes with a change in one of the inputs. Traditionally, model coefficients have been used for this purpose. But not all model architectures produce coefficients (e.g. random forest) and even in those that do use of interactions and nonlinear terms spreads out the information across multiple coefficients. As an alternative, `mod_effect` calculates a model input at one set of values, repeats the calculation after modifying a selected input, and combines the result into a "rate-of-change/slope" or a finite-difference. 
 
-Here, `mod_effect` is calculating the rate of change of fuel consumption (remember, the output of `fuel_mod_1` is in term of `mpg`) with respect to `hp`:
+Here, `mod_effect()` is calculating the rate of change of fuel consumption (remember, the output of `fuel_mod_1` is in term of `mpg`) with respect to `hp`:
 
 ```{r}
 mod_effect(fuel_mod_2, ~ hp)
 ```
-Since no specific inputs were specified, `mod_effect` attempted to do something sensible.
+Since no specific inputs were specified, `mod_effect()` attempted to do something sensible.
 
 You can, of course, specify the inputs you want, for instance:
 ```{r}
@@ -256,7 +256,7 @@ The result suggests a lower bias but higher variance for the second fuel model c
 
 ## Available model architectures
 
-"Architecture" is used to refer to the class of model. For instance, a linear model, random forests, recursive partitioning. Use the model training functions, such as `lm`, `glm`, `rlm` in the `stats` package or in other packages such as `caret` or `zelig`. 
+"Architecture" is used to refer to the class of model. For instance, a linear model, random forests, recursive partitioning. Use the model training functions, such as `lm()`, `glm()`, `rlm()` in the `stats` package or in other packages such as `caret` or `zelig`. 
 
 You can find out which model architectures are available with the command 
 ```{r}
@@ -272,16 +272,16 @@ The package authors would like to have this package ready-to-run with commonly u
 R programmers can add their own model architectures by adding S3 methods for these functions:
 
 
-- `formula_from_mod`
-- `data_from_mod`
-- `mod_eval_fun` evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
+- `formula_from_mod()`
+- `data_from_mod()`
+- `mod_eval_fun()` evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
 - `construct_fitting_call`
 
 The code for the generic and some methods are in the source .R files of the same name. This may give you some idea of how to write your own methods.
 
 It often happens that there is a sensible default method that covers lots of model architectures. You can try this out directly by running `mosaicModel:::data_from_mod.default()` (or a similar name) on the model architecture you want to support.
 
-To illustrate, let's add a set of methods for the `MASS` package's `lda` and `qda` model architectures for classification.
+To illustrate, let's add a set of methods for the `MASS` package's `lda()` and `qda()` model architectures for classification.
 
 Step 1 is to create a model of the architecture you're interested in. Remember that you will need to attach any packages needed for that kind of model.
 
@@ -314,30 +314,30 @@ mod_eval_fun(my_mod)
 Error in mod_eval_fun.default(my_mod) : The modelMosaic package doesn't have access to an evaluation function for this kind of model object.
 ```
 
-Now, of course, there is a `mod_eval_fun` method for models of class `knn3`. How did we go about implementing it? 
+Now, of course, there is a `mod_eval_fun()` method for models of class `knn3`. How did we go about implementing it? 
 
-To start, let's see if there is a `predict` method defined. This is a pretty common practice among those writing model-training functions. Regretably, there is considerable variety in the programming interface to `predict` methods, so it's quite common to have to implement a wrapper to interface any existing `predict` method to `mosaicModel`.
+To start, let's see if there is a `predict` method defined. This is a pretty common practice among those writing model-training functions. Regretably, there is considerable variety in the programming interface to `predict()` methods, so it's quite common to have to implement a wrapper to interface any existing `predict()` method to `mosaicModel`.
 ```{r}
 methods(class = "lda")
 ```
 
-Refer to the help page for `predict.lda` to see what the argument names are. `newdata =` is often the name of the argument for specifying the model inputs, but sometimes it's `x` or `data` or whatever.
+Refer to the help page for `predict.lda()` to see what the argument names are. `newdata =` is often the name of the argument for specifying the model inputs, but sometimes it's `x` or `data` or whatever.
 
-Since `lda`/`qda` is a classifier, the form of output we would like to produce is a table of probabilities for each class level for each input class. This is the standard expected by `mosaicModel`. Let's look at the output of `predict`:
+Since `lda`/`qda` is a classifier, the form of output we would like to produce is a table of probabilities for each class level for each input class. This is the standard expected by `mosaicModel`. Let's look at the output of `predict()`:
 
 ```{r}
 predict(my_mod) %>% str()
 ```
 
-This is something of a detective story, but a person very familiar with `lda` and with R will see that the `predict` method produces a list of two items. The second one called `posterior` and is a matrix with 150 rows and 3 columns, corresponding to the size of the training data.
+This is something of a detective story, but a person very familiar with `lda()` and with R will see that the `predict` method produces a list of two items. The second one called `posterior` and is a matrix with 150 rows and 3 columns, corresponding to the size of the training data.
 
-Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_eval_fun.lda` function from `mosaicModel`.
+Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_eval_fun.lda()` function from `mosaicModel`.
 
 ```{r}
 mosaicModel:::mod_eval_fun.lda
 ```
 
-The arguments to the function are the same as for all the `mod_eval_fun` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)
+The arguments to the function are the same as for all the `mod_eval_fun()` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)
 
 ```{r error = TRUE}
 mod_eval_fun(my_mod, data = iris[c(30, 80, 120),])

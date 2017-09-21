@@ -5,7 +5,7 @@ Version: 0.3.0
 Author: Kaplan Daniel [aut, cre],
   Pruim Randall [aut, cre]
 Maintainer: Daniel Kaplan <kaplan@macalester.edu>
-Description: Provides functions for evaluating, displaying, and interpreting statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients. The package includes interfaces to both regression and classification architectures, including lm, glm, random forests and recursive partitioning, knn, linear and quadratic discriminant analysis, and models produced by the caret package's train. It's straightforward to add in other other model architectures.
+Description: Provides functions for evaluating, displaying, and interpreting statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients. The package includes interfaces to both regression and classification architectures, including lm(), glm(), MASS::rlm(), random forests and recursive partitioning, k-nearest neighbors, linear and quadratic discriminant analysis, and models produced by the caret package's `train()`. It's straightforward to add in other other model architectures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: TRUE
