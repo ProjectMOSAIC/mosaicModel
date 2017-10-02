@@ -32,6 +32,8 @@ test_that("glm methods work", {
   treatment <- gl(3,3)
   d.AD <- data.frame(treatment, outcome, counts)
   mod2 <- glm(counts ~ outcome + treatment, data = d.AD, family = poisson)
+  res2 <- mod_eval_fun(mod2, data = d.AD, interval = "none")
+  expect_equal(nrow(res2), nrow(d.AD))
   res2 <- mod_eval_fun(mod2, data = d.AD, interval = "confidence")
   expect_equal(nrow(res2), nrow(d.AD))
   expect_equal(names(res2), conf_names)

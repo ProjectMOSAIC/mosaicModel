@@ -77,7 +77,7 @@ mod_eval_fun.glm <- function(model, data=NULL, interval="none", ...) {
     res$lower <- model$family$linkinv(res$lower)
     res$upper <- model$family$linkinv(res$upper)
   } else {
-    names(tmp) <- NULL # strip off case labels
+    names(vals) <- NULL # strip off case labels
     res <- data.frame(model_output = model$family$linkinv(vals)) 
   }
   
