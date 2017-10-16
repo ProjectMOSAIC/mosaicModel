@@ -56,7 +56,7 @@ mod_plot <- function(model=NULL, formula = NULL,
     ensemble <- mod_ensemble(model, nreps = bootstrap, data = data)
     res <- 
       mod_plot(ensemble, formula = formula, data = data, bootstrap = 0, nlevels = nlevels,
-               at = at, class_level = class_level, interval = "none", 
+               at = at, class_level = class_level, interval = interval, 
                post_transform = post_transform,
                size = size, alpha = alpha, ...)
     return(res)
@@ -149,7 +149,9 @@ mod_plot <- function(model=NULL, formula = NULL,
            group = show_vars[2])
   } else {
     ggplot(data = model_vals,
-           aes_string(x = show_vars[1], y = "model_output")) 
+           aes_string(x = show_vars[1], 
+                      y = "model_output",
+                      group = ifelse(".trial" %in% names(model_vals), ".trial", NA))) 
   }
  
   first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
