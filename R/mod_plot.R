@@ -197,10 +197,17 @@ mod_plot <- function(model=NULL, formula = NULL,
                            ymax = "upper", ymin = "lower", fill = show_vars[2]), 
                 color = NA, alpha = alpha/4) 
     } else {
-      Q <- Qfun(data = model_vals, 
+      Q <- if (first_var_quantitative) {
+        Qfun(data = model_vals, 
+             aes_string(x = show_vars[1],
+                        ymax = "upper", ymin = "lower"), 
+             fill = "black", alpha = alpha/4, color = NA)
+      } else {
+        Qfun(data = model_vals, 
                 aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower"), 
                 color = "black", alpha = alpha/4)
+      }
     }
   }
   
