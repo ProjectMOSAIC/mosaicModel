@@ -13,7 +13,8 @@ LazyLoad: TRUE
 RoxygenNote: 6.0.1
 Depends: 
     R (>= 3.1), 
-    mosaicCore, 
+    mosaicCore,
+    mosaic,
     splines,
     dplyr
 Imports: 
@@ -28,7 +29,6 @@ Imports:
     tidyr,
     tidyverse
 Suggests: 
-    mosaic, 
     mosaicData, 
     randomForest,
     rpart 
