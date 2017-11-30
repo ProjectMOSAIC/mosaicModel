@@ -91,8 +91,8 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
       dplyr::group_by(.row) %>% 
       dplyr::select(-.trial)
     res <- res %>% 
-      dplyr::summarise_all(c(mn = function(x){mean(x, na.rm=TRUE)}, 
-                      se = function(x){sd(x, na.rm=TRUE)})) %>%
+      dplyr::summarise_all(dplyr::funs(mn = mean, 
+                      se = sd), na.rm=TRUE) %>%
       dplyr::select(-.row)
     if (names(res)[2] == "se") # handle naming for regression case
       names(res) <- c("model_output", "model_output_se")
