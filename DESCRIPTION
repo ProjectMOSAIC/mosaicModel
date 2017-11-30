@@ -11,7 +11,7 @@ Encoding: UTF-8
 LazyData: TRUE
 LazyLoad: TRUE
 RoxygenNote: 6.0.1
-Depends: 
+Depends:  
     R (>= 3.1), 
     mosaicCore,
     mosaic,
