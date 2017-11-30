@@ -61,7 +61,7 @@ n_levels <- function(values, n) {
     if (n == 1) {
       return(signif(med, 2))
     } else {
-      res <- pretty(quantile(values, c(.1, .9)), n-1)
+      res <- pretty(quantile(values, c(.1, .9), na.rm = TRUE), n-1)
       if (n == 2) res <- res[c(1, length(res))] 
       if (length(res) > n) res <- res[-1]
       if (length(res) > n) res <- res[-length(res)]
@@ -94,7 +94,7 @@ n_levels <- function(values, n) {
 # look for pretty extreme outliers
 # return logicals: is the minimum an outlier? is the maximum an outlier?
 has_outlier <- function(values, whisker = 3) {
-  box <- as.numeric(quantile(values, probs = c(.25, .75)))
+  box <- as.numeric(quantile(values, probs = c(.25, .75), na.rm = TRUE))
   c(min(values) < box[1] - diff(box) * whisker,
     max(values) > box[2] + diff(box) * whisker )
   

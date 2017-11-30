@@ -164,7 +164,7 @@ mod_effect <- function(model, formula, step = NULL,
     }
     if (ensemble_flag) output_form$.trial <- k
     
-    Result <- rbind(Result, cbind(res, output_form))
+    Result <- rbind(Result, bind_cols(res, output_form))
   }
 
 

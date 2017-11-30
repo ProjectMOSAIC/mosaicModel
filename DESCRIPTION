@@ -1,7 +1,7 @@
 Package: mosaicModel
 Type: Package
 Title: An Interface to Statistical Modeling Independent of Model Architecture
-Version: 0.3.0.9001
+Version: 0.3.0.9003
 Author: Kaplan Daniel [aut, cre],
   Pruim Randall [aut, cre]
 Maintainer: Daniel Kaplan <kaplan@macalester.edu>
