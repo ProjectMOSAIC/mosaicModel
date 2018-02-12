@@ -7,14 +7,17 @@
 \alias{ci.sd}
 \title{Interval statistics for use with df_stats()}
 \usage{
-coverage(level = 0.95)
+coverage(x, level = 0.95, na.rm = TRUE)
 }
 \arguments{
+\item{x}{A vector of data}
+
 \item{level}{Number in 0 to 1 specifying the confidence level for the interval. (Default: 0.95)}
+
+\item{na.rm}{if \code{TRUE} disregard missing data}
 }
 \description{
-Function builders for calculating intervals. These must \emph{always} be evaluated
-with the \emph{result} being handed as a argument to \code{df_stats()}.
+Calculate coverage intervals and confidence intervals for the mean, median, sd
 }
 \examples{
 cover <- coverage(0.95)

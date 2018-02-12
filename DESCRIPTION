@@ -17,8 +17,7 @@ Depends:
     mosaic,
     splines,
     dplyr
-Imports: 
-    caret,
+Imports:
     ggplot2,
     ggformula,
     lazyeval,
@@ -29,6 +28,7 @@ Imports:
     tidyr,
     tidyverse
 Suggests: 
+    caret,
     mosaicData, 
     randomForest,
     rpart 
