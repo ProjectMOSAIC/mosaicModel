@@ -28,7 +28,7 @@ Imports:
     tidyr,
     tidyverse
 Suggests: 
-    caret,
+    caret, 
     mosaicData, 
     randomForest,
     rpart 
