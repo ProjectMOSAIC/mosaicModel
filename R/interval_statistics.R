@@ -1,20 +1,34 @@
-#' Interval statistics for use with df_stats()
+#' Interval statistics
 #' 
-#' Calculate coverage intervals and confidence intervals for the mean, median, sd
+#' Calculate coverage intervals and confidence intervals for the sample mean, median, sd, proportion, ...
+#' 
+#' Typically, these will be used within `df_stats()`. For the mean, median, and sd, the variable x must be 
+#' quantitative. For proportions, the x can be anything; use the `prop_of` argument to specify what 
+#' value you want the proportion of. Default for `prop_of` is `TRUE` for x logical, or the first level returned
+#' by `unique` for categorical or numerical variables.  The CI for proportions is computed using quantiles of the
+#' binomial distribution.
 #'
-#' @param x A vector of data
+#' @param x A variable.
+#' @param prop_of For proportions, this specifies the categorical level for which the calculation of proportion will
+#' be done. Defaults: `TRUE` for logicals for which the proportion is to
+#' be calculated.
 #' @param level Number in 0 to 1 specifying the confidence level for the interval. (Default: 0.95)
-#' @param na.rm if `TRUE` disregard missing data
+#' @param na.rm if `TRUE` disregard missing data 
 #' 
 #' @rdname intervals
-#' @aliases ci.mean ci.median ci.sd 
+#' @aliases coverage ci.mean ci.median ci.sd ci.proportion 
 #' 
 #' @examples
-#' cover <- coverage(0.95)
-#' df_stats(hp ~ cyl, data = mtcars, c95 = cover)
+#' # The central 95% interval
+#' df_stats(hp ~ cyl, data = mtcars, c95 = coverage(0.95))
+#' # The confidence interval on the mean
+#' df_stats(hp ~ cyl, data = mtcars, mean, ci.mean)
+#' # What fraction of cars have 6 cylinders?
+#' df_stats(mtcars, ~ cyl, six_cyl_prop = ci.proportion(prop_of = 6, level = 0.90))
 #' 
 #' @export
 coverage <- function(x, level = 0.95, na.rm = TRUE) {
+  if (! is.numeric(x)) stop("The variable x must be quantitative.")
   level <- check.level(level)
   bottom = (1 - level) / 2
   top = 1 - bottom
@@ -28,6 +42,7 @@ coverage <- function(x, level = 0.95, na.rm = TRUE) {
 
 #' @export
 ci.mean <- function(x, level = 0.95, na.rm = TRUE) {
+  if (! is.numeric(x)) stop("The variable x must be quantitative.")
   level <- check.level(level)
   
   n <- length(x)
@@ -45,6 +60,7 @@ ci.mean <- function(x, level = 0.95, na.rm = TRUE) {
 
 #' @export
 ci.median <- function(x, level = 0.9, na.rm = TRUE5) {
+  if (! is.numeric(x)) stop("The variable x must be quantitative.")
   level <- check.level(level)
   x <- sort(x)
   n <- length(x)
@@ -61,6 +77,7 @@ ci.median <- function(x, level = 0.9, na.rm = TRUE5) {
 
 #' @export
 ci.sd <- function(x, level = 0.95, na.rm = TRUE) {
+  if (! is.numeric(x)) stop("The variable x must be quantitative.")
   level <- check.level(level)
   n <- length(x)
   bottom <- (1 - level) / 2
@@ -74,55 +91,25 @@ ci.sd <- function(x, level = 0.95, na.rm = TRUE) {
   res 
 }
 
-#' Function builder for proportions.
-#' 
-#' Evaluate this and hand the result to `df_stats()`
-#' @param nm The level for which to find the proportion
-#' 
-#' @examples
-#' \dontrun{
-#' df_stats(mtcars, ~ cyl, proportion(6))
-#' }
 #' @export
-proportion <- function(nm = NULL) {
-  function(x) {
-    if (is.null(nm)) {
-      nm <- if (is.logical(x)) TRUE else unique(x)[1]
-    }
-  
-    c(prop = mean(x == nm[1]))
-  }
-}
-
-#' Function builder for confidence intervals on proportions
-#' 
-#' Similar to `proportion`, but 
-#' 
-#' @param level The confidence interval (Default: 0.95)
-#' @param nm The level for which to find the proportion
-#' @examples
-#' \dontrun{
-#' df_stats(mtcars, ~ cyl, cyl_prop = ci.proportion(6, level = 0.90))
-#' }
-#' @export
-ci.proportion <- function(nm = NULL, level = 0.95) {
+ci.proportion <- function(x,  prop_of = NULL, level = 0.95) {
   level <- check.level(level)
-
-  function(x) {
-    if (is.null(nm)) {
-      nm <- if (is.logical(x)) TRUE else unique(x)[1]
-    }
-    
-    prob <- mean(x == nm[1])
-    n <- length(x)
-    bottom <- (1 - level) / 2
-    top <- 1 - bottom
-    res <- qbinom(c(bottom, top), size = length(x), prob = prob) / n
-    # names(res) <- paste(nm, c("lower", "upper"), sep = "_")
-    names <- c("lower", "upper")
-    res 
+  
+  nm = prop_of
+  if (is.null(nm)) {
+    nm <- if (is.logical(x)) TRUE else unique(x)[1]
   }
-} 
+  
+  prob <- mean(x == nm[1])
+  n <- length(x)
+  bottom <- (1 - level) / 2
+  top <- 1 - bottom
+  res <- qbinom(c(bottom, top), size = length(x), prob = prob) / n
+  res[3] <- res[2]
+  res[2] <- prob
+  names(res) <- c("lower", "center", "upper")
+  res 
+}
 
 # internal use
 check.level <- function(level) {
@@ -130,4 +117,4 @@ check.level <- function(level) {
   if (level < 0 | level > 1) warning("level ", level, " is not between 0 and 1. Setting to ", res)
 
   res
-  }  
+}  
