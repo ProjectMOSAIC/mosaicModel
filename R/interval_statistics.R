@@ -69,7 +69,6 @@ ci.median <- function(x, level = 0.9, na.rm = TRUE5) {
   ci_index <- (n + qnorm(c(bottom, top)) * sqrt(n))/2 + c(0,1)
   res <- as.numeric(x[round(ci_index)])
   
-  #names(res) <- paste("ci_median", c("lower", "upper"), sep = "_")
   names(res) <- c("lower", "upper") 
   res
 }
@@ -87,7 +86,7 @@ ci.sd <- function(x, level = 0.95, na.rm = TRUE) {
     qchisq(c(top, bottom), df = n - 1)
   res <- sqrt(res)
   #names(res) <- paste("ci_sd", c("lower", "upper"), sep = "_")
-  names <- c("lower", "upper") 
+  names(res) <- c("lower", "upper") 
   res 
 }
 
