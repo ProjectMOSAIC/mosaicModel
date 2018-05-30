@@ -17,11 +17,11 @@ mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
 model value in the output. Default: \code{TRUE}.}
 
 \item{interval}{the type of interval to use: "none", "confidence", "prediction". But not all
-types are available for all model architectures.}
+types are available for all model architectures. A standard error and 95\% confidence interval are produced in the output}
 
 \item{nlevels}{how many levels to construct for input variables. (default: 3)
 For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
-with the result, use the ... to specify exactly what levels you want for any variable.}
+with the result, use  \code{...} to specify exactly what levels you want for any variable.}
 
 \item{bootstrap}{if > 1, the number of bootstrap trials to run to construct a
 standard error on the model output for each value of the inputs. This is an alternative to
@@ -37,7 +37,7 @@ when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See
 \value{
 A dataframe containing both the explanatory variable inputs and
 the resulting model output (in the \code{model_value} field). This differs from the output
-of \code{predict()}, which for many model classes/architectures may be a vector or matrix.
+of \code{stats::predict()}, which for many model classes/architectures may be a vector or matrix.
 
 A data frame containing both the inputs to the model and the corresponding outputs.
 }

@@ -46,20 +46,24 @@ df_typical <- function(data = NULL,
          " not in the data table")
   explan_vars <- if (is.null(model)) names(at) else base::union(explanatory_vars(model), names(at))
 
-  # Set a large number of levels for the first explanatory variable,
-  # then nlevels for the remaining ones.
-  if (length(nlevels) == 1) {
-    # replicate for all the explanatory variables
-    how_many <- as.list(c(rep(nlevels, length(explan_vars))))
-    names(how_many) <- explan_vars
+  if (length(explan_vars) == 0) { # the null model, response ~ 1
+    eval_levels = data_frame("null_model_input" = NA)
   } else {
-    how_many = nlevels
-  }
-  eval_levels <- reference_values(data[explan_vars], n = how_many, at = at )
-  vnames <- names(eval_levels)
-  for (name in vnames) {
-    if (inherits(data[[name]], "factor") && !inherits(eval_levels[[name]], "factor"))
-      eval_levels[[name]] <- factor(eval_levels[[name]], levels = levels(data[[name]]))
+    # Set a large number of levels for the first explanatory variable,
+    # then nlevels for the remaining ones.
+    if (length(nlevels) == 1) {
+      # replicate for all the explanatory variables
+      how_many <- as.list(c(rep(nlevels, length(explan_vars))))
+      names(how_many) <- explan_vars
+    } else {
+      how_many = nlevels
+    }
+    eval_levels <- reference_values(data[explan_vars], n = how_many, at = at )
+    vnames <- names(eval_levels)
+    for (name in vnames) {
+      if (inherits(data[[name]], "factor") && !inherits(eval_levels[[name]], "factor"))
+        eval_levels[[name]] <- factor(eval_levels[[name]], levels = levels(data[[name]]))
+    }
   }
 
   eval_levels

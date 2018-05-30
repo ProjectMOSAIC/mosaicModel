@@ -1,12 +1,12 @@
 #' Evaluate a model for specified inputs
 #' 
 #' Find the model outputs for specified inputs. This is equivalent to the 
-#' generic \code{predict()} function, except it will choose sensible values
+#' generic `predict()` function, except it will choose sensible values
 #' by default.  This simplifies getting a quick look at model values.
 #' 
 #' @return A dataframe containing both the explanatory variable inputs and
 #' the resulting model output (in the `model_value` field). This differs from the output
-#' of \code{predict()}, which for many model classes/architectures may be a vector or matrix.
+#' of `stats::predict()`, which for many model classes/architectures may be a vector or matrix.
 #'
 #' @importFrom stats formula lm median model.matrix predict quantile sd binomial poisson qbinom qchisq qnorm
 #' @importFrom utils data
@@ -19,20 +19,20 @@
 #' @param model the model to display graphically
 #' @param data optional set of cases from which to extract levels for explanatory variables
 #' @param on_training flag whether to use the training data for evaluation. Only needed
-#' when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.
+#' when there are random terms, e.g. from `rand()`, `shuffle()`, .... See details.
 #' @param interval the type of interval to use: "none", "confidence", "prediction". But not all
-#' types are available for all model architectures.
+#' types are available for all model architectures. A standard error and 95\\% confidence interval are produced in the output
 #' @param bootstrap if > 1, the number of bootstrap trials to run to construct a 
 #' standard error on the model output for each value of the inputs. This is an alternative to
 #' `interval`; you can't use both.
 #' @param nlevels how many levels to construct for input variables. (default: 3)
 #' For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
-#' with the result, use the ... to specify exactly what levels you want for any variable.  
+#' with the result, use  `...` to specify exactly what levels you want for any variable.  
 #' @param ... arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
-#' Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that
+#' Unlike `data =` the variables given in `at =` or `...` will be crossed, so that
 #' the evaluation will occur at all combinations of the various levels.
 #' @param append flag whether to include the inputs to the model along with the calculated
-#' model value in the output. Default: \code{TRUE}. 
+#' model value in the output. Default: `TRUE`. 
 #' @return A data frame containing both the inputs to the model and the corresponding outputs.
 #'
 #' @details There are four distinct ways to specify the values at which the model is to be evaluated.
@@ -41,10 +41,10 @@
 #' at all of the cases contained in that dataframe. (3) Setting input variables explicitly by using 
 #' arguments of the form var_name = values, e.g. `sex = "F"`. If not all input variables are specified in 
 #' this way, the ones that are not will have values set per (1). All combinations of the various variables
-#' will be created. See the \code{nlevels} argument. (4) Evaluating the model on the training data.
+#' will be created. See the `nlevels` argument. (4) Evaluating the model on the training data.
 #' There are two ways to do this. The first is
-#' to set the \code{data} argument to the same data frame used to train the model. The second
-#' is to use the \code{on_training = TRUE} argument. These are equivalent unless there is
+#' to set the `data` argument to the same data frame used to train the model. The second
+#' is to use the `on_training = TRUE` argument. These are equivalent unless there is
 #' some random component among the explanatory terms, as with `mosaic::rand()`, `mosaic::shuffle()` and so on.
 #'  
 #'

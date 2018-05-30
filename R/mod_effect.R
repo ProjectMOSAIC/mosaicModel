@@ -49,7 +49,9 @@
 mod_effect <- function(model, formula, step = NULL, 
                         bootstrap = 0, to = step, nlevels = 1, 
                        data = NULL, at = NULL, class_level = NULL, ... ) {
-  
+  if (missing(formula)) {
+    stop("You must provide a one-sided, one variable formula to identify the variable whose effect size you're seeking. It should be one of ", paste(paste0("'", explanatory_vars(model),"'" ), collapse = " or "))
+  }  
   if (inherits(model, "bootstrap_ensemble")) {
     ensemble <- model$replications # that is, the list of bootstrapped models
     original_model <- model$original_model
@@ -90,6 +92,12 @@ mod_effect <- function(model, formula, step = NULL,
   
   
   change_var <- all.vars(mosaic::rhs(formula))[1]
+  explan_vars <- explanatory_vars(model)
+  if (length(explan_vars) == 0) stop("The model has no explanatory variables so the output is constant and the effect size is exactly 0.")
+  if (! change_var %in% explan_vars)
+    stop(sprintf(
+      "'%s' is not an explanatory variable in the model, so effect size is exactly 0. Do you want one of %s?",
+      change_var, paste(paste0("'", explan_vars,"'"), collapse = " or ")))
   # set up so that glms are evaluated, by default, as the response rather than the link
   if (inherits(model, "glm") && (! "type" %in% names(extras))) {
     extras$type = "response"
