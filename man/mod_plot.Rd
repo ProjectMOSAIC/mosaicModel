@@ -4,36 +4,38 @@
 \alias{mod_plot}
 \title{Plot out model values}
 \usage{
-mod_plot(model = NULL, formula = NULL, data = NULL, nlevels = 3,
-  at = list(), prob_of = NULL, intervals = c("none", "confidence",
-  "prediction"), post_transform = NULL, ...)
+mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
+  nlevels = 3, at = list(), prob_of = NULL, intervals = c("none",
+  "confidence", "prediction"), post_transform = NULL, ...)
 }
 \arguments{
-\item{model}{the model to display graphically}
+\item{model}{A model to display graphically.}
 
-\item{formula}{setting the y ~ x + color variables}
+\item{formula}{A formula setting the `y ~ x + color` variables.}
 
-\item{data}{optional data set from which to extract levels for explanatory variables}
+\item{data}{An (optional) data set from which to extract levels for explanatory variables.}
 
-\item{nlevels}{how many levels to display for those variables shown at discrete levels}
+\item{nlevels}{An integer specifiying how many levels to display for variables shown at discrete levels.}
 
-\item{at}{named list giving specific values at which to hold the variables. You can accomplish 
+\item{at}{A named list giving specific values at which to hold the variables. You can accomplish
 this without forming a list by using \code{...}. See examples.}
 
-\item{prob_of}{if to show probability of a given level of the output, name the class here as a character string.}
+\item{prob_of}{A logical indicating whether to show probability of a given level of the output,
+name the class here as a character string.}
 
-\item{intervals}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
+\item{intervals}{One of "none", "confidence", "prediction" indicating which type of interval
+to display.}
 
-\item{post_transform}{a scalar transformation and new name for the response variable, 
+\item{post_transform}{A scalar transformation and new name for the response variable,
 e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
 
-\item{...}{specific values for explantory variables and/or arguments to predict()}
+\item{...}{Specific values for explantory variables and/or arguments to predict()}
 }
 \description{
 Plot out model values
 }
 \details{
-Often you will want to show some data along with the model functions. 
+Often you will want to show some data along with the model functions.
 You can do this with `ggplot2::geom_point()` making sure to set the \code{data} argument
 to be a data frame with the cases you want to plot.
 }
@@ -43,10 +45,10 @@ mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_plot(mod1)
 mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
 # show the data used for fitting along with the model
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8) +
   ggplot2::geom_point(data = mosaicData::CPS85, alpha = 0.1)
 require(ggplot2)
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8) + 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8) +
   geom_point(data = mosaicData::CPS85, alpha = 0.1) +
   ylim(0, 20)
 mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
@@ -55,8 +57,8 @@ mod3 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
 mod_plot(mod3, type = "response")
 # Adding the raw data requires an as.numeric() trick when it's TRUE/FALSE
-mod_plot(mod3, ~ age + sex + sector, nlevels = 10, type = "response") + 
-  geom_point(data = mosaicData::CPS85, 
+mod_plot(mod3, ~ age + sex + sector, nlevels = 10, type = "response") +
+  geom_point(data = mosaicData::CPS85,
   aes(x = age, y = as.numeric(married == "Married")), alpha = .1)
 }
 }

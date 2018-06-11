@@ -4,9 +4,9 @@
 \alias{gf_model}
 \title{Graph the function implicit in a model}
 \usage{
-gf_model(model = NULL, formula = NULL, data = NULL, nlevels = 3,
-  at = list(), prob_of = NULL, intervals = c("none", "confidence",
-  "prediction"), post_transform = NULL, ...)
+gf_model(object = NULL, model = NULL, formula = NULL, data = NULL,
+  nlevels = 3, at = list(), prob_of = NULL, intervals = c("none",
+  "confidence", "prediction"), post_transform = NULL, ...)
 }
 \arguments{
 \item{model}{the model to display graphically}
