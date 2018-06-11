@@ -5,38 +5,40 @@
 \title{Plot out model values}
 \usage{
 mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
-  nlevels = 3, at = list(), prob_of = NULL, intervals = c("none",
-  "confidence", "prediction"), post_transform = NULL, ...)
+  bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
+  interval = c("none", "confidence", "prediction"), post_transform = NULL,
+  size = 1, alpha = 0.8, ...)
 }
 \arguments{
-\item{model}{the model to display graphically.
-Can also be an ensemble produced with \code{mod_ensemble()}}
+\item{model}{A model to display graphically.
+Can also be an ensemble produced with \code{mod_ensemble()}.}
 
-\item{formula}{setting the y ~ x + color variables}
+\item{formula}{A formula setting the \code{y ~ x + color} variables.}
 
-\item{data}{optional data set from which to extract levels for explanatory variables}
+\item{data}{An optional data frame from which to extract levels for explanatory variables.}
 
-\item{nlevels}{how many levels to display for those variables shown at discrete levels}
+\item{bootstrap}{The number of bootstrap replications of the model to generate and plot.
+Use as an alternative to \code{interval} for confidence intervals.}
 
-\item{at}{named list giving specific values at which to hold the variables. You can accomplish
+\item{nlevels}{The number of levels to display for those variables shown at discrete levels.}
+
+\item{at}{A named list giving specific values at which to hold the variables. You can accomplish
 this without forming a list by using \code{...}. See examples.}
 
-\item{post_transform}{a scalar transformation and new name for the response variable,
-e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
+\item{class_level}{A character string indicating the level of the response variable to use
+in the plot when the model is produce a probabilty for a classifier.
+(Default: the first level.)}
 
-\item{...}{specific values for explantory variables}
+\item{interval}{One of "none", "confidence", "prediction" indicating which type of interval to display.}
 
-\item{interval}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
+\item{post_transform}{A function providing a scalar transformation and new name for the response variable.
+Example: \code{post_transform = c(price = exp)} to undo a log transformation of price.}
 
-\item{bootstrap}{when > 1, this will generate bootstrap replications of the model
-and plot all of them. Use as an alternative to \code{interval} for confidence intervals.}
+\item{size}{A numerical value for line width (default: 1)}
 
-\item{size}{numerical value for line width (default: 1)}
+\item{alpha}{A numerical value between 0 and 1 for transparency (default: 0.8)}
 
-\item{alpha}{numerical value in 0 to 1 for transparency (default: 0.8)}
-
-\item{class_level}{character string. If a probability for a classifier is being shown,
-which levels of the response variable to use in the plot. (Default: the first one.)}
+\item{...}{Used to choose specific values for explantory variables.  See examples.}
 }
 \description{
 Plot out model values

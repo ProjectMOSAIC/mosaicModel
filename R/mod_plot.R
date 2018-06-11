@@ -1,22 +1,23 @@
 #' Plot out model values
 #'
-#' @param model the model to display graphically.
-#' Can also be an ensemble produced with `mod_ensemble()`
-#' @param formula setting the y ~ x + color variables
-#' @param data optional data set from which to extract levels for explanatory variables
-#' @param nlevels how many levels to display for those variables shown at discrete levels
-#' @param at named list giving specific values at which to hold the variables. You can accomplish
-#' this without forming a list by using \code{...}. See examples.
-#' @param interval show confidence or prediction intervals: values "none", "confidence", "prediction"
-#' @param bootstrap when > 1, this will generate bootstrap replications of the model
-#' and plot all of them. Use as an alternative to `interval` for confidence intervals.
-#' @param post_transform a scalar transformation and new name for the response variable,
-#' e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.
-#' @param size numerical value for line width (default: 1)
-#' @param alpha numerical value in 0 to 1 for transparency (default: 0.8)
-#' @param class_level character string. If a probability for a classifier is being shown,
-#' which levels of the response variable to use in the plot. (Default: the first one.)
-#' @param ... specific values for explantory variables
+#' @param model A model to display graphically.
+#'   Can also be an ensemble produced with `mod_ensemble()`.
+#' @param formula A formula setting the `y ~ x + color` variables.
+#' @param data An optional data frame from which to extract levels for explanatory variables.
+#' @param nlevels The number of levels to display for those variables shown at discrete levels.
+#' @param at A named list giving specific values at which to hold the variables. You can accomplish
+#'   this without forming a list by using \code{...}. See examples.
+#' @param interval One of "none", "confidence", "prediction" indicating which type of interval to display.
+#' @param bootstrap The number of bootstrap replications of the model to generate and plot.
+#'   Use as an alternative to `interval` for confidence intervals.
+#' @param post_transform A function providing a scalar transformation and new name for the response variable.
+#'   Example: `post_transform = c(price = exp)` to undo a log transformation of price.
+#' @param size A numerical value for line width (default: 1)
+#' @param alpha A numerical value between 0 and 1 for transparency (default: 0.8)
+#' @param class_level A character string indicating the level of the response variable to use
+#'   in the plot when the model is produce a probabilty for a classifier.
+#'   (Default: the first level.)
+#' @param ... Used to choose specific values for explantory variables.  See examples.
 #'
 #'
 #' @examples
@@ -46,14 +47,17 @@
 #'
 mod_plot <-
   function(object = NULL, model = NULL, formula = NULL, data = NULL,
-           nlevels = 3, at = list(), prob_of = NULL,
-           intervals = c("none", "confidence", "prediction"),
-           post_transform = NULL, ...) {
+           bootstrap = 0,
+           nlevels = 3, at = list(), class_level = NULL,
+           interval = c("none", "confidence", "prediction"),
+           post_transform = NULL, size = 1, alpha = 0.8, ...) {
 
     # figure out what sort of thing object is and permute other arguments as required
 
     add <- FALSE
-    if (inherits(object, c("rpart", "glm", "lm", "groupwiseModel", "randomForest", "gbm"))) {
+    if (inherits(object,
+                 c("rpart", "glm", "lm", "groupwiseModel", "randomForest", "gbm",
+                   "knn3", "bootstrap_ensemble", "rpart", "lda"))) {
       if (is.null(formula) && inherits(model, "formula")) { formula <- model ; model <- object }
       if (is.null(model)) { model <- object }
     } else if (inherits(object, c("gg"))) {
@@ -74,12 +78,25 @@ mod_plot <-
       stop("object has unsupported type: ", class(object)[1])
     }
 
-    # create starting point for bulding plot layers
-    if (add) {
-      P <- object
-    } else {
-      P <- ggplot()
+    if (is.null(model)) {
+      stop("No model provided.")
     }
+
+    all_models <- NULL
+    if (inherits(model, "bootstrap_ensemble")) {
+      orig_model <- model$original_model
+    } else if (bootstrap > 1) {
+      ensemble <- mod_ensemble(model, nreps = bootstrap, data = data)
+      return(
+        mod_plot(ensemble, formula = formula, data = data, bootstrap = 0, nlevels = nlevels,
+                 at = at, class_level = class_level, interval = interval,
+                 post_transform = post_transform,
+                 size = size, alpha = alpha, ...)
+      )
+    } else {
+      orig_model <- model
+    }
+
 
     dots <- handle_dots_as_variables(model, ...)
     extras <- dots$extras
@@ -89,41 +106,55 @@ mod_plot <-
     at[names(inline_values)] <- NULL
     at <- c(at, inline_values)
 
-    intervals <- match.arg(intervals)
-
-    if (is.null(model)) {
-      stop("No model provided.")
-    } else if (inherits(model,
-                        c("rpart", "glm", "lm", "groupwiseModel",
-                          "randomForest", "gbm", "nls"))) {
-      # nothing to do
-    } else {
-      stop("Model of type", class(model)[1], "not set up for mod_plot().")
+    interval <- match.arg(interval)
+    if (length(extras) > 0) {
+      if ("intervals" %in% names(extras))
+        stop("The name for the argument is \"interval\", not intervals.")
+      stop("You've given some extraneous arguments. ")
     }
-
-    if( inherits(model, "gbm")) stop("gbm models still not working.")
 
     # If data not explicitly provided, get from model
-    if (is.null(data)) data <- data_from_model(model)
+    levels_data <-
+      if (is.null(data)) data_from_mod(orig_model) else data
 
-    # try to figure out what are the possible levels of variables
-    response_var_name <- response_var(model)
-    # is the response categorical?  If so, plot the probability of the given level
-    response_values <-
-      if (response_var_name %in% names(data)) {data[[response_var_name]]}
-    else {eval(parse(text = response_var_name), envir = data)}
-    if (! inherits(response_values, c("numeric", "logical"))) {
-      # It's categorical
-      if (is.null(prob_of))
-        prob_of <- names(sort(table(response_values), decreasing = TRUE))[1]
-      if ( ! prob_of %in% response_values)
-        stop("Level '", prob_of, "' doesn't exist in the response variable.")
-      response_var <- prob_of
-    }
 
-    explan_vars <- explanatory_vars(model)
+
+    # else if (inherits(model,
+    #                     c("rpart", "glm", "lm", "groupwiseModel",
+    #                       "randomForest", "gbm", "nls"))) {
+    #   # nothing to do
+    # } else {
+    #   stop("Model of type", class(model)[1], "not set up for mod_plot().")
+    # }
+    #
+    # if( inherits(model, "gbm")) stop("gbm models still not working.")
+    #
+
+    # Pick out the variables to be displayed, and their roles
+    explan_vars <- explanatory_vars(orig_model)
+    response_var_name <- response_var(orig_model)
+
+
     if (is.null(formula)) show_vars <- explan_vars
     else show_vars <- all.vars(mosaic::rhs(formula))
+
+
+    # # is the response categorical?  If so, plot the probability of the given level
+    # response_values <-
+    #   if (response_var_name %in% names(data)) {data[[response_var_name]]}
+    # else {eval(parse(text = response_var_name), envir = data)}
+    # if (! inherits(response_values, c("numeric", "logical"))) {
+    #   # It's categorical
+    #   if (is.null(prob_of))
+    #     prob_of <- names(sort(table(response_values), decreasing = TRUE))[1]
+    #   if ( ! prob_of %in% response_values)
+    #     stop("Level '", prob_of, "' doesn't exist in the response variable.")
+    #   response_var <- prob_of
+    # }
+    #
+    # explan_vars <- explanatory_vars(model)
+    # if (is.null(formula)) show_vars <- explan_vars
+    # else show_vars <- all.vars(mosaic::rhs(formula))
 
     # Use the first var as <x>
     # Use the second var as <color>
@@ -136,97 +167,157 @@ mod_plot <-
     # then nlevels for the remaining ones.
     how_many <- as.list(c(Inf, rep(nlevels, length(show_vars) - 1)))
     names(how_many) <- show_vars
-    eval_levels <- reference_values(data[explan_vars], n = how_many, at = at )
 
-    # set up so that glms are plotted, by default, as the response rather than the link
-    if (inherits(model, "glm") && ( ! "type" %in% names(extras))) {
-      extras$type = "response"
-    }
-    if ( ! inherits(model, c("lm", "glm", "nls")) && intervals != "none" ) {
-      warning("No intervals available for model type", class(model))
-      intervals = "none"
-    }
+    eval_levels <- df_typical(data = levels_data[explan_vars],
+                              model = orig_model,
+                              nlevels = how_many, at = at)
+
+    # Evaluate the model at the specified levels
     model_vals <-
-      do.call(predict,c(list(model, newdata = eval_levels),
-                        extras))
-    if (inherits(model, "rpart") && inherits(model_vals, c("data.frame", "matrix"))) {
-      # handle the matrix values from predict.rpart()
-      keepers <- colnames(model_vals) == prob_of
-      model_vals <- model_vals[,keepers] # just the first class
-    }
-    if ( ! is.null(post_transform)) model_vals <- post_transform[[1]](model_vals)
+      mod_eval(model = model, data = eval_levels, interval = interval, append = TRUE)
 
-    # get the confidence or prediction intervals
-    if (intervals == "none") {
-      # do nothing
-      Intervals <- NULL
-    } else {
-      if ( ! inherits(model, c("lm", "glm", "nls"))) {
-        warning("Intervals not yet available for models of class ", class(model))
-        Intervals <- NULL
+    # # set up so that glms are plotted, by default, as the response rather than the link
+    # if (inherits(model, "glm") && ( ! "type" %in% names(extras))) {
+    #   extras$type = "response"
+    # }
+    # if ( ! inherits(model, c("lm", "glm", "nls")) && intervals != "none" ) {
+    #   warning("No intervals available for model type", class(model))
+    #   intervals = "none"
+    # }
+
+    # If it's the probability from a classifier, pick out the selected level
+    if ( ! "model_output" %in% names(model_vals)) {
+      if (is.null(class_level)) class_level = names(model_vals)[ncol(model_vals)] # default
+
+      if (class_level %in% names(model_vals))
+        model_vals$model_output <- model_vals[[class_level]]
+      else
+        stop("Class level \"", class_level, "\" is not in the model output.")
+
+      response_var_name <- paste(response_var_name, "==", class_level)
+    }
+
+    # Apply the transform, if any
+    if ( ! is.null(post_transform)) {
+      the_transform <- post_transform[[1]]
+      if ("model_output" %in% names(model_vals)) {
+        model_vals[["model_output"]] <- the_transform(model_vals[["model_output"]])
       } else {
-        Intervals <-
-          do.call(predict, c(list(model, newdata = eval_levels, interval = intervals)))
-        if ( ! is.null(post_transform)) {
-          the_transform <- post_transform[[1]]
-          for (k in 1:length(Intervals))
-            Intervals[[k]] <- the_transform(Intervals[[k]])
+        for (column in setdiff(names(model_vals), explanatory_vars(orig_model))) {
+          model_vals[[column]] <- the_transform(model_vals[[column]])
         }
       }
     }
 
-    # convert any quantiles for numerical levels to discrete
-    first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
-    eval_levels <- convert_to_discrete(eval_levels)
-    # Deal with the response variable being a complex name
-    # e.g. when it includes operations on a data variable.
-    clean_response_name <- response_var_name
-    if( ! response_var_name %in% names(data))
-      clean_response_name <- "clean"
-    eval_levels[[clean_response_name]] <- model_vals
+    # model_vals <-
+    #   do.call(predict,c(list(model, newdata = eval_levels),
+    #                     extras))
+    # if (inherits(model, "rpart") && inherits(model_vals, c("data.frame", "matrix"))) {
+    #   # handle the matrix values from predict.rpart()
+    #   keepers <- colnames(model_vals) == prob_of
+    #   model_vals <- model_vals[,keepers] # just the first class
+    # }
+    # if ( ! is.null(post_transform)) model_vals <- post_transform[[1]](model_vals)
+    #
+    # # get the confidence or prediction intervals
+    # if (intervals == "none") {
+    #   # do nothing
+    #   Intervals <- NULL
+    # } else {
+    #   if ( ! inherits(model, c("lm", "glm", "nls"))) {
+    #     warning("Intervals not yet available for models of class ", class(model))
+    #     Intervals <- NULL
+    #   } else {
+    #     Intervals <-
+    #       do.call(predict, c(list(model, newdata = eval_levels, interval = intervals)))
+    #     if ( ! is.null(post_transform)) {
+    #       the_transform <- post_transform[[1]]
+    #       for (k in 1:length(Intervals))
+    #         Intervals[[k]] <- the_transform(Intervals[[k]])
+    #     }
+    #   }
+    # }
+    #
+    # # convert any quantiles for numerical levels to discrete
+    # first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
+    # eval_levels <- convert_to_discrete(eval_levels)
+    # # Deal with the response variable being a complex name
+    # # e.g. when it includes operations on a data variable.
+    # clean_response_name <- response_var_name
+    # if( ! response_var_name %in% names(data))
+    #   clean_response_name <- "clean"
+    # eval_levels[[clean_response_name]] <- model_vals
+    #
+    # if ( ! is.null(Intervals))
+    #   Intervals <- cbind(eval_levels[show_vars], data.frame(Intervals))
 
-    if ( ! is.null(Intervals))
-      Intervals <- cbind(eval_levels[show_vars], data.frame(Intervals))
+    # create starting point for bulding plot layers
+    if (add) {
+      P <- object
+    } else {
+      P <- ggplot()
+    }
+
 
     # figure out the components of the plot
 
+    plot_args <-
+      list(data = model_vals, size = size, alpha = alpha, inherit.aes = FALSE)
+
     if (length(show_vars) > 1 ) {
       plot_mapping <-
-        aes_string(x = show_vars[1], color = show_vars[2], y = clean_response_name)
-      plot_args <-
-        list(data = eval_levels, inherit.aes = FALSE)
+        aes_string(x = show_vars[1],
+                   y = "model_output",
+                   color = show_vars[2], group = show_vars[2]) # group may be unnecessary here
     } else {
       plot_mapping <-
-        aes_string(x = show_vars[1], y = clean_response_name)
-      plot_args <- list(data = eval_levels)
+        aes_string(
+          x = show_vars[1],
+          y = "model_output",
+          group = ifelse(".trial" %in% names(model_vals), ".trial", NA))
     }
 
+    first_var_quantitative <- is.numeric(eval_levels[[show_vars[1]]])
+
+    Pgeom <- if (first_var_quantitative)  geom_line else geom_point
+
+    more_mapping <- aes()
+    more_args <- list()
     if (length(show_vars) == 1) {
-      if (first_var_quantitative) {
-        P <- P + do.call(geom_line, c(plot_args, list(mapping = plot_mapping)))
-      }
-      else {
-        P <- P + do.call(geom_point, c(plot_args, list(mapping = plot_mapping)))
-      }
     } else { # more than one explanatory variable
       if (first_var_quantitative) {
-        more_mapping <- aes_string(color = show_vars[2], linetype = show_vars[2])
-        more_args <- list(alpha = 0.8)
-        geom <- geom_line
-      } else {
-        more_mapping <- aes_string(color = show_vars[2], linetype = show_vars[2])
-        more_args <- list(alpha = 0.8)
-        geom = geom_point
+        if (is.numeric(model_vals[[show_vars[2]]])) {
+          more_mapping <- aes_string(color = show_vars[2])
+        } else {
+          more_mapping <- aes_string(color = show_vars[2], linetype = show_vars[2])
+        }
+      } else { # ! first_var_quantitative
+        more_mapping <- aes_string(color = show_vars[2])
       }
+    }
+    # if (inherits(model, "bootstrap_ensemble")) {
+    #   more_mapping <- modifyList(more_mapping, aes_string(group = ".trial"))
+    # }
+
+    if (inherits(model, "bootstrap_ensemble")) {
+      for (k in unique(model_vals[[".trial"]])) {
+        more_args <- modifyList(more_args, list(data = model_vals[model_vals$.trial == k,]))
+        P <- P +
+          # select data for one bootstrap sample
+          do.call(Pgeom,
+                  c(list(mapping = modifyList(plot_mapping, more_mapping)),
+                    modifyList(plot_args, more_args))
+          )
+      }
+    } else {
       P <- P +
-        do.call(geom,
+        do.call(Pgeom,
                 c(list(mapping = modifyList(plot_mapping, more_mapping)),
                   modifyList(plot_args, more_args))
         )
     }
 
-    # Q is another layer; let's pick a funciton to use for this layer
-
+    # Q is the interval layter; let's pick a funciton to use for this layer
     if (first_var_quantitative) {
       Qgeom <- geom_ribbon
     } else {
@@ -234,23 +325,28 @@ mod_plot <-
     }
 
     Q <- NULL # nothing to show, unless ...
-    if ( ! is.null(Intervals)) {
+    if (interval != "none") {
       if (length(show_vars) > 1) {
-        Q <- Qgeom(data = Intervals,
+        Q <- Qgeom(data = model_vals,
                    aes_string(x = show_vars[1],
-                              y = "NULL", # don't need this
-                              ymax = "upr", ymin = "lwr", fill = show_vars[2]),
-                   color = NA, alpha = 0.2,
-                   inherit.aes = FALSE)
+                              ymax = "upper", ymin = "lower",
+                              fill = show_vars[2]),
+                   color = NA, alpha = alpha / 4, inherit.aes = TRUE)
       } else {
-        Q <- Qgeom(data = Intervals,
-                   aes_string(x = show_vars[1],
-                              y = "NULL", # don't need this
-                              ymax = "upr", ymin = "lwr"),
-                   color = "black", alpha = 0.2, #, fill = "blue",
-                   inherit.aes = FALSE)
+        Q <- if (first_var_quantitative) {
+          Qgeom(data = model_vals,
+                aes_string(x = show_vars[1],
+                           ymax = "upper", ymin = "lower"),
+                fill = "black", alpha = alpha / 4, color = NA, inherit.aes = TRUE)
+        } else {
+          Qgeom(data = model_vals,
+                aes_string(x = show_vars[1],
+                           ymax = "upper", ymin = "lower"),
+                color = "black", alpha = alpha / 4, inherit.aes = TRUE)
+        }
       }
     }
+
 
     if (length(show_vars) == 3)
       P <- P + facet_wrap(show_vars[3], labeller = label_both)
