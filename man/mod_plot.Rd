@@ -4,10 +4,9 @@
 \alias{mod_plot}
 \title{Plot out model values}
 \usage{
-mod_plot(model = NULL, formula = NULL, data = NULL, bootstrap = 0,
-  nlevels = 3, at = list(), class_level = NULL, interval = c("none",
-  "confidence", "prediction"), post_transform = NULL, size = 1,
-  alpha = 0.8, ...)
+mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
+  nlevels = 3, at = list(), prob_of = NULL, intervals = c("none",
+  "confidence", "prediction"), post_transform = NULL, ...)
 }
 \arguments{
 \item{model}{the model to display graphically.
@@ -17,27 +16,27 @@ Can also be an ensemble produced with \code{mod_ensemble()}}
 
 \item{data}{optional data set from which to extract levels for explanatory variables}
 
-\item{bootstrap}{when > 1, this will generate bootstrap replications of the model
-and plot all of them. Use as an alternative to \code{interval} for confidence intervals.}
-
 \item{nlevels}{how many levels to display for those variables shown at discrete levels}
 
 \item{at}{named list giving specific values at which to hold the variables. You can accomplish
 this without forming a list by using \code{...}. See examples.}
 
-\item{class_level}{character string. If a probability for a classifier is being shown,
-which levels of the response variable to use in the plot. (Default: the first one.)}
+\item{post_transform}{a scalar transformation and new name for the response variable,
+e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
+
+\item{...}{specific values for explantory variables}
 
 \item{interval}{show confidence or prediction intervals: values "none", "confidence", "prediction"}
 
-\item{post_transform}{a scalar transformation and new name for the response variable,
-e.g. \code{post_transform = c(price = exp)} to undo a log transformation of price.}
+\item{bootstrap}{when > 1, this will generate bootstrap replications of the model
+and plot all of them. Use as an alternative to \code{interval} for confidence intervals.}
 
 \item{size}{numerical value for line width (default: 1)}
 
 \item{alpha}{numerical value in 0 to 1 for transparency (default: 0.8)}
 
-\item{...}{specific values for explantory variables}
+\item{class_level}{character string. If a probability for a classifier is being shown,
+which levels of the response variable to use in the plot. (Default: the first one.)}
 }
 \description{
 Plot out model values
@@ -46,11 +45,11 @@ Plot out model values
 \dontrun{
 mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_plot(mod1)
-mod_plot(mod1, n = Inf, interval = "confidence") 
+mod_plot(mod1, n = Inf, interval = "confidence")
 mod_plot(mod1, ~ sector + sex + age) # not necessarily a good ordering
-mod_plot(mod1, ~ age + sex + sector, nlevels = 8) 
+mod_plot(mod1, ~ age + sex + sector, nlevels = 8)
 mod2 <- lm(log(wage) ~ age + sex + sector, data = mosaicData::CPS85)
-mod_plot(mod2, post_transform = c(wage = exp), 
+mod_plot(mod2, post_transform = c(wage = exp),
      interval = "confidence") # undo the log in the display
 mod3 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
