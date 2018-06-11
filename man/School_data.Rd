@@ -5,34 +5,34 @@
 \alias{School_data}
 \title{Simulated data bearing on school vouchers}
 \format{A data frame with 500 cases, each of which is a simulated student, with observations on the following variables.
-  \itemize{
-    \item{\code{test_score}} {a simulated test score for the student}
-    \item{\code{school}} {whether the student attended public or private school}
-    \item{\code{lottery}} {whether the student was entered into a lottery for a private-school voucher}
-    \item{\code{group}} {the racial/ethnic group of the student}
-    \item{\code{acad_motivation}} {the overall level of involvement and concern of the student's parents for the student's academic performance}
-    \item{\code{relig_motivation}} {the overall level of interest motivated by religion. This is 
-    potentially an issue because a large majority of urban private schools are Catholic.}
-  }}
+\itemize{
+\item{\code{test_score}} {a simulated test score for the student}
+\item{\code{school}} {whether the student attended public or private school}
+\item{\code{lottery}} {whether the student was entered into a lottery for a private-school voucher}
+\item{\code{group}} {the racial/ethnic group of the student}
+\item{\code{acad_motivation}} {the overall level of involvement and concern of the student's parents for the student's academic performance}
+\item{\code{relig_motivation}} {the overall level of interest motivated by religion. This is
+potentially an issue because a large majority of urban private schools are Catholic.}
+}}
 \usage{
 data(School_data)
 }
 \description{
-In the US, there have been controversial proposals to provide vouchers 
-to students in failing public schools. The vouchers would allow the students to attend 
-private schools. There are arguments pro and con that are often rooted in political 
-philosophy (free choice!) and politics. The presumption behind the *pro* arguments 
+In the US, there have been controversial proposals to provide vouchers
+to students in failing public schools. The vouchers would allow the students to attend
+private schools. There are arguments pro and con that are often rooted in political
+philosophy (free choice!) and politics. The presumption behind the \emph{pro} arguments
 is that attending private schools would create better outcomes for students.
 }
 \details{
-A reasonable way to test this presumption is to compare test scores for students 
-in public and private schools. 
+A reasonable way to test this presumption is to compare test scores for students
+in public and private schools.
 One famous analysis (Howell and Peterson, 2003, "The Education Gap: Vouchers and Urban Schools")
-found that voucher schools are most helpful for African-American students, 
+found that voucher schools are most helpful for African-American students,
 and not so much for white or Hispanic students.
 
-The \code{School_data} data frame comes from a simulation designed by the package author to 
-replicate the overall results but supporting a very different policy recommendation. WARNING: This is 
+The \code{School_data} data frame comes from a simulation designed by the package author to
+replicate the overall results but supporting a very different policy recommendation. WARNING: This is
 just a simulation, reflecting one hypothesis about how the world might work. Don't be tempted
 to draw conclusions about the actual factors involved in school performance from such simulated data.
 }

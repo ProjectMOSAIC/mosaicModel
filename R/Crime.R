@@ -1,9 +1,9 @@
 #' Data from the US FBI Uniform Crime Report, 1960
-#' 
+#'
 #' A report of the number of offenses reported to police per million
 #' population, and many other social and demographic variables. Each
 #' case corresponds to a state in the US.
-#' 
+#'
 #' @docType data
 #' @name Crime
 #' @usage data(Crime)
@@ -21,15 +21,15 @@
 #'     \item{\code{ExDiff}} {Change in per capita expenditure on police by state and local government from 1950 to 1960}
 #'     \item{\code{Ex0}} {1960 per capita expenditures on police.}
 #'   }
-#'   
+#'
 #' @source FBI Uniform Crime Report via \href{http://dasl.datadesk.com/data/view/114}{DASL: Data and Story Library}
-#' 
+#'
 #' @examples
 #' mod_1 <- lm(R ~ W, data = Crime)
 #' mod_2 <- lm(R ~ X, data = Crime)
 #' mod_3 <- lm(R ~ W + X, data = Crime)
-#' mod_effect_size(mod_1, ~ W)
-#' mod_effect_size(mod_3, ~ W)
-#' mod_effect_size(mod_2, ~ X)
-#' mod_effect_size(mod_3, ~ X)
+#' mod_effect(mod_1, ~ W)
+#' mod_effect(mod_3, ~ W)
+#' mod_effect(mod_2, ~ X)
+#' mod_effect(mod_3, ~ X)
 "Crime"

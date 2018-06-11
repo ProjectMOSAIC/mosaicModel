@@ -1,34 +1,39 @@
 Package: mosaicModel
 Type: Package
 Title: Create, Visualize, and Predict with Models
-Description: Create, visualize, and predict with models.
-Version: 0.1.0
-Date: 2017-06-27
+Version: 0.3.1.9000
 Authors@R: c(
     person("Kaplan", "Daniel", , "kaplan@macalester.edu", c("aut")),
     person("Pruim", "Randall", , "rpruim@calvin.edu", c("aut","cre"))
     )
+Maintainer: Daniel Kaplan <kaplan@macalester.edu>
+Description: Provides functions for evaluating, displaying, and interpreting statistical models. The goal is to abstract the operations on models from the particular architecture of the model. For instance, calculating effect sizes rather than looking at coefficients. The package includes interfaces to both regression and classification architectures, including lm(), glm(), rlm() in 'MASS', random forests and recursive partitioning, k-nearest neighbors, linear and quadratic discriminant analysis, and models produced by the 'caret' package's train(). It's straightforward to add in other other model architectures.
 License: MIT + file LICENSE
+Encoding: UTF-8
 LazyData: TRUE
 LazyLoad: TRUE
-Depends:
-    R (>= 3.1),
-    ggplot2
+Depends:  
+    R (>= 3.1), 
+    mosaicCore,
+    splines,
+    dplyr
 Imports:
-    rlang,
+    ggplot2,
+    ggformula,
     lazyeval,
-    magrittr,
-    tibble,
-    stringr,
-    glue
-Suggests:
-    mosaic,
-    dplyr,
-    testthat,
-    mosaicData,
     knitr,
-    rmarkdown,
-    lubridate
+    MASS,
+    testthat,
+    tibble,
+    tidyr,
+    tidyverse
+Suggests: 
+    mosaic,
+    caret, 
+    ddalpha,
+    mosaicData, 
+    randomForest,
+    rpart 
 VignetteBuilder: knitr
-Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1.9000

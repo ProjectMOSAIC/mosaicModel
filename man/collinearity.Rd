@@ -12,7 +12,7 @@ variables to be considered. Iteractions, etc. may also be specified.}
 
 \item{data}{a data frame from which to draw the variables in the formula}
 
-\item{format}{choice of \code{"SeIF"} for inflation of standard errors, 
+\item{format}{choice of \code{"SeIF"} for inflation of standard errors,
 \code{"degrees"} or \code{"radians"} for collinearity described as an angle
 or \code{"VIF"} for the variance inflation factor (which is the square of SeIF).}
 }

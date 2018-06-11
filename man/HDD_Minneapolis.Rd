@@ -17,15 +17,15 @@ data(HDD_Minneapolis)
 }
 \description{
 A "heating degree day" is a measure of weather coldness. It's defined to be the difference
-between the outdoor ambient temperature and 65 degrees F, but has a value of zero when the ambient 
-temperature is above 65 degrees. This difference is averaged over time and multiplied by the number 
-of days in the time period covered. The heating degree day is often used as a measure of the demand for 
+between the outdoor ambient temperature and 65 degrees F, but has a value of zero when the ambient
+temperature is above 65 degrees. This difference is averaged over time and multiplied by the number
+of days in the time period covered. The heating degree day is often used as a measure of the demand for
 domestic heating in a locale.
 }
 \details{
-These data report monthly heating degree days. For teaching purposes, the data give an extreme example 
+These data report monthly heating degree days. For teaching purposes, the data give an extreme example
 of how a relationship (hdd vs year) can be revealed by including a covariate (month). Although interest focusses
-on the change in temperature over the century the data cover, there is such regular seasonal variation that 
+on the change in temperature over the century the data cover, there is such regular seasonal variation that
 no systematic trend over the years is evident unless month is taken into account.
 }
 \examples{
