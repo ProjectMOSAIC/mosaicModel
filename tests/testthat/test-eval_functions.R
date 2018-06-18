@@ -66,6 +66,7 @@ test_that("rpart methods work", {
   mtcars2 <<- mtcars %>% mutate(mileage = cut(mpg, c(5, 15, 25, 40)))
   mod1 <- rpart::rpart(mpg ~ ., data = mtcars2)
   mod2 <- rpart::rpart(mileage ~ . - mpg, data = mtcars2)
+  expect_equal(dim(mod_output(mod1))[2], 1L)
   expect_equal(dim(mod_output(mod2))[2], 3L)
   res1 <- mod_output(mod1, data = mtcars2)
   res2 <- mod_output(mod2, data = mtcars2)
