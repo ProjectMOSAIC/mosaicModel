@@ -16,15 +16,15 @@
 #' a matrix of probabilities (for classifiers)
 #'
 #' @export
-mod_output <- function(model, data=NULL, interval="none", ...) {
+mod_output <- function(model, data = NULL, interval = "none", ...) {
   UseMethod("mod_output")
 }
 #' @export
-mod_output.default <- function(model, data=NULL, interval="none", ...) {
+mod_output.default <- function(model, data = NULL, interval = "none", ...) {
   stop("The modelMosaic package doesn't have access to an evaluation function for this kind of model object.")
 }
 #' @export
-mod_output.lm <- function(model, data=NULL, interval="none", ...) {
+mod_output.lm <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval, c("none", "confidence", "prediction"))
 
   if (is.null(data)) data <- data_from_mod(model)
@@ -42,7 +42,7 @@ mod_output.lm <- function(model, data=NULL, interval="none", ...) {
 }
 
 #' @export
-mod_output.randomForest <- function(model, data = NULL, interval="none", ...) {
+mod_output.randomForest <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval,
                         choices = c("none", "confidence", "prediction"))
 
@@ -61,7 +61,7 @@ mod_output.randomForest <- function(model, data = NULL, interval="none", ...) {
 }
 
 #' @export
-mod_output.glm <- function(model, data=NULL, interval="none", ...) {
+mod_output.glm <- function(model, data = NULL, interval = "none", ...) {
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
   if (is.null(data)) data <- data_from_mod(model)
