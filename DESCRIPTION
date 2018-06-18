@@ -24,6 +24,7 @@ Imports:
     knitr,
     MASS,
     testthat,
+    assertthat,
     tibble,
     tidyr,
     tidyverse

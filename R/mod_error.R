@@ -32,6 +32,7 @@
 #' reasons you may prefer (1-p)^2, in which case set `error_type = "mse"`. Classifiers can assign a probability
 #' of zero to the actual output, in which case the log-likelihood is `-Inf`. The `"mse"` error type avoids this.
 #'
+#' @importFrom assertthat assert_that are_equal
 #' @examples
 #' mod <- lm(mpg ~ hp + wt, data = mtcars)
 #' mod_error(mod) # In-sample prediction error.
@@ -56,7 +57,7 @@ mod_error <- function(model, testdata,
 
   if (missing(testdata)) {
     testdata <- data_from_mod(model)
-    warning("Calculating error from training data.")
+    warning("Calculating error from training data.\n")
   }
   # error functions
   mse <- function(actual, model_output) {
@@ -107,6 +108,10 @@ mod_error <- function(model, testdata,
       #warning('Setting error_type = "mse"')
       error_type <- "mse"
     }
+    assertthat::are_equal(ncol(model_vals), 1L)
+
+    model_vals <- as.numeric(model_vals[, 1])
+
     fun <- switch(tolower(error_type),
                   mse = mse,
                   sse = sse,
@@ -116,8 +121,7 @@ mod_error <- function(model, testdata,
                   dev = bad_regression_error,
                   class_error = bad_regression_error)
     res <- fun(actual, model_vals)
-  }
-  else {
+  } else {
     if (error_type == "default") {
       #warning('Setting error_type = "LL"')
       error_type <- "LL"

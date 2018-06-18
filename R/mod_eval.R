@@ -33,9 +33,8 @@
 #' the evaluation will occur at all combinations of the various levels.
 #' @param append flag whether to include the inputs to the model along with the calculated
 #' model value in the output. Default: `TRUE`.
-#' @return For `mod_eval()`, a data frame containing both the
-#' inputs to the model and the corresponding outputs. For
-#' `mod_output()` a vector containing only the model outputs.
+#' @return A data frame containing both the
+#' inputs to the model and the corresponding outputs.
 #'
 #' @details There are four distinct ways to specify the values at which the model is to be evaluated.
 #' (1) Look for some "typical values" in the data to create a handful of inputs. This is useful for
@@ -117,7 +116,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     nreps <- length(model$replications)
     output <- as.list(numeric(nreps))
     for (k in 1:nreps) {
-      model_vals <- mod_eval_fun(model$replications[[k]], data = eval_levels, interval = interval)
+      model_vals <- mod_output(model$replications[[k]], data = eval_levels, interval = interval)
       if (append) output[[k]] <- dplyr::bind_cols(eval_levels, model_vals)
       else output[[k]] <- model_vals
 
@@ -125,7 +124,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     }
     output <- dplyr::bind_rows(output)
   } else {
-    model_vals <- mod_eval_fun(model, data = eval_levels, interval = interval)
+    model_vals <- mod_output(model, data = eval_levels, interval = interval)
 
     if (append) output <- bind_cols(eval_levels, model_vals)
     else  output <- model_vals
@@ -134,17 +133,3 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
   output
 }
 
-#' @export
-#' @rdname mod_eval
-#'
-mod_output <-
-  function(model = NULL, data = NULL, append = TRUE,
-           interval = c("none", "prediction", "confidence"),
-           nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
-
-    mod_eval(
-      model = model, data = data, append = append,
-      interval = interval,
-      nlevels = nlevels, bootstrap = bootstrap, ...,
-      on_training = on_training)[["model_output"]]
-}

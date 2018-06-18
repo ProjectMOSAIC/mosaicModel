@@ -2,16 +2,11 @@
 % Please edit documentation in R/mod_eval.R
 \name{mod_eval}
 \alias{mod_eval}
-\alias{mod_output}
 \title{Evaluate a model for specified inputs}
 \usage{
 mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
   "prediction", "confidence"), nlevels = 2, bootstrap = 0, ...,
   on_training = FALSE)
-
-mod_output(model = NULL, data = NULL, append = TRUE,
-  interval = c("none", "prediction", "confidence"), nlevels = 2,
-  bootstrap = 0, ..., on_training = FALSE)
 }
 \arguments{
 \item{model}{the model to display graphically}
@@ -44,9 +39,8 @@ A dataframe containing both the explanatory variable inputs and
 the resulting model output (in the \code{model_value} field). This differs from the output
 of \code{stats::predict()}, which for many model classes/architectures may be a vector or matrix.
 
-For \code{mod_eval()}, a data frame containing both the
-inputs to the model and the corresponding outputs. For
-\code{mod_output()} a vector containing only the model outputs.
+A data frame containing both the
+inputs to the model and the corresponding outputs.
 }
 \description{
 Find the model outputs for specified inputs. This is equivalent to the

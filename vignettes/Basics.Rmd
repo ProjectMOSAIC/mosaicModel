@@ -224,6 +224,8 @@ The zero effect size for the small step is an artifact. The k-nearest neighbors 
 Sometimes you want to know how the model performs. The `mod_error()` function will compute the mean square error for a regression model and the log likelihood for a classification model.
 
 ```{r}
+mod_eval(fuel_mod_2)
+mod_output(fuel_mod_2)
 mod_error(fuel_mod_2)
 ```
 
@@ -301,7 +303,7 @@ in the `stats` package or various functions in other packages such as
 
 You can find out which model architectures are available with the command 
 ```{r}
-methods(mod_eval_fun)
+methods(mod_output)
 ```
 
 ### A note on caret::train()
@@ -330,7 +332,7 @@ these functions:
 
 - `formula_from_mod()`
 - `data_from_mod()`
-- `mod_eval_fun()` 
+- `mod_output()` 
 evaluates the model at specified values of the input variables. This is much like `predict()`, from which it is often built.
 
 - `construct_fitting_call()`
@@ -396,15 +398,15 @@ easily computed.
 
 
 
-Finally we need to create `mod_eval_fun()` method.  The default methods do not
+Finally we need to create `mod_output()` method.  The default methods do not
 work here, so we have some work to do.
-```{r eval=FALSE}
-mosaicModel:::mod_eval_fun.default(my_mod)
+```{r, error = TRUE}
+mosaicModel:::mod_output.default(my_mod)
 ```
 
 This is not atypical because the various model constructing functions store the
 information required for this in many different ways.
-Let's take a look at how `mod_eval_fun()` works for models of class `knn3`.
+Let's take a look at how `mod_output()` works for models of class `knn3`.
 
 To start, let's see if there is a `predict()` method defined. 
 ```{r}
@@ -435,16 +437,16 @@ predict(my_mod) %>% str()
 
 This is something of a detective story, but a person very familiar with `lda()` and with R will see that the `predict` method produces a list of two items. The second one called `posterior` and is a matrix with 150 rows and 3 columns, corresponding to the size of the training data.
 
-Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_eval_fun.lda()` function from `mosaicModel`.
+Once located, do what you need in order to coerce the output to a data frame and remove row names (for consistency of output).  Here's the `mod_output.lda()` function from `mosaicModel`.
 
 ```{r}
-mosaicModel:::mod_eval_fun.lda
+mosaicModel:::mod_output.lda
 ```
 
-The arguments to the function are the same as for all the `mod_eval_fun()` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)
+The arguments to the function are the same as for all the `mod_output()` methods. The body of the function pulls out the `posterior` component, coerces it to a data frame and removes the row names.  It isn't always this easy. But once the function is available in your session, you can test it out. (Make sure to give it a data set as inputs to the model)
 
 ```{r error = TRUE}
-mod_eval_fun(my_mod, data = iris[c(30, 80, 120),])
+mod_output(my_mod, data = iris[c(30, 80, 120),])
 ```
 
 Now the high-level functions in `mosaicModel` can work on LDA models.
