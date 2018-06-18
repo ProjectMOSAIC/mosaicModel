@@ -52,14 +52,14 @@ mod_error(mod) # In-sample prediction error.
 \dontrun{
 classifier <- rpart::rpart(Species ~ ., data = iris)
 mod_error(classifier)
-mod_error(classifier, error_type = "LL") 
+mod_error(classifier, error_type = "LL")
 # More typically
 inds <- sample(1:nrow(iris), size = 100)
 Training <- iris[inds, ]
 Testing  <- iris[ - inds, ]
 classifier <- rpart::rpart(Species ~ ., data = Training)
 # This may well assign zero probability to events that appeared in the
-# Testing data 
+# Testing data
 mod_error(classifier, testdata = Testing)
 mod_error(classifier, testdata = Testing, error_type = "mse")
 }
