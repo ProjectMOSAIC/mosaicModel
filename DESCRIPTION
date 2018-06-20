@@ -1,7 +1,7 @@
 Package: mosaicModel
 Type: Package
 Title: Create, Visualize, and Predict with Models
-Version: 0.3.1.9000
+Version: 0.3.1.9001
 Authors@R: c(
     person("Kaplan", "Daniel", , "kaplan@macalester.edu", c("aut")),
     person("Pruim", "Randall", , "rpruim@calvin.edu", c("aut","cre"))
@@ -16,18 +16,18 @@ Depends:
     R (>= 3.1), 
     mosaicCore,
     splines,
-    dplyr
+    magrittr
 Imports:
-    ggplot2,
     ggformula,
+    ggplot2,
     lazyeval,
     knitr,
     MASS,
     testthat,
     assertthat,
     tibble,
-    tidyr,
-    tidyverse
+    dplyr,
+    tidyr
 Suggests: 
     mosaic,
     caret, 

@@ -1,4 +1,6 @@
-#' Plot out model values
+#' Display model values
+#'
+#' For a variety of models, `mod_plot()` creates a layer or layers displaying model values.
 #'
 #' @param model A model to display graphically.
 #'   Can also be an ensemble produced with `mod_ensemble()`.
@@ -543,3 +545,8 @@ mod_plot1 <- function(model=NULL, formula = NULL,
   P <- P + ylab(response_var_name)
   P + Q # return the plot
 }
+
+#' @rdname mod_plot
+#' @aliases gf_model
+#' @export
+gf_model <- mod_plot

@@ -2,9 +2,15 @@
 % Please edit documentation in R/mod_plot.R
 \name{mod_plot}
 \alias{mod_plot}
-\title{Plot out model values}
+\alias{gf_model}
+\title{Display model values}
 \usage{
 mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
+  bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
+  interval = c("none", "confidence", "prediction"), post_transform = NULL,
+  size = 1, alpha = 0.8, ...)
+
+gf_model(object = NULL, model = NULL, formula = NULL, data = NULL,
   bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
   interval = c("none", "confidence", "prediction"), post_transform = NULL,
   size = 1, alpha = 0.8, ...)
@@ -41,7 +47,7 @@ Example: \code{post_transform = c(price = exp)} to undo a log transformation of 
 \item{...}{Used to choose specific values for explantory variables.  See examples.}
 }
 \description{
-Plot out model values
+For a variety of models, \code{mod_plot()} creates a layer or layers displaying model values.
 }
 \examples{
 \dontrun{
