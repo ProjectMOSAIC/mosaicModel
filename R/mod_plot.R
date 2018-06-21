@@ -456,7 +456,7 @@ mod_plot1 <- function(model=NULL, formula = NULL,
 
   # if (any(names(model_vals) %in% names(eval_levels)))
   #     stop("Name conflict in output of `mod_eval()`, Eval_levels has response var name in it.")
-  # model_vals <- bind_cols(eval_levels, model_vals)
+  # model_vals <- dplyr::bind_cols(eval_levels, model_vals)
 
   # figure out the components of the plot
   if (length(show_vars) > 1) {
