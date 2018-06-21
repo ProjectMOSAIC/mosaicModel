@@ -1,26 +1,26 @@
 #' Find typical levels of explanatory variables in a model/dataset.
-#' 
-#' This function tries to choose sensible values of the explanatory variables 
-#' from the data used to build a model or any other specified data. 
+#'
+#' This function tries to choose sensible values of the explanatory variables
+#' from the data used to build a model or any other specified data.
 #' (or from data specified with the \code{data =} argument.)
-#' 
-#' @details For categorical variables, the most populated levels are used. For quantitative 
-#' variables, a sequence of \code{pretty()} values is generated. 
-#' 
-#' @return A dataframe containing all combinations of the selected values for 
-#' the explanatory variables. If there are p explanatory variables, 
+#'
+#' @details For categorical variables, the most populated levels are used. For quantitative
+#' variables, a sequence of \code{pretty()} values is generated.
+#'
+#' @return A dataframe containing all combinations of the selected values for
+#' the explanatory variables. If there are p explanatory variables,
 #' there will be about \code{nlevels^p} cases.
 #'
 #' @param data optional data frame from which to extract levels for explanatory variables
 #' @param nlevels how many levels to construct for input variables.
-#' For quantitative variables, this is a suggestion. Set to `Inf` to get all levels 
+#' For quantitative variables, this is a suggestion. Set to `Inf` to get all levels
 #' for categorical variables and 100 levels for quantitative variables.
-#' @param at named list giving specific values at which to hold the variables. Use this to 
+#' @param at named list giving specific values at which to hold the variables. Use this to
 #' override the automatic generation of levels for any or all explanatory variables.
 #' @param model the model to display graphically
 #' @param ... a more concise mechanism to passing desired values for variables
 #'
-#' @details For categorical variables, will return the nlevels most popular levels, unless 
+#' @details For categorical variables, will return the nlevels most popular levels, unless
 #' the levels are specified explicitly in an argument.
 #'
 #' @examples
@@ -30,24 +30,25 @@
 #' mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 #' df_typical(model = mod1, nlevels = 3)
 #' }
+#' @importFrom dplyr data_frame
 #' @export
-df_typical <- function(data = NULL,  
+df_typical <- function(data = NULL,
                    nlevels = 3, at = list(), model=NULL, ...) {
   extras <- list(...)
   at <- c(extras, at)
-  
+
   # try to figure out what are the possible levels of variables
   if ( (! is.null(model)) && is.null(data)) data <- data_from_mod(model)
   missing_from_data <- ! names(at) %in% names(data)
-  if (any(missing_from_data)) 
+  if (any(missing_from_data))
     stop("Explanatory variable",
-         ifelse(length(at)>1, "s", ""), " ", 
-         paste0("'", paste(names(at), collapse=", "), "'"), 
+         ifelse(length(at)>1, "s", ""), " ",
+         paste0("'", paste(names(at), collapse=", "), "'"),
          " not in the data table")
   explan_vars <- if (is.null(model)) names(at) else base::union(explanatory_vars(model), names(at))
 
   if (length(explan_vars) == 0) { # the null model, response ~ 1
-    eval_levels = data_frame("null_model_input" = NA)
+    eval_levels = dplyr::data_frame("null_model_input" = NA)
   } else {
     # Set a large number of levels for the first explanatory variable,
     # then nlevels for the remaining ones.
@@ -80,7 +81,7 @@ df_typical <- function(data = NULL,
 #'
 #' @details Variables not listed in \code{at} will be assigned levels using these principles:
 #' Categorical variables: the most populated levels.
-#' Quantitative variables: central quantiles, e.g. median for n=1, 
+#' Quantitative variables: central quantiles, e.g. median for n=1,
 
 reference_values <- function(data, n = 1, at = list()) {
   var_names <- names(data)
@@ -90,7 +91,7 @@ reference_values <- function(data, n = 1, at = list()) {
   names(n_values) <- var_names
   if (inherits(n, "list")) # override any appearing in the n-list
     n_values[names(n)] <- n
-  
+
   ranges <- conversions <- as.list(rep(NA, length(var_names)))
   names(ranges) <- var_names
   for (k in 1:length(var_names)) {
@@ -105,12 +106,12 @@ reference_values <- function(data, n = 1, at = list()) {
   }
   res <- do.call(expand.grid, c(ranges, stringsAsFactors = FALSE))
   #attr(res, "convert") <- conversions
-  
+
   vnames <- names(res)
   for (name in vnames) {
     if (inherits(data[[name]], "factor") && !inherits(res[[name]], "factor"))
       res[[name]] <- factor(res[[name]], levels = levels(data[[name]]))
   }
-  
+
   res
 }
