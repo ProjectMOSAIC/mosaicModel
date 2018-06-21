@@ -16,6 +16,8 @@ gf_model(object = NULL, model = NULL, formula = NULL, data = NULL,
   size = 1, alpha = 0.8, ...)
 }
 \arguments{
+\item{object}{An R object.  Mainly used to facilitate \pkg{magrittr}-style chaining.}
+
 \item{model}{A model to display graphically.
 Can also be an ensemble produced with \code{mod_ensemble()}.}
 
