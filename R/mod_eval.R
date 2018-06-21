@@ -11,27 +11,29 @@
 #' @importFrom stats formula lm median model.matrix predict quantile sd binomial poisson qbinom qchisq qnorm
 #' @importFrom utils data
 #' @importFrom ggplot2 aes_string facet_wrap facet_grid geom_errorbar ylab geom_line label_both geom_point geom_ribbon ggplot
-#' @importFrom dplyr group_by_
+#' @importFrom dplyr bind_rows bind_cols
 #' @importFrom lazyeval lazy_dots
 #' @importFrom splines ns
 #' @importFrom mosaicCore df_stats
 #'
-#' @param model the model to display graphically
-#' @param data optional set of cases from which to extract levels for explanatory variables
-#' @param on_training flag whether to use the training data for evaluation. Only needed
+#' @param model The model to display graphically
+#' @param data Optional set of cases from which to extract levels for explanatory variables
+#' @param on_training A logical indicating whether to use the training data for evaluation. Only needed
 #' when there are random terms, e.g. from `rand()`, `shuffle()`, .... See details.
-#' @param interval the type of interval to use: "none", "confidence", "prediction". But not all
-#' types are available for all model architectures. A standard error and 95\\% confidence interval are produced in the output
-#' @param bootstrap if > 1, the number of bootstrap trials to run to construct a
+#' @param interval The type of interval to use: "none", "confidence", "prediction". But not all
+#' types are available for all model architectures.
+#' A standard error and confidence interval are produced in the output
+#' @param bootstrap If > 1, the number of bootstrap trials to run to construct a
 #' standard error on the model output for each value of the inputs. This is an alternative to
 #' `interval`; you can't use both.
-#' @param nlevels how many levels to construct for input variables. (default: 3)
+#' @param nlevels An integer indicating how many levels to construct for input variables. (default: 3)
 #' For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
 #' with the result, use  `...` to specify exactly what levels you want for any variable.
-#' @param ... arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
-#' Unlike `data =` the variables given in `at =` or `...` will be crossed, so that
-#' the evaluation will occur at all combinations of the various levels.
-#' @param append flag whether to include the inputs to the model along with the calculated
+#' @param level Confidence level. Ignored for models that don't produce confidence intervals.
+#' @param ... Arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
+#'   Unlike `data =` the variables given in `at =` or `...` will be crossed, so that
+#'   the evaluation will occur at all combinations of the various levels.
+#' @param append A logical indicating whether to include the inputs to the model along with the calculated
 #' model value in the output. Default: `TRUE`.
 #' @return A data frame containing both the
 #' inputs to the model and the corresponding outputs.
@@ -59,9 +61,12 @@
 #' mod_eval(mod2, nlevels = 2, sex = "F")
 #' }
 #' @export
-mod_eval <- function(model = NULL, data = NULL, append = TRUE,
-                     interval = c("none", "prediction", "confidence"),
-                   nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
+mod_eval <-
+  function(
+    model = NULL, data = NULL, append = TRUE,
+    interval = c("none", "prediction", "confidence"),
+    nlevels = 2, bootstrap = 0, level = 0.95, ...,
+    on_training = FALSE) {
 
   interval <- match.arg(interval)
 
@@ -101,7 +106,7 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     if (nclasses > 1) # reorder multiple columns nicely into mean, sd for each class
       res <- res[,rep(c(0,nclasses), nclasses) + rep(1:nclasses, each = 2)]
     names(res) <- gsub("_mn$","", names(res))
-    if (append) res <- bind_cols(eval_levels, res)
+    if (append) res <- dplyr::bind_cols(eval_levels, res)
 
     return(res)
   }
@@ -110,13 +115,12 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     stop("Must provide a model to evaluate.")
   }
 
-
-
   if (inherits(model, "bootstrap_ensemble")) {
     nreps <- length(model$replications)
     output <- as.list(numeric(nreps))
     for (k in 1:nreps) {
-      model_vals <- mod_output(model$replications[[k]], data = eval_levels, interval = interval)
+      model_vals <-
+        mod_output(model$replications[[k]], data = eval_levels, interval = interval, level = level)
       if (append) output[[k]] <- dplyr::bind_cols(eval_levels, model_vals)
       else output[[k]] <- model_vals
 
@@ -124,9 +128,10 @@ mod_eval <- function(model = NULL, data = NULL, append = TRUE,
     }
     output <- dplyr::bind_rows(output)
   } else {
-    model_vals <- mod_output(model, data = eval_levels, interval = interval)
+    model_vals <-
+      mod_output(model, data = eval_levels, interval = interval, level = level)
 
-    if (append) output <- bind_cols(eval_levels, model_vals)
+    if (append) output <- dplyr::bind_cols(eval_levels, model_vals)
     else  output <- model_vals
   }
 

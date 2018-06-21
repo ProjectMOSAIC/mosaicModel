@@ -5,33 +5,36 @@
 \title{Evaluate a model for specified inputs}
 \usage{
 mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
-  "prediction", "confidence"), nlevels = 2, bootstrap = 0, ...,
-  on_training = FALSE)
+  "prediction", "confidence"), nlevels = 2, bootstrap = 0, level = 0.95,
+  ..., on_training = FALSE)
 }
 \arguments{
-\item{model}{the model to display graphically}
+\item{model}{The model to display graphically}
 
-\item{data}{optional set of cases from which to extract levels for explanatory variables}
+\item{data}{Optional set of cases from which to extract levels for explanatory variables}
 
-\item{append}{flag whether to include the inputs to the model along with the calculated
+\item{append}{A logical indicating whether to include the inputs to the model along with the calculated
 model value in the output. Default: \code{TRUE}.}
 
-\item{interval}{the type of interval to use: "none", "confidence", "prediction". But not all
-types are available for all model architectures. A standard error and 95\% confidence interval are produced in the output}
+\item{interval}{The type of interval to use: "none", "confidence", "prediction". But not all
+types are available for all model architectures.
+A standard error and confidence interval are produced in the output}
 
-\item{nlevels}{how many levels to construct for input variables. (default: 3)
+\item{nlevels}{An integer indicating how many levels to construct for input variables. (default: 3)
 For quantitative variables, this is a suggestion; an attempt is made to have the levels equally spaced. If you're dissatisfied
 with the result, use  \code{...} to specify exactly what levels you want for any variable.}
 
-\item{bootstrap}{if > 1, the number of bootstrap trials to run to construct a
+\item{bootstrap}{If > 1, the number of bootstrap trials to run to construct a
 standard error on the model output for each value of the inputs. This is an alternative to
 \code{interval}; you can't use both.}
 
-\item{...}{arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
+\item{level}{Confidence level. Ignored for models that don't produce confidence intervals.}
+
+\item{...}{Arguments about or values at which to evaluate the model or the kind of output to be passed along to predict().
 Unlike \code{data =} the variables given in \code{at =} or \code{...} will be crossed, so that
 the evaluation will occur at all combinations of the various levels.}
 
-\item{on_training}{flag whether to use the training data for evaluation. Only needed
+\item{on_training}{A logical indicating whether to use the training data for evaluation. Only needed
 when there are random terms, e.g. from \code{rand()}, \code{shuffle()}, .... See details.}
 }
 \value{

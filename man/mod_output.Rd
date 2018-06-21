@@ -4,7 +4,7 @@
 \alias{mod_output}
 \title{Internal functions for evaluating models}
 \usage{
-mod_output(model, data = NULL, interval = "none", ...)
+mod_output(model, data = NULL, interval = "none", level = 0.95, ...)
 }
 \arguments{
 \item{model}{A model object of the classes permitted}
@@ -15,7 +15,10 @@ not specified, the training data will be used.}
 \item{interval}{One of "none", "confidence", or "prediction". Not all model
 types support "prediction" or even "confidence".}
 
-\item{...}{additional arguments}
+\item{level}{Confidence level for intervals.  Ignored for models that don't provide confidence
+intervals.}
+
+\item{...}{Additional arguments, typically passed through to an underlying \code{predict()} method.}
 }
 \description{
 These functions are the interface to the various model types for \code{mod_eval()}, and through

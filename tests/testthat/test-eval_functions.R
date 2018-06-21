@@ -20,6 +20,10 @@ test_that("lm methods work", {
   expect_error(mod_output(mod, data = dat, interval = "bogus"))
   expect_true(sum(abs(res1$model_output[1:5] - c(21.217, 21.217, 26.071, 21.217, 15.444))) < 0.01,
               "lm output wrong")
+  expect_lt(
+    mod_output(mod, data = dat, interval = "confidence", level = 0.95)[1,"lower"],
+    mod_output(mod, data = dat, interval = "confidence", level = 0.90)[1,"lower"]
+  )
 })
 
 test_that("glm methods work", {
@@ -45,6 +49,10 @@ test_that("glm methods work", {
   expect_error(mod_output(mod2, data = d.AD, interval = "prediction"))
   expect_true(sum(abs(res2$model_output[1:6] - c(21, 13.33333, 15.6667, 21, 13.3333, 15.666667))) < .01,
               "poisson output wrong")
+  expect_lt(
+    mod_output(mod2, data = d.AD, interval = "confidence", level = 0.95)[1, "lower"],
+    mod_output(mod2, data = d.AD, interval = "confidence", level = 0.90)[1, "lower"]
+  )
 })
 
 test_that("rlm methods work", {
@@ -60,10 +68,14 @@ test_that("rlm methods work", {
   expect_warning(res <- mod_output(mod, data = dat, interval = "prediction"))
   expect_equal(names(res), conf_names)
   expect_error(mod_output(mod, data = dat, interval = "bogus"))
+  expect_lt(
+    mod_output(mod, data = dat, interval = "confidence", level = 0.95)[1, "lower"],
+    mod_output(mod, data = dat, interval = "confidence", level = 0.90)[1, "lower"]
+  )
 })
 
 test_that("rpart methods work", {
-  mtcars2 <<- mtcars %>% mutate(mileage = cut(mpg, c(5, 15, 25, 40)))
+  mtcars2 <<- mtcars %>% dplyr::mutate(mileage = cut(mpg, c(5, 15, 25, 40)))
   mod1 <- rpart::rpart(mpg ~ ., data = mtcars2)
   mod2 <- rpart::rpart(mileage ~ . - mpg, data = mtcars2)
   expect_equal(dim(mod_output(mod1))[2], 1L)
