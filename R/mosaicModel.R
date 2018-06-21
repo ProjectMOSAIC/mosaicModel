@@ -1,8 +1,8 @@
 #' \code{mosaicModel} package
 #'
 #' Functions for teaching about modeling.
-#' 
-#' The package offers a handful of high-level functions for evaluating, displaying, 
+#'
+#' The package offers a handful of high-level functions for evaluating, displaying,
 #' and interpreting models that work in a consistent way across model architectures, e.g.
 #' lm, glm, rpart, randomForest, knn3, caret-train, and so on.
 #'
@@ -12,7 +12,7 @@
 #' * `mod_effect()` -- calculate effect sizes, that is, how a change in an input variable changes the output
 #' * `mod_error()` -- find the mean square prediction error (or the log likelihood)
 #' * `mod_ensemble()` -- create an ensemble of bootstrap replications of the model, that is, models fit to resampled data from the original model.
-#' * `mod_cv()` -- carry out cross validation on one or more models. 
+#' * `mod_cv()` -- carry out cross validation on one or more models.
 #' * `mod_fun()` -- extract a function from a model that implements the inputs-to-output relationship.
 
 #' `mosaicModel` stays out of the business of training models. You do that using functions, e.g.
@@ -23,7 +23,7 @@
 #'
 #' @docType package
 #' @name mosaicModel
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines

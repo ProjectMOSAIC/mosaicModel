@@ -45,8 +45,11 @@
 #' mod_plot(mod5)
 #' mod_plot(mod5, class_level = "manag")
 #' }
-#' @export
 #'
+#' @importFrom utils modifyList
+#' @importFrom ggplot2 aes aes_string
+#' @export
+
 mod_plot <-
   function(object = NULL, model = NULL, formula = NULL, data = NULL,
            bootstrap = 0,
@@ -268,12 +271,12 @@ mod_plot <-
 
     if (length(show_vars) > 1 ) {
       plot_mapping <-
-        aes_string(x = show_vars[1],
+        ggplot2::aes_string(x = show_vars[1],
                    y = "model_output",
                    color = show_vars[2], group = show_vars[2]) # group may be unnecessary here
     } else {
       plot_mapping <-
-        aes_string(
+        ggplot2::aes_string(
           x = show_vars[1],
           y = "model_output",
           group = ifelse(".trial" %in% names(model_vals), ".trial", NA))
@@ -283,22 +286,22 @@ mod_plot <-
 
     Pgeom <- if (first_var_quantitative)  geom_line else geom_point
 
-    more_mapping <- aes()
+    more_mapping <- ggplot2::aes()
     more_args <- list()
     if (length(show_vars) == 1) {
     } else { # more than one explanatory variable
       if (first_var_quantitative) {
         if (is.numeric(model_vals[[show_vars[2]]])) {
-          more_mapping <- aes_string(color = show_vars[2])
+          more_mapping <- ggplot2::aes_string(color = show_vars[2])
         } else {
-          more_mapping <- aes_string(color = show_vars[2], linetype = show_vars[2])
+          more_mapping <- ggplot2::aes_string(color = show_vars[2], linetype = show_vars[2])
         }
       } else { # ! first_var_quantitative
-        more_mapping <- aes_string(color = show_vars[2])
+        more_mapping <- ggplot2::aes_string(color = show_vars[2])
       }
     }
     # if (inherits(model, "bootstrap_ensemble")) {
-    #   more_mapping <- modifyList(more_mapping, aes_string(group = ".trial"))
+    #   more_mapping <- modifyList(more_mapping, ggplot2::aes_string(group = ".trial"))
     # }
 
     if (inherits(model, "bootstrap_ensemble")) {
@@ -330,19 +333,19 @@ mod_plot <-
     if (interval != "none") {
       if (length(show_vars) > 1) {
         Q <- Qgeom(data = model_vals,
-                   aes_string(x = show_vars[1],
+                   ggplot2::aes_string(x = show_vars[1],
                               ymax = "upper", ymin = "lower",
                               fill = show_vars[2]),
                    color = NA, alpha = alpha / 4, inherit.aes = TRUE)
       } else {
         Q <- if (first_var_quantitative) {
           Qgeom(data = model_vals,
-                aes_string(x = show_vars[1],
+                ggplot2::aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower"),
                 fill = "black", alpha = alpha / 4, color = NA, inherit.aes = TRUE)
         } else {
           Qgeom(data = model_vals,
-                aes_string(x = show_vars[1],
+                ggplot2::aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower"),
                 color = "black", alpha = alpha / 4, inherit.aes = TRUE)
         }
@@ -465,11 +468,11 @@ mod_plot1 <- function(model=NULL, formula = NULL,
 
   P <- if (length(show_vars) > 1 ) {
     ggplot(data = model_vals,
-           aes_string(x = show_vars[1], color = show_vars[2], y = "model_output"),
+           ggplot2::aes_string(x = show_vars[1], color = show_vars[2], y = "model_output"),
            group = show_vars[2])
   } else {
     ggplot(data = model_vals,
-           aes_string(x = show_vars[1],
+           ggplot2::aes_string(x = show_vars[1],
                       y = "model_output",
                       group = ifelse(".trial" %in% names(model_vals), ".trial", NA)))
   }
@@ -486,9 +489,9 @@ mod_plot1 <- function(model=NULL, formula = NULL,
   } else { # more than one explanatory variable
     if (first_var_quantitative) {
       if (is.numeric(model_vals[[show_vars[2]]]))
-        for_aes <- aes_string(color = show_vars[2])
+        for_aes <- ggplot2::aes_string(color = show_vars[2])
       else
-        for_aes <- aes_string(color = show_vars[2], linetype = show_vars[2])
+        for_aes <- ggplot2::aes_string(color = show_vars[2], linetype = show_vars[2])
       if (inherits(model, "bootstrap_ensemble")) {
         for (k in unique(model_vals[[".trial"]])) {
           P <- P + geom_line(data = model_vals[model_vals$.trial == k,],
@@ -499,7 +502,7 @@ mod_plot1 <- function(model=NULL, formula = NULL,
       }
     } else {
       P <- P + geom_point(
-        aes_string(color = show_vars[2]),
+        ggplot2::aes_string(color = show_vars[2]),
         alpha = alpha, size = size)
     }
   }
@@ -515,18 +518,18 @@ mod_plot1 <- function(model=NULL, formula = NULL,
   if (interval != "none") {
     if (length(show_vars) > 1) {
       Q <- Qfun(data = model_vals,
-                aes_string(x = show_vars[1],
+                ggplot2::aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower", fill = show_vars[2]),
                 color = NA, alpha = alpha/4)
     } else {
       Q <- if (first_var_quantitative) {
         Qfun(data = model_vals,
-             aes_string(x = show_vars[1],
+             ggplot2::aes_string(x = show_vars[1],
                         ymax = "upper", ymin = "lower"),
              fill = "black", alpha = alpha/4, color = NA)
       } else {
         Qfun(data = model_vals,
-                aes_string(x = show_vars[1],
+                ggplot2::aes_string(x = show_vars[1],
                            ymax = "upper", ymin = "lower"),
                 color = "black", alpha = alpha/4)
       }

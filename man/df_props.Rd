@@ -35,7 +35,7 @@ Using \code{|} in the formula specifies a conditional proportion
 }
 }
 \examples{
-df_props(mtcars, ~ cyl + gear) 
+df_props(mtcars, ~ cyl + gear)
 df_props(mtcars, ~ cyl | gear)
 df_props(mtcars, ~ cyl + gear, wide = TRUE)
 df_props(mtcars, ~ cyl + gear, margins = TRUE)

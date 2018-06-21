@@ -72,4 +72,5 @@ mod5 <- randomForest::randomForest(
 mod_plot(mod5)
 mod_plot(mod5, class_level = "manag")
 }
+
 }
