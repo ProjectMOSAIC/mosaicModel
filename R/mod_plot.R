@@ -1,7 +1,7 @@
 #' Display model values
 #'
 #' For a variety of models, `mod_plot()` creates a layer or layers displaying model values.
-#'
+#' @param object An R object.  Mainly used to facilitate \pkg{magrittr}-style chaining.
 #' @param model A model to display graphically.
 #'   Can also be an ensemble produced with `mod_ensemble()`.
 #' @param formula A formula setting the `y ~ x + color` variables.
@@ -364,9 +364,9 @@ mod_plot <-
     P + Q # return the plot
   }
 
-#' @export
+# Old version -- can be deleted once we are good to go with new version
 
-mod_plot1 <- function(model=NULL, formula = NULL,
+mod_plot0 <- function(model=NULL, formula = NULL,
                      data = NULL, bootstrap = 0,
                      nlevels = 3, at = list(), class_level = NULL,
                      interval = c("none", "confidence", "prediction"),
