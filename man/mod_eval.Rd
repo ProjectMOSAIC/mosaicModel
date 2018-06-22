@@ -67,9 +67,13 @@ some random component among the explanatory terms, as with \code{mosaic::rand()}
 \dontrun{
 mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
 mod_eval(mod1)
+mod_eval(mod1, interval = "prediction") # 95\% confidence level
+mod_eval(mod1, interval = "prediction", level = 0.9)
 mod2 <- glm(married == "Married" ~ age + sex * sector,
             data = mosaicData::CPS85, family = "binomial")
 mod_eval(mod2, nlevels = 2)
 mod_eval(mod2, nlevels = 2, sex = "F")
+mod_eval(mod2, nlevels = 2, sex = "F",
+  interval = "confidence", level = 0.9)
 }
 }
