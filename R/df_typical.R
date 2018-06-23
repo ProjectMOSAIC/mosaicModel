@@ -32,8 +32,11 @@
 #' }
 #' @importFrom dplyr data_frame
 #' @export
-df_typical <- function(data = NULL,
-                   nlevels = 3, at = list(), model=NULL, ...) {
+df_typical <- function(
+  data = NULL,
+  nlevels = 3, at = list(),
+  model = NULL, ...) {
+
   extras <- list(...)
   at <- c(extras, at)
 
@@ -44,10 +47,16 @@ df_typical <- function(data = NULL,
     stop("Explanatory variable",
          ifelse(length(at)>1, "s", ""), " ",
          paste0("'", paste(names(at), collapse=", "), "'"),
-         " not in the data table")
-  explan_vars <- if (is.null(model)) names(at) else base::union(explanatory_vars(model), names(at))
+         " not in data")
+  explan_vars <-
+    if (is.null(model)) {
+      names(at)
+    } else {
+      base::union(explanatory_vars(model), names(at))
+    }
 
-  if (length(explan_vars) == 0) { # the null model, response ~ 1
+  if (length(explan_vars) == 0) {
+    # the null model, response ~ 1
     eval_levels = dplyr::data_frame("null_model_input" = NA)
   } else {
     # Set a large number of levels for the first explanatory variable,
