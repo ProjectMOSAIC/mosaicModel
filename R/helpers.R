@@ -43,7 +43,7 @@ n_levels <- function(values, n) {
       # enough to make a nice plot
       if (length(unique_vals) < 10) unique_vals
       else seq(min(values, na.rm = TRUE),
-               max(values, na.rm = TRUE), length = 100)
+               max(values, na.rm = TRUE), length.out = 100)
     } else {
       as.character(unique_vals) # all categorical levels
     }
