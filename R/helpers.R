@@ -1,3 +1,5 @@
+#' @importFrom stats ppoints
+#'
 # returns a vector of predictions or likelihoods
 kfold_trial <- function(model, k=10, type) {
   # Grab the data and the call from the model.
@@ -71,7 +73,7 @@ n_levels <- function(values, n) {
     if (n == 1) { return(median(values, na.rm = TRUE)) }
 
     sorted_values = sort(values)
-    res <- sorted_values[round(ppoints(n) * length(values))]
+    res <- sorted_values[round(stats::ppoints(n) * length(values))]
     return(res)
   }
     # outliers <- has_outlier(values)
