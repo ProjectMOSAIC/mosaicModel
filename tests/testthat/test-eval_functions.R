@@ -104,7 +104,10 @@ test_that("Random forest methods work", {
 })
 
 
-
+test_that("Nonlinear least squares methods work",{
+  mod <- nls(temp ~ A+B*exp(-k*time), data=mosaicData::CoolingWater, start=list(A=50,B=50,k=1/20))
+  res <- mod_eval_fun(mod)
+})
 
 
 

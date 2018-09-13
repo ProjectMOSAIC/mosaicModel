@@ -4,7 +4,8 @@
 \alias{collinearity}
 \title{Calculate measures of collinearity}
 \usage{
-collinearity(formula, data, format = c("SeIF", "degrees", "radians", "VIF"))
+collinearity(formula, data, format = c("SeIF", "degrees", "radians",
+  "VIF"))
 }
 \arguments{
 \item{formula}{a formula giving, on the right-hand side, the explanatory

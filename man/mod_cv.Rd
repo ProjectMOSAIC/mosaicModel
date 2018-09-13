@@ -4,8 +4,8 @@
 \alias{mod_cv}
 \title{Compare models with k-fold cross validation}
 \usage{
-mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse", "sse",
-  "mad", "LL", "mLL", "dev", "class_error"))
+mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse",
+  "sse", "mad", "LL", "mLL", "dev", "class_error"))
 }
 \arguments{
 \item{...}{one or more models on which to perform the cross validation}

@@ -6,8 +6,8 @@
 \usage{
 mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
   bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
-  interval = c("none", "confidence", "prediction"), post_transform = NULL,
-  size = 1, alpha = 0.8, ...)
+  interval = c("none", "confidence", "prediction"),
+  post_transform = NULL, size = 1, alpha = 0.8, ...)
 }
 \arguments{
 \item{model}{A model to display graphically.

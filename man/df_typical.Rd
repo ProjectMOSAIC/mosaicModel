@@ -4,7 +4,8 @@
 \alias{df_typical}
 \title{Find typical levels of explanatory variables in a model/dataset.}
 \usage{
-df_typical(data = NULL, nlevels = 3, at = list(), model = NULL, ...)
+df_typical(data = NULL, nlevels = 3, at = list(), model = NULL,
+  ...)
 }
 \arguments{
 \item{data}{optional data frame from which to extract levels for explanatory variables}

@@ -5,9 +5,9 @@
 \alias{mod_output}
 \title{Evaluate a model for specified inputs}
 \usage{
-mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
-  "prediction", "confidence"), nlevels = 2, bootstrap = 0, ...,
-  on_training = FALSE)
+mod_eval(model = NULL, data = NULL, append = TRUE,
+  interval = c("none", "prediction", "confidence"), nlevels = 2,
+  bootstrap = 0, ..., on_training = FALSE)
 
 mod_output(model = NULL, data = NULL, append = TRUE,
   interval = c("none", "prediction", "confidence"), nlevels = 2,
