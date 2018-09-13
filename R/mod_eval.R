@@ -146,5 +146,6 @@ mod_output <-
       model = model, data = data, append = append,
       interval = interval,
       nlevels = nlevels, bootstrap = bootstrap, ...,
-      on_training = on_training)[["model_output"]]
+      on_training = on_training) # [["model_output"]] taken out 9/13/18 by DTK
+
 }

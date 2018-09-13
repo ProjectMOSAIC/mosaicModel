@@ -5,6 +5,7 @@
 #' @param ntrials how many random partitions to make. Each partition will be one case in the
 #' output of the function
 #' @param error_type The kind of output to produce from each cross-validation. See \code{\link{mod_error}} for details.
+#' @param blockwise When TRUE carries out the trials in a blockwise mode, suitable for time series.
 #'
 #' @details The purpose of cross-validation is to provide "new" data on which to test a model's
 #' performance. In k-fold cross-validation, the data set used to train the model is broken into
@@ -16,11 +17,15 @@
 #' difference between the actual response variable in the testing data and the output of the model
 #' when presented with inputs from the testing data. This is appropriate in many regression models.
 #'
+#' The blockwise mode is intended for time-series like data, where successive rows may be correlated. Rather than
+#' picking each k block as a random sample of rows, adjacent rows will be used for model evaluation.
+#'
 
 #'
 #' @export
 mod_cv <- function(..., k = 10, ntrials = 5,
-                   error_type = c("default", "mse", "sse", "mad", "LL", "mLL", "dev", "class_error")) {
+                   error_type = c("default", "mse", "sse", "mad", "LL", "mLL", "dev", "class_error"),
+                   blockwise = FALSE) {
   error_type = match.arg(error_type)
 
   # Get just the names of the models
@@ -33,13 +38,19 @@ mod_cv <- function(..., k = 10, ntrials = 5,
   for (counter in 1:length(models)) {
     this_mod <- models[[counter]]
     truth <- response_values(this_mod)
-    pred_error_results <- numeric(ntrials)
-    for (this_trial in 1:ntrials) {
-      # get the model outputs for each test group against
-      # the rest of the data
-      tmp <- kfold_trial(this_mod, k = k, type = error_type)
-      if (this_trial == 1) error_type <- names(tmp)[1]
-      pred_error_results[this_trial] <- tmp
+
+    if (blockwise) {
+      pred_error_results <- kfold_block(this_mod, k = k, type = error_type)
+      error_type <- names(pred_error_results)[1] # get the actual name, not "default"
+    } else {
+      pred_error_results <- numeric(ntrials)
+      for (this_trial in 1:ntrials) {
+        # get the model outputs for each test group against
+        # the rest of the data
+        tmp <- kfold_trial(this_mod, k = k, type = error_type)
+        if (this_trial == 1) error_type <- names(tmp)[1]
+        pred_error_results[this_trial] <- tmp
+      }
     }
     from_this_mod <- data.frame(pred_error_results, model = full_names[counter],
                                 stringsAsFactors = FALSE)

@@ -107,6 +107,7 @@ mod_error <- function(model, testdata,
       #warning('Setting error_type = "mse"')
       error_type <- "mse"
     }
+    model_vals <- model_vals[["model_output"]] # get just the one column for a regression model
     fun <- switch(tolower(error_type),
                   mse = mse,
                   sse = sse,

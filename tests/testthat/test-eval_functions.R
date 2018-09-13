@@ -5,7 +5,7 @@ conf_names <- c("model_output", "lower", "upper")
 test_that("lm methods work", {
   mod <- lm(mpg ~ hp + cyl, data = mtcars)
   dat <- data.frame(hp = 100, cyl=6)
-  expect_equivalent(mod_eval(mod)[["model_output"]], mod_output(mod))
+  expect_equivalent(mod_eval(mod), mod_output(mod))
   res1 <- mod_eval_fun(mod)
   expect_equal(nrow(res1), nrow(mtcars))
   res <- mod_eval_fun(mod, data = dat)
@@ -23,7 +23,7 @@ test_that("glm methods work", {
   expect_warning(
     mod <- glm(I(mpg > 20) ~ hp + cyl, data = mtcars, family = binomial)
   )
-  expect_equivalent(mod_eval(mod)[["model_output"]], mod_output(mod))
+  expect_equivalent(mod_eval(mod), mod_output(mod))
   res <- mod_eval_fun(mod, data = mtcars, interval = "confidence")
   expect_equal(nrow(res), nrow(mtcars))
   expect_equal(names(res), conf_names)
@@ -46,7 +46,7 @@ test_that("glm methods work", {
 
 test_that("rlm methods work", {
   mod <- MASS::rlm(mpg ~ hp + cyl, data = mtcars)
-  expect_equivalent(mod_eval(mod)[["model_output"]], mod_output(mod))
+  expect_equivalent(mod_eval(mod), mod_output(mod))
   dat <- data.frame(hp = 100, cyl=6)
   res <- mod_eval_fun(mod)
   expect_equal(nrow(res), nrow(mtcars))
@@ -63,11 +63,9 @@ test_that("rpart methods work", {
   mtcars$mileage <- cut(mtcars$mpg, c(5, 15, 25, 40))
   mod1 <- rpart::rpart(mpg ~ . -mileage, data = mtcars)
   mod2 <- rpart::rpart(mileage ~ . - mpg, data = mtcars)
-  expect(all(mod_eval(mod1, data = mtcars)[["model_output"]] ==  mod_output(mod1, data = mtcars)))
-  expect_equivalent(all(mod_eval(mod1, data = mtcars)[["model_output"]] ==  mod_output(mod1, data = mtcars)))
-  # expect(all(mod_eval(mod1)[["model_output"]] ==  mod_output(mod1)))
-  # expect_equivalent(mod_eval(mod1)[["model_output"]], mod_output(mod1))
-  expect_equivalent(mod_eval(mod2)[["model_output"]], mod_output(mod2))
+  expect(all(mod_eval(mod1, data = mtcars) ==  mod_output(mod1, data = mtcars)))
+  expect_equivalent(mod_eval(mod1, data = mtcars), mod_output(mod1, data = mtcars))
+  expect_equivalent(mod_eval(mod2), mod_output(mod2))
   res1 <- mod_eval_fun(mod1, data = mtcars)
   res2 <- mod_eval_fun(mod2, data = mtcars)
   expect_equal(nrow(res1), nrow(mtcars))
@@ -85,7 +83,7 @@ test_that("Random forest methods work", {
   library(randomForest)
   # regression
   mod <- randomForest(mpg ~ hp + cyl, data = mtcars)
-  expect_equivalent(mod_eval(mod)[["model_output"]], mod_output(mod))
+  expect_equivalent(mod_eval(mod), mod_output(mod))
   res <- mod_eval_fun(mod)
   expect_equal(names(res), "model_output")
   expect_equal(nrow(res), nrow(mtcars))
@@ -107,6 +105,7 @@ test_that("Random forest methods work", {
 test_that("Nonlinear least squares methods work",{
   mod <- nls(temp ~ A+B*exp(-k*time), data=mosaicData::CoolingWater, start=list(A=50,B=50,k=1/20))
   res <- mod_eval_fun(mod)
+  expect_equal(nrow(res), nrow(mosaicData::CoolingWater))
 })
 
 

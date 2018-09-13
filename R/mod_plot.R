@@ -1,5 +1,6 @@
 #' Plot out model values
 #'
+#' @param object Used internally to work with pipes from other ggformula functions
 #' @param model A model to display graphically.
 #'   Can also be an ensemble produced with `mod_ensemble()`.
 #' @param formula A formula setting the `y ~ x + color` variables.
@@ -43,9 +44,9 @@
 #' mod_plot(mod5)
 #' mod_plot(mod5, class_level = "manag")
 #' }
-#' @export
+# #' @export this is where Randy was trying to get mod_plot to play with ggformula objects
 #'
-mod_plot <-
+mod_plot1 <-
   function(object = NULL, model = NULL, formula = NULL, data = NULL,
            bootstrap = 0,
            nlevels = 3, at = list(), class_level = NULL,
@@ -361,7 +362,7 @@ mod_plot <-
 
 #' @export
 
-mod_plot1 <- function(model=NULL, formula = NULL,
+mod_plot <- function(model=NULL, formula = NULL,
                      data = NULL, bootstrap = 0,
                      nlevels = 3, at = list(), class_level = NULL,
                      interval = c("none", "confidence", "prediction"),

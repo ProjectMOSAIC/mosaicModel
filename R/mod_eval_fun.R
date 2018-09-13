@@ -172,6 +172,8 @@ mod_eval_fun.qda <- mod_eval_fun.lda
 
 #' @export
 mod_eval_fun.nls <- function(model, data = NULL, interval = "none", ...) {
+  interval <- match.arg(interval, choices = c("none"))
+
   if (is.null(data)) data <- data_from_mod(model)
 
   res <- data.frame(model_output = predict(model, newdata = data))
