@@ -182,9 +182,7 @@ mod_output.nls <- function(model, data = NULL, interval = "none", level = level,
 
   if (is.null(data)) data <- data_from_mod(model)
 
-  res <- as.data.frame(
-    predict(model, newdata = data, ...)
-  )
+  res <- data.frame( model_output = predict(model, newdata = data, ...))
 
   tibble::remove_rownames(res)
 }
