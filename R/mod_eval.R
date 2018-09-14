@@ -142,3 +142,18 @@ mod_eval <-
   output
 }
 
+#' @export
+#' @rdname mod_eval
+#'
+mod_output <-
+  function(model = NULL, data = NULL, append = TRUE,
+           interval = c("none", "prediction", "confidence"),
+           nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
+
+    mod_eval(
+      model = model, data = data, append = append,
+      interval = interval,
+      nlevels = nlevels, bootstrap = bootstrap, ...,
+      on_training = on_training) # [["model_output"]] taken out 9/13/18 by DTK
+
+}
