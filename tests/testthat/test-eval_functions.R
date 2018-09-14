@@ -58,7 +58,7 @@ test_that("glm methods work", {
 
 test_that("rlm methods work", {
   mod <- MASS::rlm(mpg ~ hp + cyl, data = mtcars)
-  expect_equivalent(mod_eval(mod), mod_output(mod))
+  expect_equivalent(mod_eval(mod, data = mtcars, append=FALSE), mod_output(mod, data = mtcars))
   dat <- data.frame(hp = 100, cyl=6)
   res <- mod_output(mod)
   expect_equal(nrow(res), nrow(mtcars))
@@ -98,9 +98,9 @@ test_that("Random forest methods work", {
   library(randomForest)
   # regression
   mod <- randomForest(mpg ~ hp + cyl, data = mtcars)
-  expect_equivalent(mod_eval(mod), mod_output(mod))
-  res <- mod_eval_fun(mod)
-  expect_equal(names(res), "model_output")
+  expect_equivalent(mod_eval(mod, append=FALSE, data = mtcars), mod_output(mod, data = mtcars))
+  res <- mod_output(mod, data = mtcars)
+  expect_true("model_output" %in% names(res))
   expect_equal(nrow(res), nrow(mtcars))
   expect_error(res <- mod_output(mod, interval = "confidence"))
   expect_true(sum(abs(res$model_output[1:6] -
@@ -119,7 +119,7 @@ test_that("Random forest methods work", {
 
 test_that("Nonlinear least squares methods work",{
   mod <- nls(temp ~ A+B*exp(-k*time), data=mosaicData::CoolingWater, start=list(A=50,B=50,k=1/20))
-  res <- mod_eval_fun(mod)
+  res <- mod_output(mod)
   expect_equal(nrow(res), nrow(mosaicData::CoolingWater))
 })
 

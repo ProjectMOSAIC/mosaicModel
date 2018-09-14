@@ -1,10 +1,6 @@
 #' Display model values
 #'
 #' For a variety of models, `mod_plot()` creates a layer or layers displaying model values.
-#' @param object An R object.  Mainly used to facilitate \pkg{magrittr}-style chaining.
-#' @param model A model to display graphically.
-#'   Can also be an ensemble produced with `mod_ensemble()`.
-
 #' @param model A model to display graphically. Can also be an ensemble produced with `mod_ensemble()`.
 #' @param formula A formula setting the `y ~ x + color` variables.
 #' @param data An optional data frame from which to extract levels for explanatory variables.

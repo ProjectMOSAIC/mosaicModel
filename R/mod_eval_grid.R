@@ -29,8 +29,9 @@
 #' @examples
 #' \dontrun{
 #' mod1 <- lm(wage ~ age * sex + sector, data = mosaicData::CPS85)
-#' for_plotting <- mod_eval_grid(mod1, ~ age, nlevels = Inf)
-#' gf_line(model_output ~ age | sector, color = ~ sex, data = for_plotting )
+#' for_plotting <- mod_eval_grid(mod1, ~ age, nlevels = 4)
+#' gf_line(model_output ~ age | sector, color = ~ sex, data = for_plotting ) %>%
+#'   gf_point(wage ~ age | sector, color = ~ sex, data = CPS85)
 #' for_plotting2 <- mod_eval_grid(mod1, ~ age, sector = c("const", "service"))
 #' gf_line(model_output ~ age | sector, color = ~ sex, data = for_plotting2 )
 #' }

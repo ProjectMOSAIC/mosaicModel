@@ -19,7 +19,8 @@
 #' Like \code{...}, all combinations of the values specified will be used as inputs.
 #' @param data Specifies exactly the cases at which you want to calculate the effect size.
 #' @param class_level Name of the categorical level for which the probability is to be used. Applies
-#' only to classifiers. (Default: Use the first level.)
+#' only to classifiers. (Default: Use the first level.) This will be recorded in the output under the
+#' name `.class_level`.
 #' Unlike \code{...} or \code{at}, no new combinations will be created.
 #'
 #' @return a data frame giving the effect size and the values of the explanatory variables at which
@@ -65,17 +66,27 @@ mod_effect <- function(model, formula, step = NULL,
                  class_level = class_level, ...)
     res <- Bootstrap_reps %>%
       dplyr::group_by(.trial) %>%
-      dplyr::mutate(.row = row_number()) %>%
+      dplyr::mutate(.row = dplyr::row_number()) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(.row)
-    effect_name <- names(res)[1]
-    names(res)[1] <- "slope"
-    res <- res %>%
-      dplyr::summarise(.slope = mean(slope, na.rm = TRUE),
-                .slope_se = sd(slope, na.rm = TRUE)) %>%
-      dplyr::select(-.row)
-    names(res) <- paste0(effect_name, c("_mean", "_se"))
-    explanatory_vals <- Bootstrap_reps[,-1] %>% dplyr::filter(.trial == 1) %>%
+    res <-
+      if ( "slope" %in% names(res)) {
+        res %>%
+          dplyr::summarise(change_mean = mean(change, na.rm = TRUE),
+                           change_se = sd(change, na.rm = TRUE),
+                           slope_mean = mean(slope, na.rm = TRUE),
+                           slope_se = sd(slope, na.rm = TRUE)) %>%
+          dplyr::select(-.row)
+      } else {
+        res %>%
+          dplyr::summarise(change_mean = mean(change, na.rm = TRUE),
+                           change_se = sd(change, na.rm = TRUE)) %>%
+          dplyr::select(-.row)
+      }
+    # Pull out the explanatory variables (only!) from the mod_eval() results
+    remove_cols <- which(names(Bootstrap_reps) %in% c("slope", "change"))
+    explanatory_vals <- Bootstrap_reps[, - remove_cols] %>%
+      dplyr::filter(.trial == 1) %>%
       dplyr::select(-.trial)
     return(bind_cols(res, explanatory_vals))
   } else {
@@ -148,7 +159,6 @@ mod_effect <- function(model, formula, step = NULL,
   # that single model is being stored as an ensemble of 1, so that
   # the same loop covers both cases.
   output_column <- 1
-  output_name_append <- ""
   for (k in 1:length(ensemble)) {
     base_vals <- mod_eval(ensemble[[k]], data = from_inputs, append = FALSE)
 
@@ -163,8 +173,10 @@ mod_effect <- function(model, formula, step = NULL,
         } else {
           output_column <- which(class_level == names(base_vals))
         }
+      } else {
+        # use default class level
+        class_level <- names(base_vals)[output_column]
       }
-      output_name_append <- paste0("_", names(base_vals)[output_column])
     }
     res <- if (is.numeric(step)) {
       dplyr::data_frame(
@@ -178,12 +190,9 @@ mod_effect <- function(model, formula, step = NULL,
     }
     if (ensemble_flag) output_form$.trial <- k
 
-    Result <- rbind(Result, bind_cols(res, output_form))
+    Result <- rbind(Result, bind_cols(res, output_form, .class_level = class_level))
   }
 
-
-  # If a classifier, show the name of the level whose probability is being shown
-  names(Result)[1] <- paste0(names(Result)[1], output_name_append)
 
   Result
 }

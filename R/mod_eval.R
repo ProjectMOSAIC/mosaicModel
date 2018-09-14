@@ -96,7 +96,7 @@ mod_eval <-
                interval = "none", on_training = on_training, ...)
     res <- Bootstrap_reps %>%
       dplyr::group_by(.trial) %>%
-      dplyr::mutate(.row = row_number()) %>%
+      dplyr::mutate(.row = dplyr::row_number()) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(.row) %>%
       dplyr::select(-.trial)
@@ -142,18 +142,18 @@ mod_eval <-
   output
 }
 
-#' @export
-#' @rdname mod_eval
+#' #' @export
+#' #' @rdname mod_eval
+#' #'
+#' mod_output <-
+#'   function(model = NULL, data = NULL, append = TRUE,
+#'            interval = c("none", "prediction", "confidence"),
+#'            nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
 #'
-mod_output <-
-  function(model = NULL, data = NULL, append = TRUE,
-           interval = c("none", "prediction", "confidence"),
-           nlevels = 2, bootstrap = 0, ..., on_training = FALSE) {
-
-    mod_eval(
-      model = model, data = data, append = append,
-      interval = interval,
-      nlevels = nlevels, bootstrap = bootstrap, ...,
-      on_training = on_training) # [["model_output"]] taken out 9/13/18 by DTK
-
-}
+#'     mod_eval(
+#'       model = model, data = data, append = append,
+#'       interval = interval,
+#'       nlevels = nlevels, bootstrap = bootstrap, ...,
+#'       on_training = on_training) # [["model_output"]] taken out 9/13/18 by DTK
+#'
+#' }

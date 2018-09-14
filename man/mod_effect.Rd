@@ -31,7 +31,8 @@ categorical input, "step" for a quantitative. But you can use either.)}
 Like \code{...}, all combinations of the values specified will be used as inputs.}
 
 \item{class_level}{Name of the categorical level for which the probability is to be used. Applies
-only to classifiers. (Default: Use the first level.)
+only to classifiers. (Default: Use the first level.) This will be recorded in the output under the
+name \code{.class_level}.
 Unlike \code{...} or \code{at}, no new combinations will be created.}
 
 \item{...}{additional arguments for evaluation levels of explanatory

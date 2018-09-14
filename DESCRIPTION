@@ -1,7 +1,7 @@
 Package: mosaicModel
 Type: Package
 Title: Create, Visualize, and Predict with Models
-Version: 0.3.1.9001
+Version: 0.3.1.9002
 Authors@R: c(
     person("Kaplan", "Daniel", , "kaplan@macalester.edu", c("aut")),
     person("Pruim", "Randall", , "rpruim@calvin.edu", c("aut","cre"))

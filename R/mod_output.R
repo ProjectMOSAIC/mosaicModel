@@ -177,13 +177,14 @@ mod_output.lda <- function(model, data = NULL, interval = "none", level = 0.95, 
 mod_output.qda <- mod_output.lda
 
 #' @export
-mod_output_fun.nls <- function(model, data = NULL, interval = "none", ...) {
+mod_output.nls <- function(model, data = NULL, interval = "none", level = level, ...) {
   interval <- match.arg(interval, choices = c("none"))
 
   if (is.null(data)) data <- data_from_mod(model)
 
-  res <- data.frame(model_output = predict(model, newdata = data, ...))
+  res <- as.data.frame(
+    predict(model, newdata = data, ...)
+  )
 
   tibble::remove_rownames(res)
-
 }
