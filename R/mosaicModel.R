@@ -32,6 +32,7 @@ if(getRversion() >= "2.15.1")  {
   utils::globalVariables(c(".trial"))
   utils::globalVariables(c(".slope"))
   utils::globalVariables(c(".row"))
+  utils::globalVariables(c("change"))
   utils::globalVariables(c("bind_cols"))
   utils::globalVariables(c("row_number"))
   utils::globalVariables(c("slope"))

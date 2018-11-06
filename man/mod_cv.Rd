@@ -4,8 +4,8 @@
 \alias{mod_cv}
 \title{Compare models with k-fold cross validation}
 \usage{
-mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse", "sse",
-  "mad", "LL", "mLL", "dev", "class_error"))
+mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse",
+  "sse", "mad", "LL", "mLL", "dev", "class_error"), blockwise = FALSE)
 }
 \arguments{
 \item{...}{one or more models on which to perform the cross validation}
@@ -16,6 +16,8 @@ mod_cv(..., k = 10, ntrials = 5, error_type = c("default", "mse", "sse",
 output of the function}
 
 \item{error_type}{The kind of output to produce from each cross-validation. See \code{\link{mod_error}} for details.}
+
+\item{blockwise}{When TRUE carries out the trials in a blockwise mode, suitable for time series.}
 }
 \description{
 Compare models with k-fold cross validation
@@ -30,4 +32,7 @@ whole of the data set. On each of the k testing sets, a performance output is ca
 most appropriate depends on the kind of model: regression model or classifier. The most basic measure is the mean square error: the
 difference between the actual response variable in the testing data and the output of the model
 when presented with inputs from the testing data. This is appropriate in many regression models.
+
+The blockwise mode is intended for time-series like data, where successive rows may be correlated. Rather than
+picking each k block as a random sample of rows, adjacent rows will be used for model evaluation.
 }

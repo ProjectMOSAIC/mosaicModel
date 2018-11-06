@@ -1,10 +1,10 @@
 #' Extract the model formula used in specifying the model
-#' 
+#'
 #' This typically will *not* be used by an end-user.
-#' 
+#'
 #' @param model the model
 #' @param ... (not used)
-#' 
+#'
 #' @details Not all model architectures support this. If a model architecture isn't recognized,
 #' you'll have to add a method for that class. See vignette.
 #' @export
@@ -21,3 +21,5 @@ formula_from_mod.default <- function(model, ...) {
 formula_from_mod.bootstrap_ensemble <- function(model, ...) {
   formula_from_mod(model$original_model)
 }
+#' @export
+formula_from_mod.nls <- function(model, ...) model$m$formula()

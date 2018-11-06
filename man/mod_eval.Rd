@@ -4,9 +4,9 @@
 \alias{mod_eval}
 \title{Evaluate a model for specified inputs}
 \usage{
-mod_eval(model = NULL, data = NULL, append = TRUE, interval = c("none",
-  "prediction", "confidence"), nlevels = 2, bootstrap = 0, level = 0.95,
-  ..., on_training = FALSE)
+mod_eval(model = NULL, data = NULL, append = TRUE,
+  interval = c("none", "prediction", "confidence"), nlevels = 2,
+  bootstrap = 0, level = 0.95, ..., on_training = FALSE)
 }
 \arguments{
 \item{model}{The model to display graphically}

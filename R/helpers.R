@@ -14,23 +14,57 @@ kfold_trial <- function(model, k=10, type) {
   groups <- sample(rep(1:k, length.out = nrow(data) ))
   # Create a holder for the result
   # output <- evaluate_model(model, data = data, type = type)
-  output <- numeric(nrow(data))
+  output <- rep(NA_real_, nrow(data))
+
+  for (group in 1:k) {
+    training <- data[group != groups, , drop = FALSE ]
+    testing  <- data[group == groups, , drop = FALSE ]
+
+    this_model <- try(eval(fit_call), silent = TRUE)
+    if ( ! inherits(this_model, "try-error")) {
+      tmp <- mod_error(this_model, testdata = testing, error_type = type)
+
+      output[group == groups] <- tmp
+    }
+  }
+
+  res = mean(output, na.rm = TRUE)
+  names(res) <- names(tmp)[1] # name the result after the type of error actually used
+
+  res
+}
+
+# returns a vector of predictions or likelihoods
+kfold_block <- function(model, k=10, type) {
+  # Grab the data and the call from the model.
+  data <- data_from_mod(model)
+  # For cross validation, we don't want the constructed terms
+  constructed <- grep("\\(.*\\)", names(data))
+  if (length(constructed) > 0) data[[constructed]] <- NULL # get rid of them
+
+
+  fit_call <- construct_fitting_call(model, data_name = "training")
+  # construct the groups for the k-fold block divisions
+  groups <- ceiling(seq(0.00001, k, length = nrow(data))) # e.g. 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, ...
+
+  # Create a holder for the result
+  # output <- evaluate_model(model, data = data, type = type)
+  output <- rep(NA_real_, k)
 
   for (group in 1:k) {
     training <- data[group != groups, , drop = FALSE ]
 
     testing  <- data[group == groups, , drop = FALSE ]
 
-    this_model <- eval(fit_call)
-
-    tmp <- mod_error(this_model, testdata = testing, error_type = type)
-
-    output[group == groups] <- tmp
+    this_model <- try(eval(fit_call), silent = TRUE)
+    if ( ! inherits(this_model, "try-error")) {
+      tmp <- mod_error(this_model, testdata = testing, error_type = type)
+      output[group] <- tmp
+    }
   }
 
-  res = mean(output)
+  res = data_frame(x = output)
   names(res) <- names(tmp)[1] # name the result after the type of error actually used
-
   res
 }
 
@@ -45,7 +79,7 @@ n_levels <- function(values, n) {
       # enough to make a nice plot
       if (length(unique_vals) < 10) unique_vals
       else seq(min(values, na.rm = TRUE),
-               max(values, na.rm = TRUE), length.out = 100)
+               max(values, na.rm = TRUE), length = 100)
     } else {
       as.character(unique_vals) # all categorical levels
     }
@@ -93,8 +127,7 @@ n_levels <- function(values, n) {
     #
     # candidate1 <- quantile(to_two_digits, where, type = 3, na.rm = TRUE)
     #
-    # return(unique(candidate1 + order_of_magnitude))
-
+    # return(unique(candidate1 + order_of_magnitude)
   stop("\"", var_name, "\" is neither numerical nor categorical nor date-like. Can't figure out typical levels.")
 
 }

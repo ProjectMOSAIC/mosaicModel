@@ -5,21 +5,18 @@
 \alias{gf_model}
 \title{Display model values}
 \usage{
-mod_plot(object = NULL, model = NULL, formula = NULL, data = NULL,
-  bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
-  interval = c("none", "confidence", "prediction"), post_transform = NULL,
-  size = 1, alpha = 0.8, ...)
+mod_plot(model = NULL, formula = NULL, data = NULL, bootstrap = 0,
+  nlevels = 3, at = list(), class_level = NULL,
+  interval = c("none", "confidence", "prediction"),
+  post_transform = NULL, size = 1, alpha = 0.8, ...)
 
-gf_model(object = NULL, model = NULL, formula = NULL, data = NULL,
-  bootstrap = 0, nlevels = 3, at = list(), class_level = NULL,
-  interval = c("none", "confidence", "prediction"), post_transform = NULL,
-  size = 1, alpha = 0.8, ...)
+gf_model(model = NULL, formula = NULL, data = NULL, bootstrap = 0,
+  nlevels = 3, at = list(), class_level = NULL,
+  interval = c("none", "confidence", "prediction"),
+  post_transform = NULL, size = 1, alpha = 0.8, ...)
 }
 \arguments{
-\item{object}{An R object.  Mainly used to facilitate \pkg{magrittr}-style chaining.}
-
-\item{model}{A model to display graphically.
-Can also be an ensemble produced with \code{mod_ensemble()}.}
+\item{model}{A model to display graphically. Can also be an ensemble produced with \code{mod_ensemble()}.}
 
 \item{formula}{A formula setting the \code{y ~ x + color} variables.}
 
