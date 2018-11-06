@@ -12,7 +12,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: TRUE
 LazyLoad: TRUE
-Depends: 
+Depends:
     R (>= 3.1), 
     mosaicCore,
     splines,
@@ -27,7 +27,7 @@ Imports:
     tibble,
     tidyr,
     tidyverse
-Suggests: 
+Suggests:
     mosaic,
     caret, 
     ddalpha,
@@ -37,3 +37,5 @@ Suggests:
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
+URL: https://github.com/ProjectMOSAIC/mosaicModel
+BugReports: https://github.com/ProjectMOSAIC/mosaicModel/issues

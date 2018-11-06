@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>License • mosaicModel</title>
+<title>Formula interface to counts — df_counts • mosaicModel</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,12 +25,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
-<meta property="og:title" content="License" />
+<meta property="og:title" content="Formula interface to counts — df_counts" />
+
+<meta property="og:description" content="Counts the number of cases in a data frame broken down by the
+variables in the formula." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -46,7 +50,7 @@
   </head>
 
   <body>
-    <div class="container template-title-body">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -57,7 +61,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">mosaicModel</a>
+        <a class="navbar-link" href="../index.html">mosaicModel</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.1.9000</span>
       </span>
     </div>
@@ -65,13 +69,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -81,12 +85,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/Basics.html">Using mosaicModel</a>
+      <a href="../articles/Basics.html">Using mosaicModel</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -107,19 +111,59 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>License</h1>
+    <h1>Formula interface to counts</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ProjectMOSAIC/mosaicModel/blob/master/R/df_counts.R'><code>R/df_counts.R</code></a></small>
+    <div class="hidden name"><code>df_counts.Rd</code></div>
     </div>
 
-<pre>YEAR: 2017
-COPYRIGHT HOLDER: Daniel Kaplan
-</pre>
+    <div class="ref-description">
+    
+    <p>Counts the number of cases in a data frame broken down by the
+variables in the formula.</p>
+    
+    </div>
+
+    <pre class="usage"><span class='fu'>df_counts</span>(<span class='no'>formula</span>, <span class='no'>data</span>, <span class='kw'>wide</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>margins</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>formula</th>
+      <td><p>the formula describing the relationship</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>a data frame (or you can pipe this in)</p></td>
+    </tr>
+    <tr>
+      <th>wide</th>
+      <td><p>reformat the output as a cross-tabulation. This makes sense only when there are just two variables</p></td>
+    </tr>
+    <tr>
+      <th>margins</th>
+      <td><p>show the marginal counts. Makes the most sense if <code>wide = TRUE</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>df_props</code></p></div>
+    
 
   </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#see-also">See also</a></li>
+          </ul>
 
+  </div>
 </div>
-
 
       <footer>
       <div class="copyright">

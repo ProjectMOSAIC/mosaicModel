@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>License • mosaicModel</title>
+<title><code>mosaicModel</code> package — mosaicModel • mosaicModel</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,12 +25,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
-<meta property="og:title" content="License" />
+<meta property="og:title" content="<code>mosaicModel</code> package — mosaicModel" />
+
+<meta property="og:description" content="Functions for teaching about modeling." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -46,7 +49,7 @@
   </head>
 
   <body>
-    <div class="container template-title-body">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -57,7 +60,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">mosaicModel</a>
+        <a class="navbar-link" href="../index.html">mosaicModel</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.1.9000</span>
       </span>
     </div>
@@ -65,13 +68,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -81,12 +84,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/Basics.html">Using mosaicModel</a>
+      <a href="../articles/Basics.html">Using mosaicModel</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -107,19 +110,51 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>License</h1>
+    <h1><code>mosaicModel</code> package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ProjectMOSAIC/mosaicModel/blob/master/R/mosaicModel.R'><code>R/mosaicModel.R</code></a></small>
+    <div class="hidden name"><code>mosaicModel.Rd</code></div>
     </div>
 
-<pre>YEAR: 2017
-COPYRIGHT HOLDER: Daniel Kaplan
-</pre>
+    <div class="ref-description">
+    
+    <p>Functions for teaching about modeling.</p>
+    
+    </div>
+
+        
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The package offers a handful of high-level functions for evaluating, displaying,
+and interpreting models that work in a consistent way across model architectures, e.g.
+lm, glm, rpart, randomForest, knn3, caret-train, and so on.</p><ul>
+<li><p><code><a href='mod_eval.html'>mod_eval()</a></code> -- evaluate a model, that is, turn inputs into model values. For many model architectures, you can also get prediction or confidence intervals on the outputs.</p></li>
+<li><p><code><a href='mod_plot.html'>mod_plot()</a></code> -- produce a graphical display of the "shape" of a model. There can be as many as 4 input variables shown, along with the output.</p></li>
+<li><p><code><a href='mod_effect.html'>mod_effect()</a></code> -- calculate effect sizes, that is, how a change in an input variable changes the output</p></li>
+<li><p><code><a href='mod_error.html'>mod_error()</a></code> -- find the mean square prediction error (or the log likelihood)</p></li>
+<li><p><code><a href='mod_ensemble.html'>mod_ensemble()</a></code> -- create an ensemble of bootstrap replications of the model, that is, models fit to resampled data from the original model.</p></li>
+<li><p><code><a href='mod_cv.html'>mod_cv()</a></code> -- carry out cross validation on one or more models.</p></li>
+<li><p><code><a href='mod_fun.html'>mod_fun()</a></code> -- extract a function from a model that implements the inputs-to-output relationship.
+<code>mosaicModel</code> stays out of the business of training models. You do that using functions, e.g.</p></li>
+</ul>
+<ul>
+<li><p>the familiar <code>lm</code> or <code>glm</code> provided by the <code>stats</code> package</p></li>
+<li><p><code>train</code> from the <code>caret</code> package for machine learning</p></li>
+<li><p><code>rpart</code>, <code>randomForest</code>, <code>rlm</code>, and other functions provided by other packages</p></li>
+</ul>
+    
 
   </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      
+      <li><a href="#details">Details</a></li>
+          </ul>
 
+  </div>
 </div>
-
 
       <footer>
       <div class="copyright">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>License • mosaicModel</title>
+<title>Create bootstrapped ensembles of a model — mod_ensemble • mosaicModel</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,12 +25,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
-<meta property="og:title" content="License" />
+<meta property="og:title" content="Create bootstrapped ensembles of a model — mod_ensemble" />
+
+<meta property="og:description" content="Create bootstrapped ensembles of a model" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -46,7 +49,7 @@
   </head>
 
   <body>
-    <div class="container template-title-body">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -57,7 +60,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">mosaicModel</a>
+        <a class="navbar-link" href="../index.html">mosaicModel</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.1.9000</span>
       </span>
     </div>
@@ -65,13 +68,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -81,12 +84,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/Basics.html">Using mosaicModel</a>
+      <a href="../articles/Basics.html">Using mosaicModel</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       
@@ -107,19 +110,61 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>License</h1>
+    <h1>Create bootstrapped ensembles of a model</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ProjectMOSAIC/mosaicModel/blob/master/R/mod_ensemple.R'><code>R/mod_ensemple.R</code></a></small>
+    <div class="hidden name"><code>mod_ensemble.Rd</code></div>
     </div>
 
-<pre>YEAR: 2017
-COPYRIGHT HOLDER: Daniel Kaplan
-</pre>
+    <div class="ref-description">
+    
+    <p>Create bootstrapped ensembles of a model</p>
+    
+    </div>
+
+    <pre class="usage"><span class='fu'>mod_ensemble</span>(<span class='no'>model</span>, <span class='kw'>nreps</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>model</th>
+      <td><p>a model whose data will be used for resampling</p></td>
+    </tr>
+    <tr>
+      <th>nreps</th>
+      <td><p>how many resampling trials should be created</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>a data table to use for resampling. This is not needed for many common
+model types, such as <code>lm</code>, <code>glm</code>, etc. See details.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The approach to bootstrapping implemented by this function is to create a set of bootstrap
+trials all in one go. Then, other functions such as <code><a href='mod_effect.html'>mod_effect()</a></code> and <code><a href='mod_eval.html'>mod_eval()</a></code> will be
+used to extract the information from each of the bootstrap replicates. Many model types in R carry the
+data used to train the model as part of the model object produced. For these types of models, e.g. <code>lm</code> and
+<code>glm</code>, there is no need to provide a value for the <code>data</code> argument. But there are some
+types of models for which the training data cannot be extracted from the model object. In such situations,
+you use <code>data =</code> to provide the data set to use for resampling.</p>
+    
 
   </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#details">Details</a></li>
+          </ul>
 
+  </div>
 </div>
-
 
       <footer>
       <div class="copyright">
