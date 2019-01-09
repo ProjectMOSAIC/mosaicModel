@@ -143,7 +143,7 @@ mod_effect <- function(model, formula, step = NULL,
   }
 
   # Create the output data frame with vars in desired order.
-  # change_var and to:change_var should be first two columns
+  # change_var and to_change_var should be first two columns
 
   output_form <- from_inputs
   output_form[[change_var]] <- NULL # remove it temporarily
