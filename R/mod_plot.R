@@ -132,10 +132,11 @@ mod_plot <- function(model=NULL, formula = NULL,
     the_transform <- post_transform[[1]]
     if ("model_output" %in% names(model_vals)) {
       model_vals[["model_output"]] <- the_transform(model_vals[["model_output"]])
-    } else {
-      for (column in setdiff(names(model_vals), explanatory_vars(orig_model))) {
-        model_vals[[column]] <- the_transform(model_vals[[column]])
-      }
+    }
+
+    if ("lower" %in% names(model_vals)) {
+      model_vals[["lower"]] <- the_transform(model_vals[["lower"]])
+      model_vals[["upper"]] <- the_transform(model_vals[["upper"]])
     }
   }
 
